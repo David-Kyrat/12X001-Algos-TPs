@@ -1,3 +1,5 @@
+from math import floor, ceil
+
 ########################### Exercise 1 ###########################
 
 def naive(A):
@@ -16,13 +18,26 @@ def naive(A):
 
 def is_majority(A, element):
     """Tells if 'element' is the majority element in A"""
-    # TODO
-    ...
+    n = len(A)
+    anc = floor(n/2) + 1 #ac := appearence number constraint. number of times it must appear to be the majority element
+    i, crt_an = 0, 0 # current appearence number
+    for el in A:
+        if el == element:
+            crt_an += 1
+            if crt_an >= anc: return True
+    else: return False
+
 
 def reduce(A):
     """Reduces A in at most len(A) // 2 parts using pair-wise votes"""
-    # TODO
-    ...
+    n = len(A)
+    A_prime = []
+    for i in range(floor(n/2)):
+      a, b = A[i], A[i+1]
+      if a == b: A_prime.append(a)
+    return A_prime
+        
+    
     
 def dandc(A):
     """Divide and Conquer algorithm"""
