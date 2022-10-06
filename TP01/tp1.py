@@ -19,7 +19,7 @@ def naive(A):
 def is_majority(A, element):
     """Tells if 'element' is the majority element in A"""
     n = len(A)
-    anc = floor(n/2) + 1 #ac := appearence number constraint. number of times it must appear to be the majority element
+    anc = n // 2 + 1 #ac := appearence number constraint. number of times it must appear to be the majority element
     i, crt_an = 0, 0 # current appearence number
     for el in A:
         if el == element:
@@ -32,7 +32,7 @@ def reduce(A):
     """Reduces A in at most len(A) // 2 parts using pair-wise votes"""
     n = len(A)
     A_prime = []
-    for i in range(floor(n/2)):
+    for i in range(n, step=2):
       a, b = A[i], A[i+1]
       if a == b: A_prime.append(a)
     return A_prime
