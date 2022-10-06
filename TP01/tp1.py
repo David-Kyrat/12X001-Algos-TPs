@@ -18,7 +18,11 @@ def naive(A):
 
 def is_majority(A, element):
     """Tells if 'element' is the majority element in A"""
+    if element == None or A == None: return False
     n = len(A)
+    if n == 0: return False 
+    if n == 1: return element == A[0]
+    
     anc = n // 2 + 1 #ac := appearence number constraint. number of times it must appear to be the majority element
     i, crt_an = 0, 0 # current appearence number
     for el in A:
