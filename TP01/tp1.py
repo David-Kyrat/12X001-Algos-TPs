@@ -35,8 +35,9 @@ def is_majority(A, element):
 def reduce(A):
     """Reduces A in at most len(A) // 2 parts using pair-wise votes"""
     n = len(A)
+    if n <= 1: return A #* If A is empty or a singleton => result will be A itself
     A_prime = []
-    for i in range(n, step=2):
+    for i in range(0, n-1, 2):
       a, b = A[i], A[i+1]
       if a == b: A_prime.append(a)
     return A_prime
