@@ -1,7 +1,7 @@
 from time import time
 import matplotlib.pyplot as plt
 from random import randint
-
+from math import log10
 
 def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Label: str, f2Label: str):
     """Plots two functions against each other.  
@@ -19,8 +19,9 @@ def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Lab
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.plot(plot_x, plot_f1, '-k', label=f1Label, linewidth=1)
-    plt.plot(plot_x, ploty_f2, '-b', label=f2Label, linewidth=1.2)
+    plt.plot(plot_x, plot_f2, '-b', label=f2Label, linewidth=1.2)
     plt.legend()
+    plt.show
 
 def exp_naive(base, p):
     """Naive implementation of exponentiation"""
@@ -30,16 +31,25 @@ def exp_naive(base, p):
     return pr
     # complexité theta(n*f) où f est la complexité de multiplier pr par base (au moins Omega(n)).
 
-
-def runtime(f, arg):
-    """ Takes a function f and an argument arg, and returns the time it takes to run f(arg)
+from timeit import timeit
+#import timeit
+def runtime(f, arg:tuple):
+    from timeit import timeit
+    """ Takes a function f and an argument arg, and returns the time in seconds it takes to run f(arg)
     f: the function to be timed
     arg: the argument to pass to the function
     """
-    before = time()
-    out = f(arg)
-    after = time()
-    delta_time = after - before
+    #before = time()
+    #!
+    #! DELTA TIME IS TOO SHORT => ALWAYS GETS DEFAULTED TO 0
+    #! => need to use library timeit
+    #!
+    num = 1000
+    delta_time = timeit(lambda: f(*arg), number=num)/num
+    #after = time()
+    #delta_time = (after*2000) - (before*2000)
+    #print(before, after)
+    #return (delta_time/2000)
     return delta_time
 
 def runtime_arr(f, argArray):
@@ -74,12 +84,33 @@ def exp_dandc(base, p):
 
 def compare_exp():
     """Compare runtimes of the naive and D&C algorithms using matplotlib"""
+    from math import log10
     from time import time
     import matplotlib.pyplot as plt
-    plot_x = list(range(1000, 6000, 1000))
-    plot_y_naive = runtime_arr(exp_naive,  plot_x)
-    plot_y_dandc = runtime_arr(exp_dandc, plot_x)
-    plotVS(plot_x, plot_y_naive, plot_y_dandc, "Runtime - naive_exp VS dandc_exp", "input size", "runtime", "naive", "divide & conquer")
+    args = [(2, i) for i in range(1000, 6000, 1000)]
+    plot_x = [log10(x) for x in range(1000, 6000, 1000)]
+    plot_y_naive = runtime_arr(exp_naive,  args)
+    plot_y_dandc = runtime_arr(exp_dandc, args)
+    print("x_values:", plot_x)
+    print("pairs:", args)
+    print("y_naive:", plot_y_naive)
+    print("y_dandc", plot_y_dandc)
+    plotVS(plot_x, plot_y_naive, plot_y_dandc, "Runtime - naive_exp(2, x) VS dandc_exp(2, x)", "input size", "runtime", "naive", "divide & conquer")
 
 if __name__ == '__main__':
     compare_exp()
+    """  args = [(2, i) for i in range(1000, 6000, 1000)]
+    plot_x = list(range(1000, 6000, 1000))
+    plot_y_naive = runtime_arr(exp_naive,  args)
+    plot_y_dandc = runtime_arr(exp_dandc, args)
+    print("x_values:", plot_x)
+    print("pairs:", args)
+    print("y_naive:", plot_y_naive)
+    print("y_dandc", plot_y_dandc)
+
+    plt.plot(plot_x, plot_y_naive, '-k', label="naive", linewidth=1)
+    plt.plot(plot_x, plot_y_dandc, '-b', label="dandc", linewidth=1.2)
+
+    print("plot") """
+    #while(True):
+        #pass
