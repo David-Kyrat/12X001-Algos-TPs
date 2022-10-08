@@ -54,6 +54,8 @@ def test_dandc():
         assert dandc(a) == 1
         assert dandc(b) == None
 
+test_is_majority()
+test_reduce()
 test_dandc()
 
 ########################### Exercise 2 ###########################

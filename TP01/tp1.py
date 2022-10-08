@@ -43,12 +43,6 @@ def reduce(A):
     """Reduces A in at most len(A) // 2 parts using pair-wise votes"""
     n = len(A)
     if n <= 1: return A  # * If A is empty or a singleton => result will be A itself
-
-    if n % 2 == 1:
-        rand_el = A[randint(0, n-1)]
-        if is_majority(A, rand_el): return [rand_el]
-        else: A.remove(rand_el)  # Now n is even
-
     A_prime = []
     for i in range(0, n-1, 2):
         a, b = A[i], A[i+1]
@@ -67,14 +61,20 @@ def dandc(A):
         print("A':\t", A_prime)
         l = len(A_prime) 
         if l == 1: 
-            print("Maj elem. found:", A_prime[0], "\n_______________________")
+            print("Maj elem. candidate found:", A_prime[0], "\n_______________________")
             return A_prime[0]
         if l == 0:
             print("A has no majority element")
             return None
+        if l % 2 == 1:
+            rand_el = A[-1]
+            if is_majority(A, rand_el): return rand_el
+            else: A.remove(rand_el)  # Now n is even
+            
         return dandc_rec(reduce(A_prime))
-
-    return dandc_rec(A)
+    
+    candidate = dandc_rec(A)
+    return candidate if is_majority(A, candidate) else None
     
 
 def randEl():
