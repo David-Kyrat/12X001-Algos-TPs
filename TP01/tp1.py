@@ -1,4 +1,5 @@
-from math import floor, ceil
+from cmath import exp
+from math import floor, ceil, log2
 from random import randint
 
 ########################### Exercise 1 ###########################
@@ -73,15 +74,54 @@ def compare_naiv_and_dandc():
 
 ########################### Exercice 2 ###########################
 def exp_naive(base, p):
-    """Naive implementation of exponentiation"""
-    # TODO
-    ...
-    
+  """Naive implementation of exponentiation"""
+  pr = 1
+  for _ in range(p): pr *= base
+  return pr
+  # complexité theta(n*f) où f est la complexité de multiplier pr par base (au moins Omega(n)).
+
+def toBin(x): return bin(x)[2:][::-1]
+
+
+b = toBin(25)
+print(b)
+prod = 1
+for i in range(len(b)):
+    bi = int(b[i])
+    print("bi", bi, (2**i) if (bi == 1) else 1)
+    prod = prod * ((3**(2**i)) if (bi == 1) else 1)
+print("prod =", prod)
+
+
 def exp_dandc(base, p):
+    from math import log2
     """Divide and Conquer implementation of exponentiation"""
-    # TODO
-    ...
+    k = base #* renaming base to k for readability
+    binP = bin(p)[2:]
+    start=stop = int(log2(p))
     
+    print("arr:", binP, "len:", len(binP), "last:", start)
+    def exp_rec(summ, crt_pow, i):
+        """ summ : contains the sum of the k^(2^i)
+        crt_pow: the current power of k (should be equal to k^(2^i))
+        bin: contains the binary representation of k (as an array)
+        i : the current step
+        stop: the max number of step i.e. stopping condition is "i >= stop" (stop := floor(log_2(p)))
+        """
+        if i < 0: return summ
+        print(f"start - i = {start} - {i} = {start - i}" )
+        print(f"bin[{i}]={binP[i]}", "check:", binP, f" k^(2^i) = {k}^(2^{(start-i)}) = {k}^{2**(start-i)} =", crt_pow)
+        crt_pow = crt_pow * (crt_pow if (i != stop-1) else k)
+        if binP[i] == '1': 
+            summ += crt_pow
+        print("summ:", summ, "crt_pow:", crt_pow)
+        print("--------------------")
+        return exp_rec(summ, crt_pow, i-1)
+
+    out = exp_rec(0, k, start)
+
+    if k % 2 != 0: out += 1
+    return out     
     
 def compare_exp():
     """Compare runtimes of the naive and D&C algorithms using matplotlib"""
