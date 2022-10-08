@@ -1,0 +1,249 @@
+\documentclass[french]{article}
+\usepackage[margin=1in,a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[autolanguage]{numprint}
+\usepackage{hyperref}
+\usepackage[fleqn]{amsmath}
+\usepackage{enumitem,amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{pdfpages}
+\usepackage{pgfplots}
+\usepackage{fancyhdr}
+\usepackage{pdfpages}
+\usepackage{lastpage}
+\usepackage{cleveref}
+\usepackage{ragged2e}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=bash,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+%
+\pagestyle{fancy}
+\pgfplotsset{compat=newest}
+\usetikzlibrary{calc}
+\setlength{\headheight}{73.96703pt}
+\addtolength{\topmargin}{-49.96703pt}
+\setlength{\footskip}{45.81593pt}
+\setlength{\parindent}{0cm}
+%
+\hypersetup{colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+}
+\urlstyle{same}
+
+%
+\newcommand{\unilogo}[1]{\includegraphics[scale=#1]{images/unige.png}}
+%
+\definecolor{light-gray}{gray}{0.95}
+\newcommand{\code}[1]{$\mbox{\colorbox{light-gray}{\texttt{#1}}}$}
+\newcommand{\quo}[1]{``{#1}''}
+%
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\es}{\varnothing}
+\DeclareMathOperator{\Ima}{Im}
+\renewcommand{\and}{\wedge}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\inv}[1]{{#1}^{-1}}
+\newcommand{\br}[1]{\{{#1}\}}
+\newcommand{\fa}{\forall}
+\newcommand{\te}{\exists}
+\newcommand{\dom}[1]{\mathcal{D}_{#1}}
+%
+\newcommand{\set}[2]{\{{#1}\ |\ {#2}\}}
+\newcommand{\w}{\omega}
+\newcommand{\s}{\Sigma}
+%
+\newcommand{\xor}{\oplus}
+\newcommand{\nb}{01}
+%
+%
+\title{
+   {\huge Université de Genève \\ - \\ Sciences Informatiques} \\
+    \vspace{0.6cm}
+    \unilogo{0.38} \\ 
+    \vspace{1.1cm}
+    {\huge Système d'Exploitation - TP \nb}
+    \vspace{0.1cm}
+}
+\author{Noah Munz (19-815-489)}
+\date{Septembre 2022}
+
+%
+\vspace{-2cm}
+\lhead{Université de Genève \\ Sciences Informatiques}
+\rhead{Noah Munz \\ Système d'Exploitation - TP\nb}
+\cfoot{} \lfoot{\hspace{-1.8cm} \unilogo{0.06}}
+\rfoot{Page \thepage \hspace{0.5mm} / \pageref{LastPage} \hspace{-1cm}}
+%
+%
+\begin{document}
+%
+\maketitle
+\vspace{1.3cm}
+\tableofcontents
+\thispagestyle{empty}
+\clearpage
+\setcounter{page}{1}
+%
+%
+\begin{center}
+{\huge TP \nb}
+\end{center}
+\vspace{0.3cm}
+%
+
+
+%
+\stepcounter{section}
+\section{Exercices}
+%
+\vspace{0.5cm}
+\stepcounter{subsection}
+%
+%
+\subsection{Commande echo}
+Echo affiche une ligne de texte sur la sortie standard du shell.
+%
+\subsection{Create a file}
+Avec la fonction \code{touch}, e.g. \code{touch <filename>} pour créer le fichier \code{<filename>} (vide) dans le current directory.
+
+\subsection{Lancement de Programme}
+On voit que nautilus est un explorateur de fichier et que l'argument qu'on lui donne sera juste le starting directory de l'explorateur.
+
+\subsection{Fichier}
+\vspace{0.2cm}
+
+\begin{enumerate}[label=(\alph*)]
+\item  D'après le manuel, la commande \code{wc} réalise la chose suivante: "wc - print newline, word, and byte counts for each file". \\
+I.e. \code{wc} donne des informations sur certaines caractéristiques d'un ou plusieurs fichiers. En rajoutant \code{-w} la commande retourne le nombre de mots du fichier en argument.
+
+\begin{itemize}
+    \item \code{wc -w < foo.txt} retourne le nombre de mots du fichier foo.txt qu'on a redirigé sur l'entrée standard.
+    En appelant wc sans arguments (directs), la commande va attendre/demander qu'on lui donne des mots en entrée et en utilisant \code{< foo.txt} on lui a justement redirigé le contenu du fichier foo.txt sur cette entrée.\\
+    
+    \item \code{cat foo.txt | wc w}. Avec \code{cat foo.txt} on obtient le contenu de foo.txt qu'on a \quo{pipe} vers \code{wc -w}. On a redirigé l'output de \code{cat foo.txt} vers l'input de \code{wc}. \\
+    
+    \item \code{wc -w foo.txt} retourne le nombre de mots dans foo.txt suivi du nom du fichier qu'on lui a passé (e.g. \code{13 foo.txt}). Ici on lui a passé le fichier au lieu de directement son contenu comme au point (a) et (b).\\
+\end{itemize}
+    
+\item \code{head} retourne les $n$ premières lignes d'un fichier (par défaut $n=5$). \code{tail} fait la même chose mais commence par la fin, i.e. $n$ dernières lignes
+
+\begin{itemize}
+    \item \code{head foo.txt -n 6} Retourne les 6 premières lignes de foo.txt
+    \item \code{tail foo.txt -n 6} Retourne les 6 dernières lignes de foo.txt\\
+\end{itemize}
+
+\item \code{sort} trie les lignes d'un fichiers (en les concaténant s'il y en a plusieurs) puis écrit le tout sur la sortie standard.
+Quant à lui, \code{cmd args 2> file} redirige le flux d'erreur d'erreur de l'appel à la commande \code{cmd} (avec les arguments \code{args}) dans le fichier \code{file}.\\ Donc \code{sort foo.txt >out1.txt 2>out2.txt} va trier le contenu de foo.txt puis écrire le tout au début de out1.txt (en écrasant tout ce qui s'y trouvait potentiellement avant), puis redirige le flux d'erreur vers out2.txt.\\
+\newpage
+
+Comme dit avant, out1 va contenir le résultat de sort et out2, les erreurs potentielles qui se sont produite.\\
+Si foo.txt n'existe pas le contenu de \code{out2.txt} sera l'erreur indiquant que le fichier n'existe pas i.e. \code{sort: cannot read: foo.txt: No such file or directory} et \code{out1.txt} sera vide.\\
+En revanche si foo.txt existe, \code{out1.txt} sera le résultat de \code{sort} et \code{out2.txt} sera vide.
+\end{enumerate}
+
+\subsection{Écrivez un script}
+Dans cet exercice, un script qui convertit en PNG toutes les images d'un dossier donnée vers un autre dossier, tout en prenant garde à \quo{sanitize} les noms des copies converties dans le nouveau dossier. (i.e. enlever espaces...)  a été réalisé. Il prend 3 arguments, le dossier de départ, le dossier d'arrivé et la résolution de l'image. (le dernier est optionnel)\\
+
+Le script peut être trouvé ci-dessous (p. 3) et dans le fichier \code{script-Exo2.6} sur GitHub à l'adresse:\\
+ \href{https://github.com/David-Kyrat/12X009-OS-TPs/blob/master/TP01/script-Exo-2.6}{12X009-OS-TPs/TP01/script-Exo2.6} $\ $ (où vous aurez un bien meilleur rendu.)\vspace{0.15cm}
+ 
+ Que vous pouvez télécharger directement à partir de: \\ \url{https://raw.githubusercontent.com/David-Kyrat/12X009-OS-TPs/master/TP01/script-Exo-2.6}\\
+\newpage
+
+\begin{lstlisting}
+#!/bin/bash
+oldPath=$(pwd)
+# Parse args
+if [ "$#" -lt 2 ]; then 
+    >&2 echo "Not enough arguments, expecting at least 2"
+    #exit 2
+fi
+res=""
+if [ "$#" -ge 3 ]; then 
+    if [ "$#" != 3 ]; then echo "Too many arguments, only taking the first 3 in consideration"; fi
+    res="$3";
+fi
+beg="$1"; dest="$2"
+
+echo $'\n Starting (png) conversion of images from'" \"$1\" to \"$2\" ..." 
+if [ "$3" ]; then echo $'\t (specified res: '"\"$3\")"; fi
+echo ""
+
+
+# Create output dir if does not exists
+mkdir -p -v "$dest"
+
+function is { [[ $1 ]] && echo "true" || echo "false" }
+
+function isImg {
+    crtFile="$1"
+    is '$(file "$crtFile" -i) =~ image'
+}
+
+function renameBeforeExecution {
+    mkdir tmp; cd tmp
+    cp ../* . -f 2> err
+    for f in * ; do mv "$f" $(tr -d "[' ''\"\"]" <<< "$f") -f 2> err;
+    done 
+}
+
+
+function copyAndConvertAll {
+    renameBeforeExecution
+    for f in * ; do 
+        if [[ $(isImg "$f") ]]; then
+            mv "$f" "$oldPath/$dest"
+        fi
+    done
+    cd ..
+    rm tmp -r
+    cd "$oldPath/$dest";
+
+    if [ "$res" ]; then mogrify -format png -resize "$res" * 2> err
+    else mogrify -format png * 2> err; fi
+
+    echo $'\nConverted Files:\n\t'; ls *.png -l ;
+    echo $'________________________________________________\n'
+}
+
+cd "$beg"
+
+copyAndConvertAll 
+
+cd $oldPath #go back to path where script was called
+
+
+\end{lstlisting}
+
+
+%
+%
+%
+\end{document}
