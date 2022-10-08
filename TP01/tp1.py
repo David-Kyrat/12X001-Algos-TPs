@@ -1,7 +1,6 @@
 from time import time
 import matplotlib.pyplot as plt
 from random import randint
-#from math import floor, ceil, log2
 ########################### Exercise 1 ###########################
 
 
@@ -79,28 +78,33 @@ def fillRandArray(n: int):
 def fillRandArrays(ns):
     return [fillRandArray(n) for n in ns]
 
-def runtime(f, arg, unpack: bool = True):
-    from timeit import timeit
+def runtime(f, args, unpack: bool = True, needs_use_of_timeit: bool = False, num:int = 1):
     """ Takes a function f and an argument arg, and returns the time (in ms) it takes to run f(arg)
     f: the function to be timed
-    arg: the argument to pass to the function
+    args: the arguments to pass to the function
+    ! needs_use_of_timeit: For Exp the delta in runtimes is too short and oftens ends up being 0. 
+                ! Since the problem seemed to be really common among everyone, and that implementing a timing function 
+                  ! is not really the goal of this TP, I decided to use the library timeit to solve that problem.
+    num: If needs_use_of_timeit is true, then num is the number of time f(arg) is executed. 
+            Higher num-value means statistics more relevant and closer to reality.
     """
-    #before = time()
-    #!
-    #! DELTA TIME IS TOO SHORT => ALMOST ALWAYS GETS DEFAULTED TO 0
-    #! => need to use library timeit
-    #!
-    num = 1
-    delta_time = timeit(lambda: f(*arg), number=num) * (1000/num) if unpack else timeit(lambda: f(arg), number=num) * (1000/num)
-    #delta_time = timeit(lambda: f(*arg), number=num) * (1000/num)
-    #after = time()
-    #delta_time = (after*2000) - (before*2000)
-    #print(before, after)
-    #return (delta_time/2000)
-    return delta_time
+    if needs_use_of_timeit:
+        from timeit import timeit
+        #* number of time code is executed. Higher num-value means statistics more relevant and closer to reality 
+        #delta_time = timeit(lambda: f(*arg), number=num) * (1000/num) if unpack else timeit(lambda: f(arg), number=num) * (1000/num)
+        return  timeit(lambda: f(*args), number=num) * (1000/num) if unpack else timeit(lambda: f(args), number=num) * (1000/num) 
+        # *1000 to convert to ms.
 
-def runtime_arr(f, argArray, unpack: bool = True): 
-    return [runtime(f, arg, unpack) for arg in argArray]
+    else:
+        before = time()
+        f(*args) if (unpack) else f(args)
+        after = time()
+        delta_time = after - before
+        return delta_time
+
+def runtime_arr(f, argArray, unpack: bool = True, needs_use_of_timeit: bool = False, num:int = 1): 
+    """ See "runtime()" function above for explaination """
+    return [runtime(f, arg, unpack, needs_use_of_timeit, num) for arg in argArray]
 
 def plotVS(subp_idx, plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Label: str, f2Label: str):
     """Plots two functions against each other.  
@@ -149,24 +153,16 @@ def plot_solo(subp_idx, plot_x, plot_f, title: str, xlabel: str, ylabel: str, fL
 
 def compare_naiv_and_dandc():
     """Compare runtimes  of  the  naive  and  D&C  algorithms  using  matplotlib"""
-    import random
-    from time import time
-    import matplotlib.pyplot as plt
-
     plot_x = list(range(1000, 11000, 1000))
     args = fillRandArrays(plot_x) #[[fillRandArray(n)] for n in range(1000, 110000, 1000)] #
     titles = ["Runtime of getMajorityElement - Naive", "Runtime of getMajorityElement - D&C", "Runtime of getMajorityElement - naive VS D&C"]
     xlabel, ylabel = "input size (len of array)", "runtime (ms)"
-    
-    plot_y_naive =  runtime_arr(naive, args, False)
-    plot_y_dandc = runtime_arr(dandc, args, False)
-    
+    plot_y_naive =  runtime_arr(naive, args, unpack=False, needs_use_of_timeit=True)
+    plot_y_dandc = runtime_arr(dandc, args, unpack=False, needs_use_of_timeit=True)
     plt.figure().set_figheight(11)
     plot_solo(1, plot_x, plot_y_naive, titles[0], xlabel, ylabel, "Naive")
     plot_solo(2, plot_x, plot_y_dandc, titles[1], xlabel, ylabel, "D&C")
-    
     plotVS(3, plot_x, plot_y_naive, plot_y_dandc, titles[2], xlabel, ylabel, "naive", "divide & conquer")
-
 
 # TODO: Uncomment to see comparison
 compare_naiv_and_dandc()
@@ -213,10 +209,11 @@ def compare_exp():
     from math import log10
     from time import time
     import matplotlib.pyplot as plt
+    num = 1000
     args = [(2, i) for i in range(1000, 6000, 1000)]
     plot_x = [log10(x) for x in range(1000, 6000, 1000)]
-    plot_y_naive = runtime_arr(exp_naive,  args)
-    plot_y_dandc = runtime_arr(exp_dandc, args)
+    plot_y_naive = runtime_arr(exp_naive,  args, needs_use_of_timeit=True, num=num)
+    plot_y_dandc = runtime_arr(exp_dandc, args, needs_use_of_timeit=True, num=num)
     titles = [r"Runtime of $(2^x)$ - Naive", r"Runtime of $(2^x)$ - D&C", r"Runtime of $(2^x)$ - naive VS D&C"]
     xlabel, ylabel = "input size (nb of digit)", "runtime (ms)"
     """ print("x_values:", plot_x)
