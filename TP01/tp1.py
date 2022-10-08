@@ -86,46 +86,31 @@ def exp_naive(base, p):
 
 
 def exp_dandc(base, p):
+    if p == 0: return 1 
+    if p == 1: return base
+    
     from math import log2
     """Divide and Conquer implementation of exponentiation"""
     def toBin(x): return bin(x)[2:][::-1]
-    k = base #* renaming base to k for readability
-    binP = toBin(p)
-    stop = int(log2(p))
-    start = 0
-    print("k =", k, "arr:", binP, "len:", len(binP), "start:", start)
+    binP, i0, stop = toBin(p),  1, int(log2(p))
     
-    def exp_rec(summ, crt_pow, i):
-        """ summ : contains the sum of the k^(2^i)
+    def exp_rec(prod, crt_pow, i):
+        """ summ : contains the sum of the base^(2^i)
         crt_pow: the current power of k (should be equal to k^(2^i))
-        bin: contains the binary representation of k (as an array)
+        binP: contains the binary representation of k (as an array)
         i : the current step
         stop: the max number of step i.e. stopping condition is "i >= stop" (stop := floor(log_2(p)))
         """
-        if i > stop: return summ
-        #print(f"start - i = {start} - {i} = {start - i}" )
-        crt_pow = crt_pow * (crt_pow if (i != 0) else k)
-        print(f"bin[{i}]={binP[i]}", "check:", binP, f" k^(2^i) = {k}^(2^{(i)}) = {k}^{2**(i)} =", crt_pow)
-        if binP[i] == '1': 
-            summ *= crt_pow
-        print("summ:", summ, "crt_pow:", crt_pow)
-        print("--------------------")
-        return exp_rec(summ, crt_pow, i+1)
+        if i > stop: return prod
+        crt_pow = crt_pow * crt_pow #if (i != 0) else k)
+        if binP[i] == '1': prod *= crt_pow
+        return exp_rec(prod, crt_pow, i+1)
 
-    out = exp_rec(1, 1, start)
-
-    #if k % 2 != 0: out += 1
-    return out     
+    prod0, pow_0 = 1, base
+    if (binP[0] == '1'): prod0 = pow_0
+    return exp_rec(prod0, pow_0, i0)
 
 
-b = toBin(25)
-print(b)
-prod = 1
-for i in range(len(b)):
-    bi = int(b[i])
-    print("bi", bi, (2**i) if (bi == 1) else 1)
-    prod = prod * ((3**(2**i)) if (bi == 1) else 1)
-print("prod =", prod)
     
 def compare_exp():
     """Compare runtimes of the naive and D&C algorithms using matplotlib"""
