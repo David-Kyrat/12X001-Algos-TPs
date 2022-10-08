@@ -46,7 +46,7 @@ def reduce(A):
 
     if n % 2 == 1:
         rand_el = A[randint(0, n-1)]
-        if is_majority(A, rand_el): return rand_el
+        if is_majority(A, rand_el): return [rand_el]
         else: A.remove(rand_el)  # Now n is even
 
     A_prime = []
@@ -58,12 +58,20 @@ def reduce(A):
 
 def dandc(A):
     """Divide and Conquer algorithm"""
+    print("A:\t", A)
     if not A: return None
     n = len(A)
     if n == 0: return None
     if n == 1: return A[0]
     def dandc_rec(A_prime):
-        if len(A_prime) <= 1: return A_prime[0]
+        print("A':\t", A_prime)
+        l = len(A_prime) 
+        if l == 1: 
+            print("Maj elem. found:", A_prime[0], "\n_______________________")
+            return A_prime[0]
+        if l == 0:
+            print("A has no majority element")
+            return None
         return dandc_rec(reduce(A_prime))
 
     return dandc_rec(A)
@@ -101,11 +109,8 @@ def runtime(f, arg:tuple):
     #return (delta_time/2000)
     return delta_time
 
-def runtime_arr(f, argArray): 
-    return [runtime(f, arg) for arg in argArray]
+def runtime_arr(f, argArray): return [runtime(f, arg) for arg in argArray]
 
-#def time_for_randInput(f, n):
-#    return time(f((n)))
 def plotVS(subp_idx, plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Label: str, f2Label: str):
     """Plots two functions against each other.  
     - plot_x: the x-axis values

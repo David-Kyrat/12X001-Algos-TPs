@@ -54,6 +54,7 @@ def test_dandc():
         assert dandc(a) == 1
         assert dandc(b) == None
 
+test_dandc()
 
 ########################### Exercise 2 ###########################
 from tp1 import exp_naive, exp_dandc
