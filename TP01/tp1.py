@@ -63,7 +63,7 @@ def dandc(A):
 
     candidate = dandc_rec(A)
     return candidate if is_majority(A, candidate) else None
-    
+ 
 
 def randEl():
     # 50% for 0 & 50% for [1-9]
@@ -203,6 +203,11 @@ def exp_dandc(base, p):
     # if P is odd then we have to multiply by base at the beginning => hence why we start our product at base
     return exp_rec(prod0, pow_0, i0)
 
+"""
+    exp_rec se fait appeler floor(log2(p)) fois et la complexité de chaque appel de exp_rec est constitué
+    de au pire le produit entre base(^2^(i-1) et lui même (crt_pow * crt_pow) plus celui base^(2^i) et des termes avant (prod *= crt_prod).
+    Donc la complexité de exp_rec reste logarithmique 
+"""
 
 def compare_exp():
     """Compare runtimes of the naive and D&C algorithms using matplotlib"""
