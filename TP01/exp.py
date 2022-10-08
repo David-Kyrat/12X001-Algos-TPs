@@ -17,7 +17,8 @@ def plotVS(subp_idx, plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: 
     plt.subplot(3,1, subp_idx)
     plt.tight_layout()
     plt.title(title)
-    plt.ylim(0, min(plot_f1[1:]))
+    m1, m2, gap = min(plot_f2), min(plot_f1[1:]), 0.2
+    plt.ylim(m1 - gap * m1, m2 + gap * m2)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.plot(plot_x, plot_f1, '-k', label=f1Label, linewidth=1)
@@ -39,6 +40,8 @@ def plot_solo(subp_idx, plot_x, plot_f, title: str, xlabel: str, ylabel: str, fL
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
+    m, M, gap = min(plot_f), max(plot_f), 0.35
+    plt.ylim(m - gap*m, M + gap*M)
     plt.plot(plot_x, plot_f, '-b', label=fLabel, linewidth=1)
     plt.legend(prop={'size': 7})
     plt.legend(fontsize=7)
@@ -111,17 +114,18 @@ def compare_exp():
     plot_x = [log10(x) for x in range(1000, 6000, 1000)]
     plot_y_naive = runtime_arr(exp_naive,  args)
     plot_y_dandc = runtime_arr(exp_dandc, args)
-    title = "Runtime - naive_exp(2, x) VS dandc_exp(2, x)"
+    titles = [r"Runtime of $(2^x)$ - Naive", r"Runtime of $(2^x)$ - D&C", r"Runtime of $(2^x)$ - naive VS D&C"]
     xlabel, ylabel = "input size (nb of digit)", "runtime (ms)"
-    print("x_values:", plot_x)
+    """ print("x_values:", plot_x)
     print("pairs:", args)
     print("y_naive:", plot_y_naive)
-    print("y_dandc", plot_y_dandc)
+    print("y_dandc", plot_y_dandc) """
+
+    plt.figure().set_figheight(11)
+    plot_solo(1, plot_x, plot_y_naive, titles[0], xlabel, ylabel, "Naive")
+    plot_solo(2, plot_x, plot_y_dandc, titles[1], xlabel, ylabel, "D&C")
     
-    plot_solo(1, plot_x, plot_y_naive, "Runtime naive", xlabel, ylabel, "naive")
-    plot_solo(2, plot_x, plot_y_dandc, "Runtime D&C", xlabel, ylabel, "D&C")
-    
-    plotVS(3, plot_x, plot_y_naive, plot_y_dandc, "", xlabel, ylabel, "naive", "divide & conquer")
+    plotVS(3, plot_x, plot_y_naive, plot_y_dandc, titles[2], xlabel, ylabel, "naive", "divide & conquer")
 
 if __name__ == '__main__':
     compare_exp()
