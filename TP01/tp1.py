@@ -167,6 +167,12 @@ def compare_naiv_and_dandc():
 # TODO: Uncomment to see comparison
 compare_naiv_and_dandc()
 
+"""
+On voit que le runtime de dandc() devient tellement insignifiant devant celui de naif() que l'on a du mal à distinguer la courbe de dandc()
+de l'axe des abcisses (t=0ms).
+En effet le runtime de naif() explose si fort que la fonction met plus de 7 secondes a s'executer pour n=10000, c'est plus  
+de 1000 fois plus élevé que dandc() pour un input de la même taille
+"""
 
 ########################### Exercice 2 ###########################
 def exp_naive(base, p):
@@ -235,3 +241,9 @@ def compare_exp():
 
 # TODO: Uncomment to see comparison
 # compare_exp()
+
+"""
+De la même manière que précedemment, on voit que le runtime de exp_dandc() devient insignifiant devant celui de exp_naif(), que l'on confondrait l'axe
+des abcsisses avec la courbe bleu. Ici l'écart est moins marqué mais il n'en reste pas moindre.
+Pour un nombre qui avoisine les 4 chiffres l'algorithme naif met presque 2ms à répondre contre 0.030 - 0.040ms pour la version divide and conquer.
+"""
