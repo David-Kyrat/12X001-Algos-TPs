@@ -154,14 +154,11 @@ def plot_solo(subp_idx, plot_x, plot_f, title: str, xlabel: str, ylabel: str, fL
 
 def compare_naiv_and_dandc():
     """Compare runtimes  of  the  naive  and  D&C  algorithms  using  matplotlib"""
-    import random
-    from time import time
-    import matplotlib.pyplot as plt
 
     plot_x = list(range(1000, 11000, 1000))
     args = fillRandArrays(plot_x) #[[fillRandArray(n)] for n in range(1000, 110000, 1000)] #
     titles = ["Runtime of getMajorityElement - Naive", "Runtime of getMajorityElement - D&C", "Runtime of getMajorityElement - naive VS D&C"]
-    xlabel, ylabel = "input size (len of array)", "runtime (ms)"
+    xlabel, ylabel = "input size (length of array)", "runtime (ms)"
     
     plot_y_naive =  runtime_arr(naive, args, False)
     plot_y_dandc = runtime_arr(dandc, args, False)
