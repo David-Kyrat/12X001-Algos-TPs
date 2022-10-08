@@ -93,7 +93,17 @@ def time_for_randInput(f, n):
     return time(f(fillRandArray(n)))
 
 
-def plotVS(plot_x, plot_f1, plot_f2, title, xlabel, ylabel, f1Label, f2Label):
+def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Label: str, f2Label: str):
+    """Plots two functions against each other.  
+    - plot_x: the x-axis values
+    - plot_f1: the y-values of the first function
+    - plot_f2: the y-values of the second function
+    - title: the title of the plot
+    - xlabel: the label of the x-axis
+    - ylabel: the label of the y-axis
+    - f1Label: the label of the first function
+    - f2Label: the label of the second function
+    """
     plt.title(title)
     #plt.ylim(np.min(plot_y) - 0.1, np.max(plot_y) + 0.1)
     plt.xlabel(xlabel)
@@ -168,7 +178,7 @@ def compare_exp():
     """Compare runtimes of the naive and D&C algorithms using matplotlib"""
     from time import time
     import matplotlib.pyplot as plt
-
+    
     # TODO
     ...
 
