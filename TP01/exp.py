@@ -15,13 +15,27 @@ def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Lab
     - f2Label: the label of the second function
     """
     plt.title(title)
-    #plt.ylim(np.min(plot_y) - 0.1, np.max(plot_y) + 0.1)
+    plt.ylim(0, min(plot_f1[1:]))
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.plot(plot_x, plot_f1, '-k', label=f1Label, linewidth=1)
     plt.plot(plot_x, plot_f2, '-b', label=f2Label, linewidth=1.2)
     plt.legend()
-    plt.show
+
+def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str):
+    """Plots two functions against each other.  
+    - plot_x: the x-axis values
+    - plot_f: the y-values of the function
+    - title: the title of the plot
+    - xlabel: the label of the x-axis
+    - ylabel: the label of the y-axis
+    - fLabel: the label of the function
+    """
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.plot(plot_x, plot_f, '-b', label=fLabel, linewidth=1)
+    plt.legend()
 
 def exp_naive(base, p):
     """Naive implementation of exponentiation"""
@@ -35,7 +49,7 @@ from timeit import timeit
 #import timeit
 def runtime(f, arg:tuple):
     from timeit import timeit
-    """ Takes a function f and an argument arg, and returns the time in seconds it takes to run f(arg)
+    """ Takes a function f and an argument arg, and returns the time (in ms) it takes to run f(arg)
     f: the function to be timed
     arg: the argument to pass to the function
     """
@@ -45,7 +59,7 @@ def runtime(f, arg:tuple):
     #! => need to use library timeit
     #!
     num = 1000
-    delta_time = timeit(lambda: f(*arg), number=num)/num
+    delta_time = timeit(lambda: f(*arg), number=num) * (1000/num)
     #after = time()
     #delta_time = (after*2000) - (before*2000)
     #print(before, after)
@@ -91,11 +105,16 @@ def compare_exp():
     plot_x = [log10(x) for x in range(1000, 6000, 1000)]
     plot_y_naive = runtime_arr(exp_naive,  args)
     plot_y_dandc = runtime_arr(exp_dandc, args)
+    title = "Runtime - naive_exp(2, x) VS dandc_exp(2, x)"
+    xlabel, ylabel = "input size (magnitude i.e. nb of digit)", "runtime (ms)"
     print("x_values:", plot_x)
     print("pairs:", args)
     print("y_naive:", plot_y_naive)
     print("y_dandc", plot_y_dandc)
-    plotVS(plot_x, plot_y_naive, plot_y_dandc, "Runtime - naive_exp(2, x) VS dandc_exp(2, x)", "input size", "runtime", "naive", "divide & conquer")
+    plot_solo(plot_x, plot_y_naive, "Runtime naive", xlabel, ylabel, "naive")
+    plot_solo(plot_x, plot_y_dandc, "Runtime D&C", xlabel, ylabel, "D&C")
+    
+    plotVS(plot_x, plot_y_naive, plot_y_dandc, "", xlabel, ylabel, "naive", "divide & conquer")
 
 if __name__ == '__main__':
     compare_exp()
