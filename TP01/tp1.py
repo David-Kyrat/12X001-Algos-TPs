@@ -52,27 +52,21 @@ def reduce(A):
 
 def dandc(A):
     """Divide and Conquer algorithm"""
-    print("A:\t", A)
     if not A: return None
     n = len(A)
     if n == 0: return None
     if n == 1: return A[0]
     def dandc_rec(A_prime):
-        print("A':\t", A_prime)
         l = len(A_prime) 
-        if l == 1: 
-            print("Maj elem. candidate found:", A_prime[0], "\n_______________________")
-            return A_prime[0]
-        if l == 0:
-            print("A has no majority element")
-            return None
+        if l == 1: return A_prime[0]
+        if l == 0: return None
         if l % 2 == 1:
             rand_el = A[-1]
             if is_majority(A, rand_el): return rand_el
-            else: A.remove(rand_el)  # Now n is even
+            else: A.remove(rand_el)  # Now l is even
             
         return dandc_rec(reduce(A_prime))
-    
+
     candidate = dandc_rec(A)
     return candidate if is_majority(A, candidate) else None
     

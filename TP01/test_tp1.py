@@ -77,3 +77,6 @@ def test_exp_naive():
     
 def test_exp_dandc():
     exp_test(exp_dandc)
+
+test_exp_naive()
+test_exp_dandc()
