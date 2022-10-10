@@ -165,14 +165,8 @@ def compare_naiv_and_dandc():
     plotVS(3, plot_x, plot_y_naive, plot_y_dandc, titles[2], xlabel, ylabel, "naive", "divide & conquer")
 
 # TODO: Uncomment to see comparison
-# compare_naiv_and_dandc()
+compare_naiv_and_dandc()
 
-"""
-On voit que le runtime de dandc() devient tellement insignifiant devant celui de naif() que l'on a du mal à distinguer la courbe de dandc()
-de l'axe des abcisses (t=0ms).
-En effet le runtime de naif() explose si fort que la fonction met plus de 7 secondes a s'executer pour n=10000, c'est plus  
-de 1000 fois plus élevé que dandc() pour un input de la même taille
-"""
 
 ########################### Exercice 2 ###########################
 def exp_naive(base, p):
@@ -181,8 +175,6 @@ def exp_naive(base, p):
     for _ in range(p):
         pr *= base
     return pr
-    # complexity theta(n*f) where f is the complexity of the multiplication of pr by base (at least Omega(n)).
-
 
 def exp_dandc(base, p):
     if p == 0: return 1
@@ -209,11 +201,6 @@ def exp_dandc(base, p):
     # if P is odd then we have to multiply by base at the beginning => hence why we start our product at base
     return exp_rec(prod0, pow_0, i0)
 
-"""
-    exp_rec se fait appeler floor(log2(p)) fois et la complexité de chaque appel de exp_rec est constitué
-    de au pire le produit entre base(^2^(i-1) et lui même (crt_pow * crt_pow) plus celui base^(2^i) et des termes avant (prod *= crt_prod).
-    Donc la complexité de exp_rec reste logarithmique 
-"""
 
 def compare_exp():
     """Compare runtimes of the naive and D&C algorithms using matplotlib"""
@@ -244,8 +231,3 @@ def compare_exp():
 # TODO: Uncomment to see comparison
 compare_exp()
 
-"""
-De la même manière que précedemment, on voit que le runtime de exp_dandc() devient insignifiant devant celui de exp_naif(), que l'on confondrait l'axe
-des abcsisses avec la courbe bleu. Ici l'écart est moins marqué mais il n'en reste pas moindre.
-Pour un nombre qui avoisine les 4 chiffres l'algorithme naif met presque 2ms à répondre contre 0.030 - 0.040ms pour la version divide and conquer.
-"""
