@@ -119,7 +119,7 @@ def plotVS(subp_idx, plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: 
     """
     
     plt.subplot(3,1, subp_idx)
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.title(title)
     m1, m2, gap = min(plot_f2), min(plot_f1[1:]), 0.2
     plt.ylim(m1 - gap * m1, m2 + gap * m2)
@@ -127,7 +127,7 @@ def plotVS(subp_idx, plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: 
     plt.ylabel(ylabel)
     plt.plot(plot_x, plot_f1, '-k', label=f1Label, linewidth=1)
     plt.plot(plot_x, plot_f2, '-b', label=f2Label, linewidth=1.2)
-    plt.legend(prop={'size': 7})
+    plt.legend(prop={'size': 5})
     plt.legend(fontsize=7)
 
 def plot_solo(subp_idx, plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str):
@@ -140,14 +140,14 @@ def plot_solo(subp_idx, plot_x, plot_f, title: str, xlabel: str, ylabel: str, fL
     - fLabel: the label of the function
     """
     plt.subplot(3, 1, subp_idx)
-    plt.tight_layout(pad=5)
+    #plt.tight_layout(pad=5)
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     m, M, gap = min(plot_f), max(plot_f), 0.35
     plt.ylim(m - gap*m, M + gap*M)
     plt.plot(plot_x, plot_f, '-b', label=fLabel, linewidth=1)
-    plt.legend(prop={'size': 7})
+    plt.legend(prop={'size': 5})
     plt.legend(fontsize=7)
 
 
@@ -165,7 +165,7 @@ def compare_naiv_and_dandc():
     plotVS(3, plot_x, plot_y_naive, plot_y_dandc, titles[2], xlabel, ylabel, "naive", "divide & conquer")
 
 # TODO: Uncomment to see comparison
-compare_naiv_and_dandc()
+# compare_naiv_and_dandc()
 
 """
 On voit que le runtime de dandc() devient tellement insignifiant devant celui de naif() que l'on a du mal à distinguer la courbe de dandc()
@@ -232,15 +232,17 @@ def compare_exp():
     print("y_naive:", plot_y_naive)
     print("y_dandc", plot_y_dandc) """
 
-    plt.figure().set_figheight(11)
+    #plt.figure().set_figheight(11)
     plot_solo(1, plot_x, plot_y_naive, titles[0], xlabel, ylabel, "Naive")
     plot_solo(2, plot_x, plot_y_dandc, titles[1], xlabel, ylabel, "D&C")
     
     plotVS(3, plot_x, plot_y_naive, plot_y_dandc, titles[2], xlabel, ylabel, "naive", "divide & conquer")
+    plt.tight_layout()
+    plt.show()
 
 
 # TODO: Uncomment to see comparison
-# compare_exp()
+compare_exp()
 
 """
 De la même manière que précedemment, on voit que le runtime de exp_dandc() devient insignifiant devant celui de exp_naif(), que l'on confondrait l'axe
