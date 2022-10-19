@@ -15,15 +15,6 @@ class El:
 
     def __add__(self, other): return El(self.w + other.w, self.v + other.v)
 
-    def unpk(self):
-        """:return: (self.w, self.v). i.e. unpack the El"""
-        return self.w, self.v
-
-def sum_els(items: list[El]) -> El :
-    """:return: new El created as the sum of each element in given list """
-    tmp = El(0, 0)
-    for el in items: tmp += el
-    return tmp
 
 def knapsack(items: list[El], W, sorting_key, highest: bool = True):
     """:return: Solution of Knapsack problem for set of item "items" and max weight W, by selecting first
@@ -33,30 +24,18 @@ def knapsack(items: list[El], W, sorting_key, highest: bool = True):
     n, w, i, bag = len(items), 0, 0, []
     if n == 0: return bag
     if n == 1: return bag if items[0].w > W else [items[0]]
-
     items = sorted(items, key=sorting_key, reverse=highest)
-    print("Items:", items)
 
     def try_rec(k, w, n):
-        print("k =", k, " n =", n, " w =", w)
         if k >= n: return k, w, n
         crt = items[k]
-        print("items[k] =", crt)
-
-        if crt.w + w > W:
-            print((crt.w + w), ">=", W, "\n--")
-            return try_rec(k + 1, w, n)
+        if crt.w + w > W: return try_rec(k + 1, w, n)
         else:
             bag.append(items.pop(k))
-            print("adding", crt, "to knapsack,", "w =", w)
-            print("list:", items)
-            print("--------------")
             return k, w + crt.w, n - 1
 
     while w < W and i < n:
         i, w, n = try_rec(i, w, n)
-
-    print("\n\n")
     return bag
 
 def knapsack_upk(knap: list[El]):
