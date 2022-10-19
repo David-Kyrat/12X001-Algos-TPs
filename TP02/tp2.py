@@ -115,7 +115,6 @@ def find_set(S, u):
 def union(S, Su, Sv, u_idx):
     """ Replace S[u_idx] by Su.union(Sv) and remove Sv from list of sets S """
     tmp = Su.union(Sv)
-    print("union:", tmp)
     S[u_idx] = tmp
     S.remove(Sv)
 
@@ -134,26 +133,9 @@ def kruskal(A):
     E = sorted(E, key=lambda edge: edge[2])  # sorted according to weight in increasing order
     for e in E:
         u, v = e[1], e[0]
-        # if (not S[u].issubset(S[v])) and (not S[v].issubset(S[u])):
-
         u_idx, v_idx = find_set(S, u), find_set(S, v)
         Su, Sv = S[u_idx], S[v_idx]
-        print(f"find-set({u}): {Su}")
-        print(f"find-set({v}): {Sv}")
         if Su != Sv:
             F += [(u, v)]
-            print("(u, v) =", (u, v))
-            print("F:", F)
             union(S, Su, Sv, u_idx)
-            print("Sets:", S)
-            print("-----------------")
     return F
-
-if __name__ == "__main__":
-    A = [[0, 1, 2], [1, 0, 10], [2, 10, 0]]
-
-    B = [[0, 2, 1], [2, 0, 10], [1, 10, 0]]
-
-    C = [[0, 10, 2], [10, 0, 1], [2, 1, 0]]
-
-    kruskal(A)
