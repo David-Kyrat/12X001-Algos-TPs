@@ -107,9 +107,21 @@ def compute_change(money, coin_set):
 ########################### Exercise 3 ###########################
 
 
+def find_set(S, u):
+    """:return: Index of 1st set in 'S' that contains 'u' """
+    for i in range(len(S)):
+        if u in S[i]: return i
+
+def union(S, Su, Sv, u_idx):
+    """ Replace S[u_idx] by Su.union(Sv) and remove Sv from list of sets S """
+    tmp = Su.union(Sv)
+    print("union:", tmp)
+    S[u_idx] = tmp
+    S.remove(Sv)
+
 def kruskal(A):
-    """Given A a square matrix (list of lists), returns a list of edges that compose the MST"""
-    # NOTE: A weight of 0 means that there is no edge between nodes and it should not be taken into the MST
+    """Given A, a square matrix (list of lists), returns a list of edges that compose the MST"""
+    # NOTE: A weight of 0 means that there is no edge between nodes, and it should not be taken into the MST
     n = len(A)
     if n <= 0: return []
     if n == 1: return [(0, 0)]
@@ -122,8 +134,26 @@ def kruskal(A):
     E = sorted(E, key=lambda edge: edge[2])  # sorted according to weight in increasing order
     for e in E:
         u, v = e[1], e[0]
-        if (not S[u].issubset(S[v])) and (not S[v].issubset(S[u])):
+        # if (not S[u].issubset(S[v])) and (not S[v].issubset(S[u])):
+
+        u_idx, v_idx = find_set(S, u), find_set(S, v)
+        Su, Sv = S[u_idx], S[v_idx]
+        print(f"find-set({u}): {Su}")
+        print(f"find-set({v}): {Sv}")
+        if Su != Sv:
             F += [(u, v)]
-            union = S[u].union(S[v])
-            S[u] = S[v] = union
+            print("(u, v) =", (u, v))
+            print("F:", F)
+            union(S, Su, Sv, u_idx)
+            print("Sets:", S)
+            print("-----------------")
     return F
+
+if __name__ == "__main__":
+    A = [[0, 1, 2], [1, 0, 10], [2, 10, 0]]
+
+    B = [[0, 2, 1], [2, 0, 10], [1, 10, 0]]
+
+    C = [[0, 10, 2], [10, 0, 1], [2, 1, 0]]
+
+    kruskal(A)
