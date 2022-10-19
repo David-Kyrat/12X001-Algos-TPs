@@ -123,27 +123,8 @@ def kruskal(A):
     # vertex is index
     for e in E:
         u, v = e[1], e[0]
-        # print("edge:", (u, v, e[2]))
-        # print("find-set(u)=", S[u])
-        # print("find-set(v)=", S[v])
-
         if (not S[u].issubset(S[v])) and (not S[v].issubset(S[u])):
-            # print("(u, v) =", [(u, v)])
             F += [(u, v)]
-            # print("F =", F)
             union = S[u].union(S[v])
-            # print("union=", union)
             S[u] = S[v] = union
-        #print("------------------")
     return F
-
-
-if __name__ == "__main__":
-    print("")
-    A = [
-        [0, 1, 2],
-        [1, 0, 10],
-        [2, 10, 0]
-    ]
-    KA = kruskal(A)
-    print("kruskal(A) =", KA)
