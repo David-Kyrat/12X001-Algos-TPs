@@ -39,12 +39,12 @@ def knapsack(items: list[El], W, sorting_key, highest: bool = True):
     return bag
 
 def knapsack_upk(knap: list[El]):
+    """ :return: Unpacked list of El. i.e. creates 2 separated list of weight, value from the given list of El."""
     weights, values = [], []
     for el in knap:
         weights.append(el.w)
         values.append(el.v)
     return weights, values
-
 
 
 def knapsack_a(weights, values, max_weight):
@@ -68,24 +68,6 @@ def knapsack_c(weights, values, max_weight):
 
 ########################### Exercise 2 ###########################
 
-
-# def compute_change(money, coin_set):
-#     """Returns a list of coin values (in the coin set) that sums up to 'money'"""
-#     if coin_set is None or money <= 0: return []
-#     n = len(coin_set)
-#     if n == 0: return []
-#
-#     def try_rec(i, left, acc):
-#         """ Try recursively to put the biggest amount of the biggest coin into acc without "overflowing" 'money'  """
-#         if i >= n or left <= 0: return acc
-#         crt_coin = coin_set[i]
-#         crt_amnt = int(left / crt_coin)  # how many coin of value coin_set[i] can we put at max ?
-#
-#         if crt_amnt <= 0: return try_rec(i + 1, left, acc)
-#         else: return try_rec(i + 1, left - (crt_amnt * crt_coin), acc + crt_amnt * [crt_coin])
-#
-#     change = try_rec(0, money, [])
-#     return change
 
 def compute_change(money, coin_set):
     """Returns a list of coin values (in the coin set) that sums up to 'money'"""
