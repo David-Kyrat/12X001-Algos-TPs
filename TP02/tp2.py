@@ -57,8 +57,8 @@ def knapsack_b(weights, values, max_weight):
     """Adds available item with the lowest weigth first"""
     items: list[El] = [El(w, v) for w, v in zip(weights, values)]
     return knapsack_upk(knapsack(items, max_weight, sorting_key=lambda el: el.w, highest=False))
-    
-    
+
+
 def knapsack_c(weights, values, max_weight):
     """Adds available item with the highest (value / weight) ratio first"""
     items: list[El] = [El(w, v) for w, v in zip(weights, values)]
@@ -71,10 +71,21 @@ def knapsack_c(weights, values, max_weight):
 
 def compute_change(money, coin_set):
     """Returns a list of coin values (in the coin set) that sums up to 'money'"""
-    # TODO
-    ...
+    if coin_set is None or money <= 0: return []
+    n = len(coin_set)
+    if n == 0: return []
 
+    def try_rec(i, left, acc):
+        """ Try recursively to put the biggest amount of the biggest coin into acc without "overflowing" 'money'  """
+        if i >= n or left <= 0: return acc
+        crt_coin = coin_set[i]
+        crt_amnt = int(left / crt_coin)  # how many coin of value coin_set[i] can we put at max ?
 
+        if crt_amnt <= 0: return try_rec(i + 1, left, acc)
+        else: return try_rec(i + 1, left - (crt_amnt * crt_coin), acc + crt_amnt * [crt_coin])
+
+    change = try_rec(0, money, [])
+    return change
 
 ########################### Exercise 3 ###########################
 
@@ -82,9 +93,13 @@ def compute_change(money, coin_set):
 def kruskal(A):
     """Given A a square matrix (list of lists), returns a list of edges that compose the MST"""
     # NOTE: A weight of 0 means that there is no edge between nodes and it should not be taken into the MST
-    
+
     # TODO
     ...
 
 if __name__ == "__main__":
     print("")
+    coin_set = [30, 24, 12, 6, 3, 1]
+    print(compute_change(0, coin_set))
+    print(compute_change(2, coin_set))
+
