@@ -69,22 +69,39 @@ def knapsack_c(weights, values, max_weight):
 ########################### Exercise 2 ###########################
 
 
+# def compute_change(money, coin_set):
+#     """Returns a list of coin values (in the coin set) that sums up to 'money'"""
+#     if coin_set is None or money <= 0: return []
+#     n = len(coin_set)
+#     if n == 0: return []
+#
+#     def try_rec(i, left, acc):
+#         """ Try recursively to put the biggest amount of the biggest coin into acc without "overflowing" 'money'  """
+#         if i >= n or left <= 0: return acc
+#         crt_coin = coin_set[i]
+#         crt_amnt = int(left / crt_coin)  # how many coin of value coin_set[i] can we put at max ?
+#
+#         if crt_amnt <= 0: return try_rec(i + 1, left, acc)
+#         else: return try_rec(i + 1, left - (crt_amnt * crt_coin), acc + crt_amnt * [crt_coin])
+#
+#     change = try_rec(0, money, [])
+#     return change
+
 def compute_change(money, coin_set):
     """Returns a list of coin values (in the coin set) that sums up to 'money'"""
     if coin_set is None or money <= 0: return []
     n = len(coin_set)
     if n == 0: return []
 
-    def try_rec(i, left, acc):
-        """ Try recursively to put the biggest amount of the biggest coin into acc without "overflowing" 'money'  """
+    def try_rec(left, i, acc):
+        """ left := money left to partition into coins, i:= current coin index, acc:= accumulator containing the solution
+            Try recursively to put the biggest amount of the biggest coin into acc without "overflowing" 'money'  """
         if i >= n or left <= 0: return acc
-        crt_coin = coin_set[i]
-        crt_amnt = int(left / crt_coin)  # how many coin of value coin_set[i] can we put at max ?
 
-        if crt_amnt <= 0: return try_rec(i + 1, left, acc)
-        else: return try_rec(i + 1, left - (crt_amnt * crt_coin), acc + crt_amnt * [crt_coin])
+        if left - coin_set[i] >= 0: return try_rec(left - coin_set[i], i, acc + [coin_set[i]])
+        else: return try_rec(left, i + 1, acc)
 
-    change = try_rec(0, money, [])
+    change = try_rec(money, 0, [])
     return change
 
 ########################### Exercise 3 ###########################
