@@ -110,13 +110,40 @@ def compute_change(money, coin_set):
 def kruskal(A):
     """Given A a square matrix (list of lists), returns a list of edges that compose the MST"""
     # NOTE: A weight of 0 means that there is no edge between nodes and it should not be taken into the MST
+    n = len(A)
+    if n <= 0: return []
+    if n == 1: return [(0, 0)]
+    S, F, E = [{i} for i in range(n)], [], []
 
-    # TODO
-    ...
+    for i in range(n):
+        for j in range(i + 1):
+            if A[i][j] != 0: E.append((i, j, A[i][j]))
+    # visits each edge only once => O(|E|)
+    E = sorted(E, key=lambda edge: edge[2])  # sorted according to weight in increasing order
+    # vertex is index
+    for e in E:
+        u, v = e[1], e[0]
+        # print("edge:", (u, v, e[2]))
+        # print("find-set(u)=", S[u])
+        # print("find-set(v)=", S[v])
+
+        if (not S[u].issubset(S[v])) and (not S[v].issubset(S[u])):
+            # print("(u, v) =", [(u, v)])
+            F += [(u, v)]
+            # print("F =", F)
+            union = S[u].union(S[v])
+            # print("union=", union)
+            S[u] = S[v] = union
+        #print("------------------")
+    return F
+
 
 if __name__ == "__main__":
     print("")
-    coin_set = [30, 24, 12, 6, 3, 1]
-    print(compute_change(0, coin_set))
-    print(compute_change(2, coin_set))
-
+    A = [
+        [0, 1, 2],
+        [1, 0, 10],
+        [2, 10, 0]
+    ]
+    KA = kruskal(A)
+    print("kruskal(A) =", KA)
