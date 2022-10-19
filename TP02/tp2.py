@@ -65,14 +65,6 @@ def knapsack_c(weights, values, max_weight):
     return knapsack_upk(knapsack(items, max_weight, sorting_key=lambda el: el.v / el.w))
 
 
-def print_knapsack_result(knap: El):
-    # print("Result Knapsack", knap)
-    # value_sum = sum([el.v for el in knap])
-    # weight_sum = sum([el.w for el in knap])
-    print("\t", "Total weight:", knap.w, "  Total value:", knap.v)
-    print("______________________________________________________________\n")
-
-
 
 ########################### Exercise 2 ###########################
 
@@ -96,9 +88,3 @@ def kruskal(A):
 
 if __name__ == "__main__":
     print("")
-    weights, values, max_weight = [10, 3, 7, 12, 1], [5, 2, 4, 9, 2], 25
-    print_knapsack_result(knapsack_a(weights, values, max_weight))
-    print_knapsack_result(knapsack_b(weights, values, max_weight))
-    print_knapsack_result(knapsack_c(weights, values, max_weight))
-
-

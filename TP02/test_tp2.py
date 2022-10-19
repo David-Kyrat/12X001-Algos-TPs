@@ -10,13 +10,6 @@ def test_knapsack_a():
     assert knapsack_a(w, v, 22) == ([12, 10], [9, 5])
     assert knapsack_a(w, v, 29) == ([12, 10, 7], [9, 5, 4])
 
-if __name__ == "__main__":
-    print("")
-    W, w, v = 10, [10, 3, 7, 12, 1], [5, 2, 4, 9, 2]
-    outa = knapsack_a(w, v, W)
-    import numpy as np
-    print(outa)
-    print(np.sum(outa, 0))
 
 def test_knapsack_b():
     w, v = [10, 3, 7, 12, 1], [5, 2, 4, 9, 2]
