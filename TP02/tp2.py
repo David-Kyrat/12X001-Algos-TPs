@@ -120,7 +120,6 @@ def kruskal(A):
             if A[i][j] != 0: E.append((i, j, A[i][j]))
     # visits each edge only once => O(|E|)
     E = sorted(E, key=lambda edge: edge[2])  # sorted according to weight in increasing order
-    # vertex is index
     for e in E:
         u, v = e[1], e[0]
         if (not S[u].issubset(S[v])) and (not S[v].issubset(S[u])):
