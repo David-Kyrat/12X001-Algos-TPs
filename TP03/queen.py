@@ -131,8 +131,7 @@ def nQueenAll(n):
                 if P(x, k, n): sols.add(tuple(x)) # using a set to avoid duplicates
                 bt_rec(x, k+1, n)
 
-    bt_rec([None]*n, 0, n)
-    
+    bt_rec([None]*n, 0, n)    
     return [list(sol_tuple) for sol_tuple in sols] # converting set of tuple back to list of list
 
 
@@ -153,7 +152,7 @@ def str_sol(x):
 def printSol(x): print(str_sol(x))
 
 if __name__ == '__main__':
-    n = 4    
+    n = 12   
     #sol1 = nQueen(n)
     #print(f"\nSol1:\n{str_sol(sol1)}")
 
