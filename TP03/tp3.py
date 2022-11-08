@@ -37,6 +37,16 @@ def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
             
     return all_sols
 
+#!
+#!
+#! As was allowed, The N-Queen problem was implemented like in the lecture notes.
+#! Please execute the main function in queen.py with different values of n 
+#! to see/test the implementation.
+# For example for n=5, you can check the correctness of the solutions with the ones at https://www.researchgate.net/figure/The-ten-solutions-of-the-5-queens-problem_fig1_226219656
+# For n=6 : https://www.researchgate.net/figure/Four-solutions-to-the-6-queens-problem_fig2_250697280#:~:text=Context%201-,...,as%20shown%20in%20Figure%201. 
+#!
+#!
+
 def B(x, k, n):
     """Tells, given the current partial solution x, current step k and final size n, 
     whether the current solution x is valid (True) or not (False)."""

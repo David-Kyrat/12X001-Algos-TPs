@@ -168,8 +168,9 @@ def printSol(x): print(pretty_str_sol(x))
 ########################### MAIN / TEST OF N-QUEEN PROBLEM ###########################
 
 if __name__ == '__main__':
-    n = 4
+    n = 5
 
+    print("________________________________________________________\n")
     print("  --- All Solutions to N-Queens problem for n =", n, "---")
     print("________________________________________________________\n")
     sols = solve_bt(n)
@@ -179,3 +180,10 @@ if __name__ == '__main__':
         print(f"Solution n°{i} :")
         printSol(sol)
         print("")
+
+    print("--- END N-Queen ---")
+
+#
+# For example for n=5, you can check the correctness with the one at https://www.researchgate.net/figure/The-ten-solutions-of-the-5-queens-problem_fig1_226219656
+# For n=6 : https://www.researchgate.net/figure/Four-solutions-to-the-6-queens-problem_fig2_250697280#:~:text=Context%201-,...,as%20shown%20in%20Figure%201. 
+#
