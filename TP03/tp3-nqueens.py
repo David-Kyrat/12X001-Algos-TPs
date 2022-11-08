@@ -5,6 +5,85 @@ QUEEN = "👸"
 WHITE = "⬜"
 BLACK = "⬛"
 
+def P_naive(x:list[list[list[str]]], k, n):
+    """ Special implementation of P_naive to work with naive version below"""
+    def pretty_to_useful(s:str):
+        return 1 if s == QUEEN else 0
+
+    # for each chessboard in x
+    for crt in x:
+        M = [[pretty_to_useful(crt[i][j]) for i in range(n)] for j in range(n)]
+        M = [[] for _ in range(n)]
+        queens = [] #array of queen column indices. (doing this to match with implementation of isSameDiag used in B(x, k, n) below)
+        for i in range(n):
+            for j in range(n):
+                el = 0
+                if (crt[i][j] == QUEEN):
+                    el = 1
+                    queens.append((i,j))
+                M[i].append(el)
+
+        # checks for diagonals
+        for qidx in range(len(queens)-1):
+            crtq = queens[qidx]
+
+            for q2idx in range(qidx+1, len(queens)):
+                crt2q = queens[q2idx]
+                if isSameDiag(crtq[0], crtq[1], crt2q[0], crt2q[1]): return False
+    
+        # checks for rows
+        for row_idx in range(n):
+            sum = 0
+            for j in range(n):
+                sum += M[row_idx][j]
+            if sum > 1: return False
+        
+        # checks for columns
+        for col_idx in range(n):
+            #def col_i(idcrt): return M[i][idcrt]
+            sum = 0
+            for j in range(n):
+                sum += M[j][col_idx]
+            if sum > 1: return False
+
+        
+
+
+    return True
+
+def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
+    """Naive solution for the N-Queens problem. Do not modify this function."""
+    
+    # If we are starting, initialize current solution
+    if remaining is None:
+        remaining = n
+        curr_sol = [[WHITE if (r+c)%2 == 0 else BLACK for r in range(n)] for c in range(n)]
+    
+    # If we placed all queens, check whether the found solution is plausible and return it
+    if remaining == 0:
+        if P_naive([curr_sol for _ in range(n)], n-1, n):
+            return [curr_sol]
+        return []
+    
+    # If we still have queens to place, place one in the next non-explored square and find all solutions
+    all_sols = []
+    for r in range(n):
+        for c in range(n):
+            
+            # Skipping visited squares
+            if r < i or (r == i and c < j):
+                continue
+            
+            # Placing a queen in the next available square (left-to-right, top-to-bottom)
+            copy_sol = [[curr_sol[i][j] for j in range(n)] for i in range(n)]
+            copy_sol[r][c] = QUEEN
+            
+            # Finding all solutions with the newly placed queen
+            sols = solve_naive(n, remaining-1, copy_sol, r, c+1)
+            all_sols.extend(sols)
+            
+    return all_sols
+
 # redifing abs because name is shorter than the 'fabs' function from math (and because it should only take ints here)
 def abs(x:int)->int: return x if (x >= 0) else -x
 
@@ -173,12 +252,28 @@ def pretty_str_sols(solution_list):
 
 def printSol(x): print(pretty_str_sol(x))
 
+################ COMPARISION NAIVE / BACKTRACKING FOR N-QUEEN PROBLEM ################
+
+# TODO: Compare naive and backtracking runtimes
+from util import *
+
+
+def compare_naive_and_backtracking():
+    """Compares the running times for the naive and backtracking algorithms for n = [1, ..., 6]"""
+    from time import time
+
+    import matplotlib.pyplot as plt
+    max_n = 6
+    plot_n = [n for n in range(max_n)]
+    #plot
+    
+
+
+
 
 ########################### MAIN / TEST OF N-QUEEN PROBLEM ###########################
 
-if __name__ == '__main__':
-    n = 4
-
+def test(n):
     print("________________________________________________________\n")
     print("  --- All Solutions to N-Queens problem for n =", n, "---")
     print("________________________________________________________\n")
@@ -191,6 +286,18 @@ if __name__ == '__main__':
         print("")
 
     print("--- END N-Queen ---")
+
+
+if __name__ == '__main__':
+    n = 4
+    # test(n)
+    #compare_naive_and_backtracking()
+    s = solve_naive(n)
+    for x in s:
+        for subx in x:
+            print(subx)
+        print("------\n")
+  
 
 # Output for n=4: you can see that is exactly the same one as in your tests
 """ 
