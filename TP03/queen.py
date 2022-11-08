@@ -5,11 +5,21 @@ QUEEN = "👸"
 WHITE = "⬜"
 BLACK = "⬛"
 
-def abs(x): return x if (x >= 0) else -x
+# redifing abs because name is shorter than the 'fabs' function from math (and because it should only take ints here)
+def abs(x:int)->int: return x if (x >= 0) else -x
 
 
-def diff(arr1, arr2):  # return arr1 \ arr2
-    #if (not arr2 or len(arr2) == 0): return arr1
+def diff(arr1, arr2):
+    '''Return `arr1` \ `arr2` (mathematical difference)
+    
+    Parameters
+    ----------
+    @ `arr1` - First array
+    @ `arr2` - Array to be removed from arr1
+    
+    Returns
+    -------
+        `arr1` without `arr2`.'''
     set2 = set(arr2)  # "is in" check should be O(1)
     return [a1 for a1 in arr1 if a1 not in set2]
 
@@ -37,14 +47,13 @@ def T(x, k, n):
     
     Parameters
     ----------
-    @ `x` - (Partial solution) i.e. Current state of the board. A list of the queens column indices (i.e. x0 x1 ... xk)
+    @ `x` - (Partial solution) i.e. Current state of the board. List of column indices (i.e. [x_i]_{1<=i<=k} where x_i = column of i-th queen)
     @ `k` - the number of queens placed so far
     @ `n` - the number of queens
     
     Returns
     -------
         The set of all possible positions for the `k+1`-th queen. '''
-    #x => [x_i]_{1<=i<=k} where x_i = column of i-th queen
     return diff(range(n), x[:k])
 
 
