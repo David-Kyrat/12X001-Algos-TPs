@@ -1,5 +1,5 @@
 ########################### Exercise 1 ###########################
-from tp3 import B, T, P, solve_bt
+from queen import B, T, P, pretty_str_sols, solve_bt
 
 def test_B():
     checkboard0 = [
@@ -161,8 +161,8 @@ def test_P():
     assert P(x, 3, 4) == False
 
 def test_solve_bt():
-    assert solve_bt(3) == []
-    assert solve_bt(4) == [
+    assert pretty_str_sols(solve_bt(3)) == []
+    assert pretty_str_sols(solve_bt(4)) == [
         [
             ["⬜", "👸", "⬜", "⬛"],
             ["⬛", "⬜", "⬛", "👸"],

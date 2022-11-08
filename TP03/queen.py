@@ -94,7 +94,7 @@ def P(x, k, n):
     return True
 
 
-def solve_bt(n) -> list[list[int]]:
+def solve_bt(n) -> None | list[list[int]]:
     '''`solve_bt` returns all the solutions for the N-Queens problem for a chess board of size n.
     
     Takes a number `n` and returns a (list of) lists of `n` columns indices, each of which is
@@ -108,7 +108,7 @@ def solve_bt(n) -> list[list[int]]:
     Returns
     -------
         A list of all possible solution to the N-Queens problem. i.e. list of lists of the columns indices of the queens. '''
-    if n < 4: return None
+    if n < 4: return []
     sols:set = set()
     def bt_rec(x, k, n):        
         for y in T(x, k, n):
@@ -147,6 +147,7 @@ def pretty_str_sol(x):
     Returns
     -------
         A pretty graphic/formatted representation of the chessboard'''
+    if x == None or x == []: return []
     n = len(x)
     
     M = fill_emptyboard(n)
@@ -162,13 +163,21 @@ def pretty_str_sol(x):
         s += "]\n"
     return s
 
+
+def pretty_str_sols(solution_list):
+    """ Returns
+        -------
+        result of calling `pretty_str_sol(solution)` for each `solution` in `solution_list`"""
+    return [pretty_str_sol(solution) for solution in solution_list]
+    
+
 def printSol(x): print(pretty_str_sol(x))
 
 
 ########################### MAIN / TEST OF N-QUEEN PROBLEM ###########################
 
 if __name__ == '__main__':
-    n = 5
+    n = 4
 
     print("________________________________________________________\n")
     print("  --- All Solutions to N-Queens problem for n =", n, "---")
@@ -183,7 +192,30 @@ if __name__ == '__main__':
 
     print("--- END N-Queen ---")
 
+# Output for n=4: you can see that is exactly the same one as in your tests
+""" 
+________________________________________________________
+
+  --- All Solutions to N-Queens problem for n = 4 ---
+________________________________________________________
+
+Solution n°1 :
+[⬜, ⬛, 👸, ⬛]
+[👸, ⬜, ⬛, ⬜]
+[⬜, ⬛, ⬜, 👸]
+[⬛, 👸, ⬛, ⬜]
+
+
+Solution n°2 :
+[⬜, 👸, ⬜, ⬛]
+[⬛, ⬜, ⬛, 👸]
+[👸, ⬛, ⬜, ⬛]
+[⬛, ⬜, 👸, ⬜]
+
+
+--- END N-Queen --- """
+
 #
-# For example for n=5, you can check the correctness with the one at https://www.researchgate.net/figure/The-ten-solutions-of-the-5-queens-problem_fig1_226219656
+# For n=5, you can check the correctness with the one at https://www.researchgate.net/figure/The-ten-solutions-of-the-5-queens-problem_fig1_226219656
 # For n=6 : https://www.researchgate.net/figure/Four-solutions-to-the-6-queens-problem_fig2_250697280#:~:text=Context%201-,...,as%20shown%20in%20Figure%201. 
 #
