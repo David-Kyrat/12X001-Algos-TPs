@@ -1,4 +1,17 @@
 
+
+#!
+#!
+#! As was allowed, The N-Queen problem was implemented like in the lecture notes.
+#! Please execute the main function in queen.py with different values of n 
+#! to see/test the implementation.
+#! Nontheless A copy of the output was added at the end of file, you can verify that it is 
+#! the same as the one generate when queen.py is run and also the same one as in your tests 
+# For n=5, you can check the correctness of the solutions with the ones at https://www.researchgate.net/figure/The-ten-solutions-of-the-5-queens-problem_fig1_226219656
+# For n=6 : https://www.researchgate.net/figure/Four-solutions-to-the-6-queens-problem_fig2_250697280#:~:text=Context%201-,...,as%20shown%20in%20Figure%201. 
+#!
+#!
+
 ########################### Exercise 1 ###########################
 
 QUEEN = "👸"
@@ -260,20 +273,30 @@ from util import *
 
 def compare_naive_and_backtracking():
     """Compares the running times for the naive and backtracking algorithms for n = [1, ..., 6]"""
-    from time import time
-
-    import matplotlib.pyplot as plt
-    max_n = 6
-    plot_n = [n for n in range(max_n)]
-    #plot
-    
+    max_n = 4
+    plot_n = [n for n in range(1, max_n+2)]
+    plot_f1 = runtime_arr(solve_naive, plot_n, unpack=False)
+    plot_f2 = runtime_arr(solve_bt, plot_n, unpack=False)
+    xlabel = "Chessboard Dimension"
+    ylabel = "Runtime (s)"
+    title = "Runtime of Naive VS Backtracking solution"
+    f1label = "Naive implementation"
+    f2label = "Backtracking implementation"
+    plotVS(plot_n, plot_f1, plot_f2, title, xlabel, ylabel, f1label, f2label)
 
 
 
 
 ########################### MAIN / TEST OF N-QUEEN PROBLEM ###########################
 
-def test(n):
+def test_naive(n):
+    s = solve_naive(n)
+    for x in s:
+        for subx in x:
+            print(subx)
+        print("------\n")
+
+def test_backtrack(n):
     print("________________________________________________________\n")
     print("  --- All Solutions to N-Queens problem for n =", n, "---")
     print("________________________________________________________\n")
@@ -290,13 +313,10 @@ def test(n):
 
 if __name__ == '__main__':
     n = 4
-    # test(n)
-    #compare_naive_and_backtracking()
-    s = solve_naive(n)
-    for x in s:
-        for subx in x:
-            print(subx)
-        print("------\n")
+    # test_naive(n)
+    # test_backtrack(n)
+    compare_naive_and_backtracking()
+   
   
 
 # Output for n=4: you can see that is exactly the same one as in your tests
