@@ -44,8 +44,8 @@ def P_naive(x:list[list[list[str]]], k, n):
     for crt in x:
         M = np.zeros((n,n))
         #[[] for _ in range(n)]
-        
-        queens:list[tuple(int, int)] = [] #array of queen column indices. (doing this to match with implementation of isSameDiag used in B(x, k, n) below)
+        queens:list[tuple(int, int)] = [(0, 0)] #array of queen column indices. (doing this to match with implementation of isSameDiag used in B(x, k, n) below)
+        queens.pop()
         for i in range(n):
             for j in range(n):
                 el = 0
@@ -91,8 +91,12 @@ def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
     # If we placed all queens, check whether the found solution is plausible and return it
     if remaining == 0:
         if P_naive([curr_sol for _ in range(n)], n-1, n):
-            return [curr_sol]
-        return []
+            out = [[[""]]]
+            out[0] = curr_sol
+            return out #[curr_sol]
+
+        out = [[[""]]];out[0][0].pop()
+        return out
     
     # If we still have queens to place, place one in the next non-explored square and find all solutions
     all_sols = []
@@ -310,6 +314,8 @@ def compare_naive_and_backtracking():
 
 def test_naive(n):
     s = solve_naive(n)
+    print(type(s))
+    print(s)
     for x in s:
         for subx in x:
             print(subx)
