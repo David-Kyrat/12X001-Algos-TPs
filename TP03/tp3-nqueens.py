@@ -14,14 +14,29 @@
 
 ########################### Exercise 1 ###########################
 
+
+
 QUEEN = "👸"
 WHITE = "⬜"
 BLACK = "⬛"
 
+
+def pretty_to_useful(s: str):
+        return 1 if s == QUEEN else 0
+    
+def useful_to_pretty(cell_val:int, row:int, col:int): 
+        return QUEEN if cell_val == 1 else (WHITE if (row+col)%2 == 0 else BLACK)
+
+def translate(board) -> list[list]:
+    """based on board[0][0], infers whether need to translate WHITE/BLACK/QUEEN to 0/1 or the opposite """
+    if board[0][0] in {0, 1}:
+        return [[useful_to_pretty(board[i][j], i, j) for j in range(len(board[i]))] for i in range(len(board))]
+    else:
+        return list(map(lambda row: [pretty_to_useful(cell) for cell in row] , board))
+
+
 def P_naive(x:list[list[list[str]]], k, n):
     """ Special implementation of P_naive to work with naive version below"""
-    def pretty_to_useful(s:str):
-        return 1 if s == QUEEN else 0
 
     # for each chessboard in x
     for crt in x:
