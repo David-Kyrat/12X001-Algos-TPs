@@ -15,7 +15,7 @@
 ########################### Exercise 1 ###########################
 import numpy as np
 import numba
-from numba import jit, njit
+from numba import jit
 
 
 QUEEN = "👸"
@@ -36,7 +36,7 @@ def translate(board) -> list[list]:
     else:
         return list(map(lambda row: [pretty_to_useful(cell) for cell in row] , board))
 
-@njit
+@jit
 def P_naive(x:list[list[list[str]]], k, n):
     """ Special implementation of P_naive to work with naive version below"""
 
@@ -79,7 +79,7 @@ def P_naive(x:list[list[list[str]]], k, n):
             if sum > 1: return False
     return True
 
-@njit
+@jit
 def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
     """Naive solution for the N-Queens problem. Do not modify this function."""
     
@@ -95,8 +95,8 @@ def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
             out[0] = curr_sol
             return out #[curr_sol]
 
-        out = [[[""]]];out[0][0].pop()
-        return out
+        #out = [[[""]]]; out[0][0].pop()
+        return []
     
     # If we still have queens to place, place one in the next non-explored square and find all solutions
     all_sols = []
@@ -114,14 +114,19 @@ def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
             # Finding all solutions with the newly placed queen
             sols = solve_naive(n, remaining-1, copy_sol, r, c+1)
             all_sols.extend(sols)
+            """ if (sols == [[[""]]]):
+                tmp = [""]; tmp.pop()
+                all_sols.extend(tmp)
+            else: 
+                all_sols.extend(sols) """
             
     return all_sols
 
 # redifing abs because name is shorter than the 'fabs' function from math (and because it should only take ints here)
-@njit
+@jit
 def abs(x:int)->int: return x if (x >= 0) else -x
 
-@njit
+@jit
 def diff(arr1, arr2):
     '''Return `arr1` \ `arr2` (mathematical difference)
     
@@ -136,7 +141,7 @@ def diff(arr1, arr2):
     set2 = set(arr2)  # "is in" check should be O(1)
     return [a1 for a1 in arr1 if a1 not in set2]
 
-@njit
+@jit
 def isSameDiag(i1, j1, i2, j2):
     '''`isSameDiag` returns `True` if the two points are on the same diagonal, and `False` otherwise.
     
@@ -153,7 +158,7 @@ def isSameDiag(i1, j1, i2, j2):
     disti, distj = abs(i1-i2), abs(j1-j2)
     return disti == distj
 
-@njit
+@jit
 def T(x, k, n):
     '''`T(x,k,n)` returns the set of all possible positions for the `(k+1)`-th queen, given the positions
     of the first `k` queens
@@ -169,7 +174,7 @@ def T(x, k, n):
         The set of all possible positions for the `k+1`-th queen. '''
     return diff(range(n), x[:k])
 
-@njit
+@jit
 def B(x, k, n):
     '''If the last queen is not on the same diagonal as any of the previous queens, then return True
     
@@ -188,7 +193,7 @@ def B(x, k, n):
         if isSameDiag(k, x[k], i, x[i]): return False
     return True
 
-@njit
+@jit
 def P(x, k, n):
     if None in x: return False
     for i in range(n-1):
@@ -236,7 +241,7 @@ def solve_bt(n) -> None | list[list[int]]:
 
 
 ########################### PRINTING/TEST FUNCTIONS ###########################
-@njit
+@jit
 def fill_emptyboard(n):
     ''' Generate an empty chess board of size `n` with `WHITE` and `BLACK` in each cell
 
