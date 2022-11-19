@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from time import time, time_ns
+from time import time
 
 
 def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Label: str, f2Label: str):
@@ -66,8 +66,7 @@ def runtime(f, args, unpack: bool):
         The time it takes to run the function f with the arguments args'''
     before = time()
     f(*args) if (unpack) else f(args)
-    after = time()
-    delta_time = after - before
+    delta_time = time() - before
     return delta_time
 
 def runtime_arr(f, argArray, unpack: bool): 

@@ -13,8 +13,9 @@
 #!
 
 ########################### Exercise 1 ###########################
-
-
+import numba
+import numpy as np
+#from numba import njit
 
 QUEEN = "👸"
 WHITE = "⬜"
@@ -35,87 +36,11 @@ def translate(board) -> list[list]:
         return list(map(lambda row: [pretty_to_useful(cell) for cell in row] , board))
 
 
-def P_naive(x:list[list[list[str]]], k, n):
-    """ Special implementation of P_naive to work with naive version below"""
-
-    # for each chessboard in x
-    for crt in x:
-        M = [[pretty_to_useful(crt[i][j]) for i in range(n)] for j in range(n)]
-        M = [[] for _ in range(n)]
-        queens = [] #array of queen column indices. (doing this to match with implementation of isSameDiag used in B(x, k, n) below)
-        for i in range(n):
-            for j in range(n):
-                el = 0
-                if (crt[i][j] == QUEEN):
-                    el = 1
-                    queens.append((i,j))
-                M[i].append(el)
-
-        # checks for diagonals
-        for qidx in range(len(queens)-1):
-            crtq = queens[qidx]
-
-            for q2idx in range(qidx+1, len(queens)):
-                crt2q = queens[q2idx]
-                if isSameDiag(crtq[0], crtq[1], crt2q[0], crt2q[1]): return False
-    
-        # checks for rows
-        for row_idx in range(n):
-            sum = 0
-            for j in range(n):
-                sum += M[row_idx][j]
-            if sum > 1: return False
-        
-        # checks for columns
-        for col_idx in range(n):
-            #def col_i(idcrt): return M[i][idcrt]
-            sum = 0
-            for j in range(n):
-                sum += M[j][col_idx]
-            if sum > 1: return False
-
-        
-
-
-    return True
-
-def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
-    """Naive solution for the N-Queens problem. Do not modify this function."""
-    
-    # If we are starting, initialize current solution
-    if remaining is None:
-        remaining = n
-        curr_sol = [[WHITE if (r+c)%2 == 0 else BLACK for r in range(n)] for c in range(n)]
-    
-    # If we placed all queens, check whether the found solution is plausible and return it
-    if remaining == 0:
-        if P_naive([curr_sol for _ in range(n)], n-1, n):
-            return [curr_sol]
-        return []
-    
-    # If we still have queens to place, place one in the next non-explored square and find all solutions
-    all_sols = []
-    for r in range(n):
-        for c in range(n):
-            
-            # Skipping visited squares
-            if r < i or (r == i and c < j):
-                continue
-            
-            # Placing a queen in the next available square (left-to-right, top-to-bottom)
-            copy_sol = [[curr_sol[i][j] for j in range(n)] for i in range(n)]
-            copy_sol[r][c] = QUEEN
-            
-            # Finding all solutions with the newly placed queen
-            sols = solve_naive(n, remaining-1, copy_sol, r, c+1)
-            all_sols.extend(sols)
-            
-    return all_sols
-
 # redifing abs because name is shorter than the 'fabs' function from math (and because it should only take ints here)
+
 def abs(x:int)->int: return x if (x >= 0) else -x
 
-
+ 
 def diff(arr1, arr2):
     '''Return `arr1` \ `arr2` (mathematical difference)
     
@@ -147,7 +72,7 @@ def isSameDiag(i1, j1, i2, j2):
     disti, distj = abs(i1-i2), abs(j1-j2)
     return disti == distj
 
-
+ 
 def T(x, k, n):
     '''`T(x,k,n)` returns the set of all possible positions for the `(k+1)`-th queen, given the positions
     of the first `k` queens
@@ -163,7 +88,7 @@ def T(x, k, n):
         The set of all possible positions for the `k+1`-th queen. '''
     return diff(range(n), x[:k])
 
-
+ 
 def B(x, k, n):
     '''If the last queen is not on the same diagonal as any of the previous queens, then return True
     
@@ -182,6 +107,7 @@ def B(x, k, n):
         if isSameDiag(k, x[k], i, x[i]): return False
     return True
 
+ 
 def P(x, k, n):
     if None in x: return False
     for i in range(n-1):
@@ -201,6 +127,85 @@ def P(x, k, n):
     return True
 
 
+ 
+def P_naive(x:list[list[list[str]]], k, n):
+    """ Special implementation of P_naive to work with naive version below"""
+    # for each chessboard in x
+    for crt in x:
+        #M = [[pretty_to_useful(crt[i][j]) for i in range(n)] for j in range(n)]
+        M = np.zeros((n,n), dtype=np.ushort) #np.array([[] for _ in range(n)])
+        queens:list[tuple[int, int]] = [] #array of queen column indices. (doing this to match with implementation of isSameDiag used in B(x, k, n) below)
+        for i in range(n):
+            for j in range(n):
+                el = 0
+                if (crt[i][j] == QUEEN):
+                    el = 1
+                    queens.append((i,j))
+                    M[i,j] = el
+                #M[i][j].append(el)
+                
+                
+
+        # checks for diagonals
+        for qidx in range(len(queens)-1):
+            crtq = queens[qidx]
+
+            for q2idx in range(qidx+1, len(queens)):
+                crt2q = queens[q2idx]
+                if isSameDiag(crtq[0], crtq[1], crt2q[0], crt2q[1]): return False
+    
+        # checks for rows
+        for row_idx in range(n):
+            sum = 0
+            for j in range(n):
+                sum += M[row_idx][j]
+            if sum > 1: return False
+        
+        # checks for columns
+        for col_idx in range(n):
+            #def col_i(idcrt): return M[i][idcrt]
+            sum = 0
+            for j in range(n):
+                sum += M[j][col_idx]
+            if sum > 1:
+                return False
+    return True
+
+
+def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0) -> list[list[list[str]]]:
+    """Naive solution for the N-Queens problem. Do not modify this function."""
+    
+    # If we are starting, initialize current solution
+    if remaining is None:
+        remaining = n
+        curr_sol = [[WHITE if (r+c)%2 == 0 else BLACK for r in range(n)] for c in range(n)]
+    
+    # If we placed all queens, check whether the found solution is plausible and return it
+    if remaining == 0:
+        if P_naive([curr_sol for _ in range(n)], n-1, n):
+            return [curr_sol]
+        tmp:list[list[list[str]]] = [[[]]]
+        return tmp
+    np.empty
+    # If we still have queens to place, place one in the next non-explored square and find all solutions
+    all_sols = []
+    for r in range(n):
+        for c in range(n):
+            
+            # Skipping visited squares
+            if r < i or (r == i and c < j):
+                continue
+            
+            # Placing a queen in the next available square (left-to-right, top-to-bottom)
+            copy_sol = [[curr_sol[i][j] for j in range(n)] for i in range(n)]
+            copy_sol[r][c] = QUEEN
+            
+            # Finding all solutions with the newly placed queen
+            sols = solve_naive(n, remaining-1, copy_sol, r, c+1)
+            all_sols.extend(sols)
+            
+    return all_sols
+
 def solve_bt(n) -> None | list[list[int]]:
     '''`solve_bt` returns all the solutions for the N-Queens problem for a chess board of size n.
     
@@ -217,6 +222,7 @@ def solve_bt(n) -> None | list[list[int]]:
         A list of all possible solution to the N-Queens problem. i.e. list of lists of the columns indices of the queens. '''
     if n < 4: return []
     sols:set = set()
+     
     def bt_rec(x, k, n):        
         for y in T(x, k, n):
             x[k] = y
@@ -282,14 +288,14 @@ def printSol(x): print(pretty_str_sol(x))
 
 ################ COMPARISION NAIVE / BACKTRACKING FOR N-QUEEN PROBLEM ################
 
-# TODO: Compare naive and backtracking runtimes
+
 from util import *
 
 
 def compare_naive_and_backtracking():
     """Compares the running times for the naive and backtracking algorithms for n = [1, ..., 6]"""
-    max_n = 4
-    plot_n = [n for n in range(1, max_n+2)]
+    max_n = 6
+    plot_n = [n for n in range(3, max_n+1)]
     plot_f1 = runtime_arr(solve_naive, plot_n, unpack=False)
     plot_f2 = runtime_arr(solve_bt, plot_n, unpack=False)
     xlabel = "Chessboard Dimension"
@@ -298,8 +304,6 @@ def compare_naive_and_backtracking():
     f1label = "Naive implementation"
     f2label = "Backtracking implementation"
     plotVS(plot_n, plot_f1, plot_f2, title, xlabel, ylabel, f1label, f2label)
-
-
 
 
 ########################### MAIN / TEST OF N-QUEEN PROBLEM ###########################
@@ -328,9 +332,9 @@ def test_backtrack(n):
 
 if __name__ == '__main__':
     n = 4
-    # test_naive(n)
+    test_naive(n)
     # test_backtrack(n)
-    compare_naive_and_backtracking()
+    # compare_naive_and_backtracking()
    
   
 
