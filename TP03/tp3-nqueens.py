@@ -13,7 +13,8 @@
 #!
 
 ########################### Exercise 1 ###########################
-
+import numba
+from numba import jit, njit
 
 
 QUEEN = "👸"
@@ -34,7 +35,7 @@ def translate(board) -> list[list]:
     else:
         return list(map(lambda row: [pretty_to_useful(cell) for cell in row] , board))
 
-
+@njit
 def P_naive(x:list[list[list[str]]], k, n):
     """ Special implementation of P_naive to work with naive version below"""
 
@@ -73,12 +74,9 @@ def P_naive(x:list[list[list[str]]], k, n):
             for j in range(n):
                 sum += M[j][col_idx]
             if sum > 1: return False
-
-        
-
-
     return True
 
+@njit
 def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
     """Naive solution for the N-Queens problem. Do not modify this function."""
     
@@ -113,9 +111,10 @@ def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
     return all_sols
 
 # redifing abs because name is shorter than the 'fabs' function from math (and because it should only take ints here)
+@njit
 def abs(x:int)->int: return x if (x >= 0) else -x
 
-
+@njit
 def diff(arr1, arr2):
     '''Return `arr1` \ `arr2` (mathematical difference)
     
@@ -130,7 +129,7 @@ def diff(arr1, arr2):
     set2 = set(arr2)  # "is in" check should be O(1)
     return [a1 for a1 in arr1 if a1 not in set2]
 
-
+@njit
 def isSameDiag(i1, j1, i2, j2):
     '''`isSameDiag` returns `True` if the two points are on the same diagonal, and `False` otherwise.
     
@@ -147,7 +146,7 @@ def isSameDiag(i1, j1, i2, j2):
     disti, distj = abs(i1-i2), abs(j1-j2)
     return disti == distj
 
-
+@njit
 def T(x, k, n):
     '''`T(x,k,n)` returns the set of all possible positions for the `(k+1)`-th queen, given the positions
     of the first `k` queens
@@ -163,7 +162,7 @@ def T(x, k, n):
         The set of all possible positions for the `k+1`-th queen. '''
     return diff(range(n), x[:k])
 
-
+@njit
 def B(x, k, n):
     '''If the last queen is not on the same diagonal as any of the previous queens, then return True
     
@@ -182,6 +181,7 @@ def B(x, k, n):
         if isSameDiag(k, x[k], i, x[i]): return False
     return True
 
+@njit
 def P(x, k, n):
     if None in x: return False
     for i in range(n-1):
@@ -229,7 +229,7 @@ def solve_bt(n) -> None | list[list[int]]:
 
 
 ########################### PRINTING/TEST FUNCTIONS ###########################
-
+@njit
 def fill_emptyboard(n):
     ''' Generate an empty chess board of size `n` with `WHITE` and `BLACK` in each cell
 
@@ -304,6 +304,7 @@ def compare_naive_and_backtracking():
 
 ########################### MAIN / TEST OF N-QUEEN PROBLEM ###########################
 
+
 def test_naive(n):
     s = solve_naive(n)
     for x in s:
@@ -328,9 +329,9 @@ def test_backtrack(n):
 
 if __name__ == '__main__':
     n = 4
-    # test_naive(n)
+    test_naive(n)
     # test_backtrack(n)
-    compare_naive_and_backtracking()
+    #compare_naive_and_backtracking()
    
   
 
