@@ -24,10 +24,10 @@ BLACK = "⬛"
 
 
 def pretty_to_useful(s: str):
-        return 1 if s == QUEEN else 0
+    return 1 if s == QUEEN else 0
     
 def useful_to_pretty(cell_val:int, row:int, col:int): 
-        return QUEEN if cell_val == 1 else (WHITE if (row+col)%2 == 0 else BLACK)
+    return QUEEN if cell_val == 1 else (WHITE if (row+col)%2 == 0 else BLACK)
 
 def translate(board) -> list[list]:
     """based on board[0][0], infers whether need to translate WHITE/BLACK/QUEEN to 0/1 or the opposite """
@@ -36,7 +36,7 @@ def translate(board) -> list[list]:
     else:
         return list(map(lambda row: [pretty_to_useful(cell) for cell in row] , board))
 
-@jit
+
 def P_naive(x:list[list[list[str]]], k, n):
     """ Special implementation of P_naive to work with naive version below"""
 
@@ -79,12 +79,12 @@ def P_naive(x:list[list[list[str]]], k, n):
             if sum > 1: return False
     return True
 
-@jit
-def solve_naive(n, remaining=None, curr_sol=None, i=0, j=0):
+
+def solve_naive(n, remaining=-1, curr_sol=-1, i=0, j=0):
     """Naive solution for the N-Queens problem. Do not modify this function."""
     
     # If we are starting, initialize current solution
-    if remaining is None:
+    if remaining == -1:
         remaining = n
         curr_sol = [[WHITE if (r+c)%2 == 0 else BLACK for r in range(n)] for c in range(n)]
     
@@ -195,7 +195,7 @@ def B(x, k, n):
 
 @jit
 def P(x, k, n):
-    if None in x: return False
+    if -1 in x: return False
     for i in range(n-1):
         crt = x[i]
         for j in range(i+1, n):
@@ -213,7 +213,7 @@ def P(x, k, n):
     return True
 
 
-def solve_bt(n) -> None | list[list[int]]:
+def solve_bt(n) -> list[list[int]]:
     '''`solve_bt` returns all the solutions for the N-Queens problem for a chess board of size n.
     
     Takes a number `n` and returns a (list of) lists of `n` columns indices, each of which is
@@ -229,6 +229,7 @@ def solve_bt(n) -> None | list[list[int]]:
         A list of all possible solution to the N-Queens problem. i.e. list of lists of the columns indices of the queens. '''
     if n < 4: return []
     sols:set = set()
+    @jit
     def bt_rec(x, k, n):        
         for y in T(x, k, n):
             x[k] = y
@@ -236,7 +237,7 @@ def solve_bt(n) -> None | list[list[int]]:
                 if P(x, k, n): sols.add(tuple(x)) # using a set to avoid duplicates
                 bt_rec(x, k+1, n)
 
-    bt_rec([None]*n, 0, n)    
+    bt_rec([-1]*n, 0, n)    
     return [list(sol_tuple) for sol_tuple in sols] # converting set of tuple back to list of list
 
 
@@ -266,12 +267,12 @@ def pretty_str_sol(x):
     Returns
     -------
         A pretty graphic/formatted representation of the chessboard'''
-    if x == None or x == []: return []
+    if x == -1 or x == []: return []
     n = len(x)
     
     M = fill_emptyboard(n)
     for i in range(n):
-        if x[i]!= None: M[i][x[i]] = QUEEN
+        if x[i]!= -1: M[i][x[i]] = QUEEN
     s = ""
     for row in M:
         s += "["
@@ -343,8 +344,8 @@ def test_backtrack(n):
 
 if __name__ == '__main__':
     n = 4
-    test_naive(n)
-    # test_backtrack(n)
+    #test_naive(n)
+    test_backtrack(n)
     #compare_naive_and_backtracking()
    
   
