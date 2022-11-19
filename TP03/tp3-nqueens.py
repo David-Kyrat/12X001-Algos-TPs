@@ -13,6 +13,7 @@
 #!
 
 ########################### Exercise 1 ###########################
+import numpy as np
 import numba
 from numba import jit, njit
 
@@ -41,16 +42,18 @@ def P_naive(x:list[list[list[str]]], k, n):
 
     # for each chessboard in x
     for crt in x:
-        M = [[pretty_to_useful(crt[i][j]) for i in range(n)] for j in range(n)]
-        M = [[] for _ in range(n)]
-        queens = [] #array of queen column indices. (doing this to match with implementation of isSameDiag used in B(x, k, n) below)
+        M = np.zeros((n,n))
+        #[[] for _ in range(n)]
+        
+        queens:list[tuple(int, int)] = [] #array of queen column indices. (doing this to match with implementation of isSameDiag used in B(x, k, n) below)
         for i in range(n):
             for j in range(n):
                 el = 0
                 if (crt[i][j] == QUEEN):
                     el = 1
                     queens.append((i,j))
-                M[i].append(el)
+                    M[i, j] = el
+                #M[i].append(el)
 
         # checks for diagonals
         for qidx in range(len(queens)-1):
