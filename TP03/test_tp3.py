@@ -1,5 +1,5 @@
 ########################### Exercise 1 ###########################
-from queen import B, T, P, pretty_str_sols, solve_bt
+from tp3_nqueens import B, T, P, pretty_str_sols, solve_bt
 
 def test_B():
     checkboard0 = [

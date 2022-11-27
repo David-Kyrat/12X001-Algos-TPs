@@ -1,3 +1,4 @@
+from timeit import timeit
 import matplotlib.pyplot as plt
 from time import time, time_ns
 
@@ -24,11 +25,13 @@ def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Lab
     plt.xticks(plot_x)
     plt.plot(plot_x, plot_f1, '-k', label=f1Label, linewidth=1)
     plt.plot(plot_x, plot_f2, '-r', label=f2Label, linewidth=3)
+    plt.figsi
+    
     #plt.legend(prop={'size': 5})
     #plt.legend(fontsize=7)
     plt.legend()
     plt.show()
-
+import numpy as np
 def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str):
     """Plots a single function
     - plot_x: the x-axis values
@@ -39,16 +42,24 @@ def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str)
     - fLabel: the label of the function
     """
     #plt.tight_layout(pad=5)
+    fig = plt.figure()
     plt.title(title)
+    plt.grid()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    M, gap = max(plot_f), 0.35
-    
-    plt.ylim(0, M + gap*M)
+    M, gap = max(plot_f), 0.25
+    plt.xticks(plot_x)
+    #plt.ylim(0, M + gap*M)
+    plt.yticks(np.linspace(0, M, 27))
     plt.plot(plot_x, plot_f, '-b', label=fLabel, linewidth=1)
     #  plt.legend(prop={'size': 5})
     #  plt.legend(fontsize=7)
+    fig.set_figheight(7)
     plt.legend()
+    print("\nshowing plot\n")
+    plt.show()
+    #fig.show()
+    #fig.tight_layout()
 
 
 def runtime(f, args, unpack: bool):
@@ -65,9 +76,12 @@ def runtime(f, args, unpack: bool):
     -------
         The time it takes to run the function f with the arguments args'''
     before = time()
-    f(*args) if (unpack) else f(args)
-    after = time()
-    delta_time = after - before
+    #f(*args) if (unpack) else f(args)
+    #after = time()
+    
+    delta_time = timeit(lambda : f(*args) if (unpack) else f(args), number=1) * 1.000
+    #delta_time = after - before
+    
     return delta_time
 
 def runtime_arr(f, argArray, unpack: bool): 
