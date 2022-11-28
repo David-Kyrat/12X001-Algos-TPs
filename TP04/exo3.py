@@ -1,9 +1,35 @@
 ########################### Exercise 2 ###########################
 
+def format_output_for_test(solution, coin_set):
+    """
+    ``Computechange()`` functions returns a list ``l`` s.t. ``l[i]`` is the amount of times ``coin_set[i]`` was used.
+    so we have to format that output/solution to adapt to the format expected in 'test_tp4.py'
 
+    Parameters
+    ----------
+    @ `solution` - Solution returned by 'compute_change()'
+    @ `coin_set` - coin_set used to compute 'solution'
 
-def compute_change(money, coin_set):
-    """Returns the optimal change (lowest number of coins) for the given 'money' and 'coin set'."""
+    Returns
+    -------
+        ``coin_set`` values for each non null ``amount`` in ```solution``"""
+    fmt_out = []
+    for i, coin_amount in enumerate(solution):
+        if coin_amount != 0:
+            fmt_out += coin_amount*[coin_set[i]]
+    return fmt_out
+    
+def compute_change(money, coin_set:list) -> list:
+    """Computes the optimal change (lowest number of coins) for the given 'money' and 'coin set'.
+
+    Parameters
+    ----------
+    @ `money` - amount to change
+    @ `coin_set` - values of the coins to used when returning the money (sorted in decreasing order)
+
+    Returns
+    -------
+        (list) Solution ``l`` s.t. ``l[i]`` is the amount of times ``coin_set[i]`` was used."""    
     if coin_set is None or coin_set == [] or money <= 0: return []
     C, n = coin_set, len(coin_set)        
 
@@ -18,7 +44,7 @@ def compute_change(money, coin_set):
         if money == coin:
             sol = [0]*n
             sol[i] = 1
-            return sol
+            return format_output_for_test(sol, coin_set)
 
     # if not then there exists at least 2 subsets S1, S2 such that S1, S2 also minimize the amount of coin used (if S is optimal)
     # (S1, S2) are the solutions to the subproblems, so we can compute the subsolutions step by step by memorizing the answers to the previous steps in D
@@ -46,13 +72,6 @@ def compute_change(money, coin_set):
     # Hence min { sum(D[i]) } for i in {0..n} is the optimal amount of coins, and row i contains the optimal solution.
     
     opti_row = min(range(n), key= lambda i: sum(D[i]))
-    #print(f"optimal solutions: {opti_row[:-1]} ")
-    return D[opti_row] #if opti_row != 0 else []
-
-if __name__ == '__main__':
-    A1, s1 = 6, [11, 5, 2, 1]
-    s2 = [1]
-    print(compute_change(A1, s1))
-    print(compute_change(A1, s2))
-    
-
+    out = format_output_for_test(D[opti_row], coin_set)  # Now formatting our output to adapt to the format expected in test_tp4
+    #out = D[opti_row]
+    return out

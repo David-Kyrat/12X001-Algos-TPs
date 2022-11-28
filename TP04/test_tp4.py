@@ -1,5 +1,6 @@
 ########################### Exercise 1 ###########################
-from tp4 import get_solution
+from exo1 import get_solution
+
 def test_get_solution():
     M = [
         [0,None,None,None,None,None,None,None],
@@ -28,7 +29,7 @@ def test_get_solution():
 
 
 ########################### Exercise 2 ###########################
-from tp4 import compute_change
+from exo3 import compute_change
 
 def test_compute_change():
     coin_set = [30, 24, 12, 6, 3, 1]
@@ -38,7 +39,7 @@ def test_compute_change():
     assert compute_change(48, coin_set) == [24, 24] # Optimal solution greedy could not find.
 
 ########################### Exercise 3 ###########################
-from tp4 import longest_common_subsequence, longest_common_substring
+from exo2 import longest_common_subsequence, longest_common_substring
 
 def test_longest_common_subsequence():
     a, b = ["a", "c", "t", "g", "a", "a"], ["c", "g", "a", "t"]
