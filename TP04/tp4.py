@@ -30,7 +30,7 @@ def compute_change(money, coin_set):
     # in the last column of D i.e. D[n], (D[i][n] contains the amount of coins used for the i-th subproblem) 
     
     opti_row = min(range(n), key= lambda i: sum(D[i]))
-    print(f"optimal solutions: {opti_row[-1]} coins: {opti_row[:-1]} ")
+    print(f"optimal solutions: {opti_row[:-1]} ")
 
 
 ########################### Exercise 3 ###########################
