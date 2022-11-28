@@ -9,25 +9,28 @@ def get_solution(M):
 ########################### Exercise 2 ###########################
 def compute_change(money, coin_set):
     """Returns the optimal change (lowest number of coins) for the given 'money' and 'coin set'."""
-    A, C, n = money, coin_set, len(coin_set)
+    C, n = coin_set, len(coin_set)
 
-    def solve_sub(Ci) -> list[int]:
-        """Returns the list res of coinset where res[k] is the amount of times we used coin Ci[k]. res[n] contains the amount of coins used overall for this subproblem"""
-        res = [0]*(n+1)
-
-        
-        return res
-
+    def solve_sub(Ci, left, k, acc):
+        """ Returns the list res of coinset where res[k] is the amount of times we used coin Ci[k].
+            left := money left to partition into coins, k:= current coin index, acc:= accumulator containing the solution"""
+        if k >= n or left <= 0: return acc
+        if left - Ci[k] >= 0: return solve_sub(Ci, left - Ci[k], k, acc + [Ci[k]])
+        return solve_sub(Ci, left, k + 1, acc)
     
     # matrix of solutions where the row i contains the solution for the subproblem with C = Ci = {c1, ..., ci}
-    D = [[] for _ in range(n)]
-        
+    D = [] #[[] for _ in range(n)]
     for i in range(n):
-        D[i] = solve_sub(C[:i+1])
+        D.append(solve_sub(C[:i+1], money, 0, []))
 
-    # Now we just have to search the min in the last column of D i.e. D[n], (D[n][i] contains the amount of coins used for the i-th subproblem) 
-    # Hence min { D[n][k] } for k in {0..n} is the optimal amount of coins, and row k contains the optimal solution.
+    # Now we just have to search the min of the sum of each column
+    # Hence min { sum(D[k]) } for k in {0..n} is the optimal amount of coins, and row k contains the optimal solution.
     
+    #! NO
+    # in the last column of D i.e. D[n], (D[i][n] contains the amount of coins used for the i-th subproblem) 
+    
+    opti_row = min(range(n), key= lambda i: sum(D[i]))
+    print(f"optimal solutions: {opti_row[-1]} coins: {opti_row[:-1]} ")
 
 
 ########################### Exercise 3 ###########################
