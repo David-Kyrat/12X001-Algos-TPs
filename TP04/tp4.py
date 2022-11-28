@@ -1,44 +1,58 @@
-########################### Exercise 1 ###########################
-def get_solution(M):
-    """Returns a table T where each value T_ij tells the minimum cost to get from city i to city j based on the cost matrix M.
-    Also returns the cost of travelling from city 0 to n-1 and the respective path as a list of indexes."""
-    # TODO
-    
-
-
 ########################### Exercise 2 ###########################
+
+
+
 def compute_change(money, coin_set):
     """Returns the optimal change (lowest number of coins) for the given 'money' and 'coin set'."""
-    C, n = coin_set, len(coin_set)
+    if coin_set is None or coin_set == [] or money <= 0: return []
+    C, n = coin_set, len(coin_set)        
 
-    def solve_sub(Ci, left, k, acc):
-        """ Returns the list res of coinset where res[k] is the amount of times we used coin Ci[k].
-            left := money left to partition into coins, k:= current coin index, acc:= accumulator containing the solution"""
-        if k >= n or left <= 0: return acc
-        if left - Ci[k] >= 0: return solve_sub(Ci, left - Ci[k], k, acc + [Ci[k]])
-        return solve_sub(Ci, left, k + 1, acc)
-    
-    # matrix of solutions where the row i contains the solution for the subproblem with C = Ci = {c1, ..., ci}
-    D = [] #[[] for _ in range(n)]
+    # matrix of solutions where the row i contains the solution for the subproblem with C = Ci = {cn, ..., ci}. (we start with the lowest coin values)
+    # say in rapport maybe that e.g. for C = {10,5,1} we start with C={1} then C={1,2}
+    D = [] 
+
+    # Let S be the optimal answer
+    # Either there exists a coin of value exactly 'money' (i.e. S = <that coin>)
     for i in range(n):
-        D.append(solve_sub(C[:i+1], money, 0, []))
+        coin = C[i]
+        if money == coin:
+            sol = [0]*n
+            sol[i] = 1
+            return sol
+
+    # if not then there exists at least 2 subsets S1, S2 such that S1, S2 also minimize the amount of coin used (if S is optimal)
+    # (S1, S2) are the solutions to the subproblems, so we can compute the subsolutions step by step by memorizing the answers to the previous steps in D
+
+    # function to solve subproblems
+    def solve_sub(Ci, step_idx):
+        """ Returns the list res of coinset where res[k] is the amount of times we used coin Ci[k]."""
+        left, sol = money, [0]*n
+        
+        for k, coin in enumerate(Ci):
+            # if largest current coin is too big, then the solution is exactly the one we mememorized before
+            if (k == 0 and step_idx > 0 and coin > left): return D[step_idx-1]
+            crt_amnt = left // coin
+            left -= crt_amnt * coin
+            sol[n-step_idx-1 + k] = crt_amnt # stores crt_amnt in sol but in reversed order since we iterate first on the lowest coins
+            if left <= 0: return sol
+        return []
+        
+    for i in range(n-1, -1, -1):
+        tmp = solve_sub(C[i:], n-1-i) # padding with the necessary amount of 0s
+        #if len(tmp) < n: tmp = [0]*i + tmp
+        D.append(tmp)
 
     # Now we just have to search the min of the sum of each column
-    # Hence min { sum(D[k]) } for k in {0..n} is the optimal amount of coins, and row k contains the optimal solution.
-    
-    #! NO
-    # in the last column of D i.e. D[n], (D[i][n] contains the amount of coins used for the i-th subproblem) 
+    # Hence min { sum(D[i]) } for i in {0..n} is the optimal amount of coins, and row i contains the optimal solution.
     
     opti_row = min(range(n), key= lambda i: sum(D[i]))
-    print(f"optimal solutions: {opti_row[:-1]} ")
+    #print(f"optimal solutions: {opti_row[:-1]} ")
+    return D[opti_row] #if opti_row != 0 else []
 
+if __name__ == '__main__':
+    A1, s1 = 6, [11, 5, 2, 1]
+    s2 = [1]
+    print(compute_change(A1, s1))
+    print(compute_change(A1, s2))
+    
 
-########################### Exercise 3 ###########################
-def longest_common_subsequence(A, B):
-    """Returns the longest common subsequence (LCS) between lists A and B"""
-    # TODO
-
-
-def longest_common_substring(A, B):
-    """Returns the longest common substring between lists A and B"""
-    # TODO
