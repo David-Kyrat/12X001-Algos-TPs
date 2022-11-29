@@ -26,11 +26,10 @@ def get_solution(M):
     for k in range(n):
         for i in range(k+1, n):
             #print(k, i)
-            for j in range(min(k, i-1)): # ignoring those where |i-j| = 1 since there are no interm step
-                #if k <= i: continue # T triangular => we then iterate only over for the necessary values of k,i,j that is j < k < i
-                                    # We could add i=k and k=j but Tij = 0 for all i==j so we dont need to cover them since they'll be 0. 
-                if j in (k, i): continue
-                #if j > k: break
+            for j in range(min(k+1, i-1)): # ignoring those where |i-j| = 1 since there are no interm step
+                if j == i: continue        # T triangular => we then iterate only over for the necessary values of k,i,j that is j < k < i
+                                           # We could add i=k and k=j but Tij = 0 for all i==j so we dont need to cover them since they'll be 0. 
+                
                 print(f"T[{i}, {j}] = min[ T[{i}, {j}], T[{k}, {j}] + T[{i}, {k}] ]")
             print()
 
