@@ -13,7 +13,6 @@ def get_solution(M):
     # matrix that will contain the optimal intermediary steps to take to minimize the cost. 
     # I.e. (when filled) P(i,j) is the path to take to pay the min. amount Tij (to go from j to i). (since T is lower triangular we must always have j <= i)
     
-    #[[j for j in range(n)] for i in range(n)]
     #! remove this when done testing
     if M is None or n <= 0: return [], [] #[[]], 0, []
 
@@ -26,7 +25,6 @@ def get_solution(M):
                     P[i][j].append(k) # we add this step to the matrix of paths to keep a record of the optimal intermediary step to take"""
     for k in range(n):
         for i in range(k+1, n):
-            #print(k, i)
             for j in range(min(k+1, i-1)): # ignoring those where |i-j| = 1 since there are no interm step
                 if j == i: continue        # T triangular => we then iterate only over for the necessary values of k,i,j that is j < k < i
                                            # We could add i=k and k=j but Tij = 0 for all i==j so we dont need to cover them since they'll be 0. 
@@ -34,45 +32,12 @@ def get_solution(M):
                 if candidate < crt : # if T_k-1(i, k)+ T_k-1(k, j) < T_k-1(i, j) we set T_k(i, j) to T_k-1(i, k)+ T_k-1(k, j) or else we dont change it
                     T[i][j] = candidate
                     P[i][j].append(k) # we add this step to the matrix of paths to keep a record of the optimal intermediary step to take
-                #print(f"T[{i}, {j}] = min[ T[{i}, {j}], T[{k}, {j}] + T[{i}, {k}] ]")
-            #print()
 
     # Tij now contains the contains min(C(i, j)) (for i,j in [|0, n-1|]) where C(i, j) would be defined 
     # as the function that returns all possible path to go from i-th town to j-th town.
 
     #minCost_startTolast = T[0][n-1]
     
-    return T, P
-
-
-def amin(x, y):
-    if x is None and y is None: return None
-    elif x is None: return y
-    elif y is None: return x
-    return x if y > x else y
-
-def pls(x,y):
-    if x is None and y is None: return None
-    elif x is None: return y
-    elif y is None: return x
-    return x+y
-
-
-def get_solution2(M):
-    T, n = deepcopy(M), len(M)  # M is a squared lower triangular matrix.
-    P = [[[] for _ in range(n)] for _ in range(n)]
-    if M is None or n <= 0:
-        return [], []  # [[]], 0, []
-
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):  # ignoring those where |i-j| = 1 since there are no interm step
-                crt, candidate = T[i][j], pls(T[i][k], T[k][j])
-                crtmin = amin(crt,  candidate)
-                T[i][j] = crtmin
-                if (crtmin == candidate):
-                    P[i][j].append(k)
-
     return T, P
 
 def printMat(T):
