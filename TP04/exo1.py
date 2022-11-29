@@ -10,24 +10,28 @@ def get_solution(M):
 
     T, n = M, len(M) # M is a squared lower triangular matrix. 
     P = [[] * n] # matrix that will contain the optimal intermediary steps to take to minimize the cost. 
-               # I.e. (when filled) P(i,j) is the path to take to pay the min. amount Tij (to go from i to j).
+               # I.e. (when filled) P(i,j) is the path to take to pay the min. amount Tij (to go from j to i). (since T is lower triangular we must always have j <= i)
 
     #! remove this when done testing
     if M is None or n <= 0: return [], [] #[[]], 0, []
 
-    """for k in range(n): # we then iterate only over for the necessary values of k,i,j that is i < k < j 
+    """for k in range(n): 
         for i in range(k): # we could add i=k and k=j but Tij = 0 for all i==j so we dont need to cover them since they'll be 0.
             for j in range(k+1, n):  #! maybe n+1 idk
                 crt, candidate = T[i][j], T[i][k] + T[k][j]
                 if candidate < crt : # if T_k-1(i, k)+ T_k-1(k, j) < T_k-1(i, j) we set T_k(i, j) to T_k-1(i, k)+ T_k-1(k, j) or else we dont change it
                     T[i][j] = candidate
                     P[i][j].append(k) # we add this step to the matrix of paths to keep a record of the optimal intermediary step to take"""
- 
+    def p(i,j): return (T[i][j] if T[i][j] is not None else "_")
     for k in range(n):
-        for i in range(0, n):
+        for i in range(k+1, n):
             #print(k, i)
-            for j in range(k):
-                print((k, i, j), T[i][j] if T[i][j] is not None else "_")
+            for j in range(min(k, i-1)): # ignoring those where |i-j| = 1 since there are no interm step
+                #if k <= i: continue # T triangular => we then iterate only over for the necessary values of k,i,j that is j < k < i
+                                    # We could add i=k and k=j but Tij = 0 for all i==j so we dont need to cover them since they'll be 0. 
+                if j in (k, i): continue
+                #if j > k: break
+                print(f"T[{i}, {j}] = min[ T[{i}, {j}], T[{k}, {j}] + T[{i}, {k}] ]")
             print()
 
     # Tij now contains the contains min(C(i, j)) (for i,j in [|0, n-1|]) where C(i, j) would be defined 
