@@ -27,6 +27,7 @@ def test_get_solution():
     count, path = 19.9, [0, 2, 7]
     assert get_solution(M) == (T, count, path)
 
+test_get_solution()
 
 ########################### Exercise 2 ###########################
 from exo2 import compute_change

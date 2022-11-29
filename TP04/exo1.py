@@ -1,6 +1,17 @@
 from copy import deepcopy
 
 ########################### Exercise 1 ###########################
+
+def getpath(i, j, P):
+    """ return optimal path with the optimal intermediary steps in P"""
+    intermed = sorted(P[i][j])
+    opti_path = [i]
+    for inter_step in intermed:
+        opti_path += [inter_step]
+    opti_path += [j]
+    return opti_path
+    
+
 def get_solution(M):
     """Returns a table T where each value T_ij tells the minimum cost to get from city i to city j based on the cost matrix M.
     Also returns the cost of travelling from city 0 to n-1 and the respective path as a list of indexes."""
@@ -32,18 +43,14 @@ def get_solution(M):
                 if candidate < crt : # if T_k-1(i, k)+ T_k-1(k, j) < T_k-1(i, j) we set T_k(i, j) to T_k-1(i, k)+ T_k-1(k, j) or else we dont change it
                     T[i][j] = candidate
                     P[i][j].append(k) # we add this step to the matrix of paths to keep a record of the optimal intermediary step to take
-
     # Tij now contains the contains min(C(i, j)) (for i,j in [|0, n-1|]) where C(i, j) would be defined 
     # as the function that returns all possible path to go from i-th town to j-th town.
 
     #minCost_startTolast = T[0][n-1]
+    opti_path = list(reversed(getpath(n-1, 0, P)))
+    # we reverse because opti_path was extracted in the natural order of the matrix. => have to adapt to test
     
-    return T, P
-
-def printMat(T):
-    for list in T:
-        print(list)
-
+    return T, T[n-1][0] , opti_path
 
 M = [
     [0, None, None, None, None, None, None, None],
@@ -57,7 +64,6 @@ M = [
 ]
 #
 
-T, P = get_solution(M)
 
 correctT = [
     [0, None, None, None, None, None, None, None],
@@ -70,4 +76,3 @@ correctT = [
     [19.9, 16.9, 13.9, 13.9, 13.9, 12, 7.4, 0]
 ]
     
-assert T == correctT
