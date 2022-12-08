@@ -9,6 +9,8 @@ board = [
         [13, 14, 15, 12]
     ]
 
+
+    
 def test_c_hat():
     assert c_hat(board) == 3
 
