@@ -6,4 +6,6 @@ tests
 tests/*
 **/.pytest_cache
 *.zip
+TP05/out
+TP05/images
 
