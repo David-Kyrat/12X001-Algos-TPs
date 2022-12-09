@@ -1,6 +1,6 @@
 ########################### Exercise 1 ###########################
-from tp5 import c_hat, solve_taquin
-from tp5 import UP, RIGHT, DOWN, LEFT
+from fifteen_puzzle import c_hat, solve_taquin
+from fifteen_puzzle import UP, RIGHT, DOWN, LEFT
 
 board = [
         [1, 2, 3, 4],

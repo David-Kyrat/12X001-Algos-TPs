@@ -4,30 +4,44 @@
 \usepackage[T1]{fontenc}
 \usepackage[autolanguage]{numprint}
 \usepackage{hyperref}
-\usepackage[fleqn]{amsmath}
+%\usepackage[fleqn]{amsmath}
 \usepackage{enumitem,amssymb}
 \usepackage{graphicx}
 \usepackage{xcolor}
 \usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{pdfpages}
-\usepackage{pgfplots}
+%\usepackage{pgfplots}
 \usepackage{fancyhdr}
 \usepackage{pdfpages}
 \usepackage{lastpage}
 \usepackage{cleveref}
 \usepackage{ragged2e}
-\usepackage{graphicx}
-%
+\usepackage{listings}
 %
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 %
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  label={lst:code_direct}
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
 %
 \pagestyle{fancy}
-\pgfplotsset{compat=newest}
-\usetikzlibrary{calc}
 \setlength{\headheight}{73.96703pt}
 \addtolength{\topmargin}{-49.96703pt}
 \setlength{\footskip}{45.81593pt}
@@ -49,7 +63,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\es}{\varnothing}
-\DeclareMathOperator{\Ima}{Im}
+%\DeclareMathOperator{\Ima}{Im}
 \renewcommand{\and}{\wedge}
 \newcommand{\ra}{\rightarrow}
 \newcommand{\inv}[1]{{#1}^{-1}}
@@ -63,7 +77,7 @@
 \newcommand{\s}{\Sigma}
 %
 \newcommand{\xor}{\oplus}
-\newcommand{\nb}{0X}
+\newcommand{\nb}{05}
 %
 \DeclareMathSymbol{*}{\mathbin}{symbols}{"01}
 
@@ -78,7 +92,7 @@
     \vspace{0.1cm}
 }
 \author{Noah Munz (19-815-489)}
-\date{<DATE> 2022}
+\date{Dec 2022}
 
 %
 \lhead{Université de Genève \\ Sciences Informatiques}
@@ -86,8 +100,9 @@
 \cfoot{} \lfoot{\hspace{-1.8cm} \unilogo{0.06}}
 \rfoot{Page \thepage \hspace{0.5mm} / \pageref{LastPage} \hspace{-1cm}}
 %
-
+%
 \begin{document}
+%
 \maketitle
 \vspace{0.5cm}
 \tableofcontents
@@ -101,22 +116,11 @@
 \end{center}
 \vspace{0.3cm}
 %
-\stepcounter{section}
-\section{Exercices}
-%
-\vspace{0.5cm}
-\stepcounter{subsection}
-\stepcounter{subsection}
+\section{Taquin / Fifteen Puzzle}
 
-
-
-\subsection{Problème}
+\subsection{Fonction de coût}
 
 %
-
 %
-\vspace{0.4cm}
-\subsection{Implementation}
-\vspace{0.3cm}
-
+%
 \end{document}
