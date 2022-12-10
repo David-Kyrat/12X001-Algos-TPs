@@ -34,7 +34,7 @@ class M(Enum):
 
 def isMisplaced(board: list[list[int]], coord:tuple[int, int]) -> bool:
     """Returns True if the element at coord is misplaced, False otherwise. i.e. 15 should be at (3, 3)"""
-    return board[coord[0]][coord[1]] == 4 * coord[0] + coord[1] + 1
+    return board[coord[0]][coord[1]] != 4 * coord[0] + coord[1] + 1
 
 
 def tmp():
@@ -44,7 +44,7 @@ def tmp():
 
 B = tmp()
 
-def swap(board: list[list[int]], tx:tuple[int, int], move: M, misplaced: set[tuple[int, int]]) -> set[tuple[int, int]]:
+def swap(board: list[list[int]], tx:tuple[int, int], move: M, misplaced: set[tuple[int, int]]):
     """Swap index and index coord in coord in the board.
 
     Parameters
@@ -53,10 +53,6 @@ def swap(board: list[list[int]], tx:tuple[int, int], move: M, misplaced: set[tup
     @ `tx` - index of white square (16)
     @ `move` - move applied to the white square
     @ `misplaced` - set of misplaced tiles
-
-    Returns
-    ----------
-        `misplaced` - updated set of misplaced tiles
     """
     nc = move + tx # new coord
     board[tx[0]][tx[1]], board[nc[0]][nc[1]] = board[nc[0]][nc[1]], board[tx[0]][tx[1]] # swap
@@ -64,13 +60,13 @@ def swap(board: list[list[int]], tx:tuple[int, int], move: M, misplaced: set[tup
     print(isMisplaced(board, nc), nc)
     # if the new coord is misplaced, add it to the misplaced set
     if isMisplaced(board, nc): misplaced.add(nc)
+    elif nc in misplaced: misplaced.remove(nc)
     
     print(isMisplaced(board, tx), tx)
     # if the swap corrected the position of a tile, remove it from the misplaced set
-    if not isMisplaced(board, tx) and tx in misplaced: 
-        misplaced.remove(tx)
-    
-    
+    if isMisplaced(board, tx): misplaced.add(tx) # if already in it => does nothing
+    elif tx in misplaced: misplaced.remove(tx)
+
 
 class Node: 
     """Node of the game tree. Each node has a ``depth`` (``int``), a cost (``int``), a list of moves ``moves`` (``list[M]``) 
