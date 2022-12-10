@@ -37,39 +37,40 @@ class Node:
     """Node of the game tree. Each node has a ``depth`` (``int``), a cost (``int``), a list of moves ``moves`` (``list[M]``) 
     the index of the empty square, ``tx``, (``tuple[int, int]``) in its associated board, and the value of g(this) (``int``)."""
     
-    def __init__(self, cost:int, move: M, parent = None, tx: tuple[int, int] = None):
+    def __init__(self, cost:int, move: M, parent, tx: tuple[int, int] = None):
         """Primary constructor of the Node class.
 
         Parameters
         ----------
         @ `cost`   - cost of this, defined by ``c_hat(this) = h(this) + g(this)``
         @ `move`   - move that led to this node from its parent
-        @ (optional) `parent` - parent of this node (If not given then this node is the root of the game tree)
-        @ (optional)`tx`     - index of the empty square in the associated board. (If not given, => will be inferred from `parent`)
+        @ `parent` - parent of this node (Can be None, If it is, then this node is the root of the game tree, and tx has to be given)
+        @ (optional)`tx` - index of the empty square in the associated board. (If not given, => will be inferred from `parent`)
         @ `depth`  - depth of this node in the game tree (i.e. ``h(this)``)
-        @ `g`      - value of ``g(this)``
+        @ `gx`      - value of ``g(this)``
         """
         if parent is None:
-            self.init_root(cost, tx)
+            self.__init_root__(cost, tx)
             return
         
         self.depth = parent.depth + 1
         self.cost = cost
         self.moves = parent.moves + [move]
         self.tx = move + parent.tx # addition between a move and a tuple was defined in the M class above. e.g. ``M.UP + (3, 2)`` returns ``(3, 1)``
-        self.g = cost - (parent.depth + 1)
+        self.gx = cost - (parent.depth + 1)
 
-    def init_root(self, cost:int, taquin_index: tuple[int, int]):
-        """``taquin_index`` is the index of the empty square in the initial board """
+    def __init_root__(self, cost:int, taquin_index: tuple[int, int]):
+        """'Private' constructor of root, ``taquin_index`` is the index of the empty square in the initial board """
         self.depth = 0
         self.cost = cost
         self.moves = []
         self.tx = taquin_index
-        self.g = cost
+        self.gx = cost
 
     def __repr__(self):
         """Representation of a node as a string."""
         return f"Node(ĉ={self.cost}, h={self.depth}, tx={self.tx}, moves={self.moves})"
+
 
 
 # associate each direction to its corresponding move
