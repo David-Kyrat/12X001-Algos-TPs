@@ -1,51 +1,9 @@
-from enum import Enum
+########################### Exercise 3 ###########################
+from fifteen_puzzle import M, M_ALL, mv, UP, RIGHT, DOWN, LEFT
 
-########################### Exercise 1 ###########################
-# Definitions
-UP, RIGHT, DOWN, LEFT = "up", "right", "down", "left"
-
-#!
-#! To switch from the cost function:
-#! ĉ(x) = h(x) + g(x) to ĉ(x) = h(x)
-#! (change the last line of ``update_misplaced_compute_cost()``)
-#!
-
-class M(Enum):
-    UP = (-1, 0)
-    DOWN = (1, 0)
-    RIGHT = (0, 1)
-    LEFT = (0, -1)
-
-    v = property(lambda self: self.value)
-
-    # e.g. M.UP() returns (0, -1)
-    def __call__(self): return self.v
-
-    def __add__(self, other):
-        if isinstance(other, (tuple, list)):
-            return (self()[0] + other[0], self()[1] + other[1])
-        if isinstance(other, M):
-            return self + other()
-        raise ValueError(f"Cannot add {type(other)} to {type(self)}")
-
-    def __sub__(self, other):
-        if isinstance(other, (tuple, list)):
-            return (self.v[0] - other[0], self.v[1] - other[1])
-        if isinstance(other, M):
-            return self - other.v
-        raise ValueError(f"Cannot subtract {type(other)} from {type(self)}")
-
-    def inv(self): 
-        """Returns the inverse of the move. e.g. M.UP.inv() returns M.DOWN"""
-        return M((-self()[0], -self()[1]))
-
-    def __repr__(self): return self.name
-
-def isMisplaced(board: list[list[int]], coord: tuple[int, int]) -> bool:
-    """Returns True if the element at coord is misplaced, False otherwise. i.e. 15 should be at (3, 3)"""
-    DIM = len(board)
-    return board[coord[0]][coord[1]] != DIM * coord[0] + coord[1] + 1
-
+#
+#* Lets call ``a`` the index of our current location, we want to move ``a`` from the starting point ``a0`` to the arrival/destination ``b``.
+# 
 
 def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
     """Swap index and index coord in coord in the board and update set of misplaced tiles (if not none).
@@ -53,43 +11,19 @@ def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tu
     Parameters
     ----------
     @ `board` - Game board
-    @ `tx` - index of white square (16)
-    @ `move` - move applied to the white square
+    @ `move` - move to be made
     @ (optional) `misplaced` - set of misplaced tiles
 
     Returns
     ----------
-        New position of the white square
+        New position of ``a``
     """
     nc = move + tx # new coord of white square
     board[tx[0]][tx[1]], board[nc[0]][nc[1]] = board[nc[0]][nc[1]], board[tx[0]][tx[1]] # swap
 
     if misplaced is None: return nc
-    
-    # if the new coord is misplaced, add it to the misplaced set
-    if isMisplaced(board, nc): misplaced.add(nc)
-    else: misplaced.discard(nc) # if not in it => does nothing
-    
-    # if the swap corrected the position of a tile, remove it from the misplaced set
-    if isMisplaced(board, tx): misplaced.add(tx) # if already in it => does nothing
-    else: misplaced.discard(tx)
 
     return nc
-
-
-def c_hat(board: list[list[int]]) -> int:
-    """Cost function for a given board is the cost function the optimum, i.e. ĉ(board) = ĉ(optimum) = ĉ(root) (by relation 3.3 in the lecture notes). 
-    and for root, ĉ(root) = h(root) + g(root) = 0 + g(root) = g(root) = number of misplaced tiles (16 excluded). Hence why we only compute g(root) here.
-
-    (in this version, everything has to be recomputed from scratch, 
-    for more info on "attempt" at better complexity see ``update_misplaced_compute_cost()`` below.)
-    The cost of a node of the game is the number of squares that are not at their place (16 excluded)."""
-    misplaced = 0
-    for i in range(len(board)):
-        for j in range(len(board[i])):
-            if isMisplaced(board, (i, j)):
-                misplaced += 1
-    return max(0, misplaced - 1) # -1 because we do not coun the empty square
 
 
 class Node: 
@@ -138,62 +72,6 @@ class Node:
         return f"Node(ĉ={self.cost}, h={self.depth}, tx={self.tx}, moves={self.moves})"
 
 
-def init_misplaced(board: list[list[int]], white_square_value) -> tuple[tuple[int, int], set[tuple[int, int]]]:
-    """Initialize the set of misplaced tiles and return index of white square (16).
-
-    Parameters
-    ----------
-    @ `board` - Game board
-
-    Returns
-    ----------
-        Tuple: (index of white square (16),   Set of misplaced tiles)
-    """
-    misplaced = set()
-    tx0 = (-1, -1) # index of white square (16) 
-    for i in range(len(board)):
-        for j in range(len(board[i])):
-            if board[i][j] == white_square_value: tx0 = (i, j)
-            if isMisplaced(board, (i, j)):
-                misplaced.add((i, j))
-    return tx0, misplaced
-
-
-def apply_moves(board: list[list[int]], tx0: tuple[int, int], moves: list[M], misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
-    """Apply the given list of moves to the given board.
-
-    Parameters
-    ----------
-    @ `board` - Game board (usually the initial board)
-    @ `tx0`   - Taquin indeX in given board (index of the white square (16) in ``board``) (usually the initial index of the white square)
-    @ `moves` - List of moves to apply
-    @ `misplaced` - Set of misplaced tiles (if not given, no misplaced set will be saved/computed)
-
-    Returns
-    ----------
-        New position of white square, (NB: modifies the board and ``misplaced`` in place) """
-
-    tx = tx0 # index of the empty square in the initial board
-    for move in moves:
-        tx = swap(board, tx, move, misplaced)
-    return tx
-
-def unapply_moves(board: list[list[int]], tx: tuple[int, int], moves: list[M]):
-    """Return the board into its initial state. i.e. Unapply the given list of moves to the given board.
-
-    Parameters
-    ----------
-    @ `board` - Game board
-    @ `tx`  - Taquin indeX (index of the white square after applying all ``moves`` to ``board``)
-    @ `moves` - List of moves to reverse/unapply
-
-    Returns
-    ----------
-        Nothing, modifies the board in place """
-    
-    for i in range(len(moves)-1, -1, -1):
-        tx = swap(board, tx, moves[i].inv(), None)
-    
 
 def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], board: list[list[int]], moves: list[M])-> tuple[int, int, set[tuple[int, int]]]: 
     """ Instead of storing copies of the board (which would be memory consuming since board is a 2d matrix), 
@@ -226,12 +104,6 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     gx = len(_misplaced) # g(x) = number of misplaced tiles
     hx = node.depth
     return gx+hx, gx, _misplaced
-
-
-# associate each move to its corresponding direction
-mv: dict[M, str] = {M.UP: UP, M.RIGHT: RIGHT, M.DOWN: DOWN, M.LEFT: LEFT}
-
-M_ALL = set(mv.keys()) # set of all possible moves
 
 
 def children_moves(node: Node, DIM: int) -> set[M]:
@@ -296,44 +168,21 @@ def nextENode(liveNodes: list[Node]) -> Node:
     return liveNodes.pop()
 
 
-def convert_solution(goal_node: Node) -> list[str]:
-    """ Return the list of moves (as string i.e. "up", "down"...) to get from the initial state to the goal state.
-
-    Parameters
-    ----------
-    @ `goal_node` - Node representing the goal state
-
-    Returns
-    -------
-        List of moves to get from the initial state to the goal state.
-    """
-    return [mv[move] for move in goal_node.moves]
-
-
-def solve_taquin(board: list[list[int]], extract_path_from_goalNode: bool = True, white_square:int = 16) -> list[str] | Node:
-    """Function that solves the 15-puzzle using branch and bound,
-    for the cost function ``ĉ(x) = h(x) + g(x)`` where ``h(x) = depth of x`` and ``g(x) = number of misplaced tiles``.
-    NB: technically the algorithm could work for more than 16 tiles (i.e. for a board of size n x n where n >= 4)
-    
-    Parameters
-    ----------
-    @ `board` - Matrix representing the initial state of the game
-    @ `convert_sol` - If True, return the list of moves as string (i.e. 'up', 'down'...) to get from the initial state to the goal state. If False, return the goal node.
-    @ `white_square` - (only useful if board is a nxn matrix with n>4) Value of the white square in the initial state of the game. Default is 16.
-
-    NB: does not modify given board
-    """
-    DIM = len(board) # board should be a square matrix
+def solve_shortest_path(domain:list[list[int]], a:tuple[int, int], b:tuple[int, int]) -> list[tuple[int, int]]:
+    """Finds the shortest path from point a to point b according to the 2-dimensional domain.
+    The path is returned as a list of steps from a to b, where each step is a tuple with 2 integers."""
+    # TODO
+    n, m = len(domain), len(domain[0])
+    DIM = n, m
     liveNodes: list[Node] = []
-
-    enode = Node(None, None, board) # special constructor for root node
-    if white_square != 16 and DIM > 4:  enode.__init_root__(board, white_square) # if white_square is not 16 then update the value used in ``init_misplaced()``
+    
+    enode:Node = None # TODO
     while not P(enode):
         available_moves: set[M] = children_moves(enode, DIM)
 
-        for move in available_moves: 
-            child = Node(move, enode, board)
+        for move in available_moves:
+            child = None # TODO
             addToLiveNodes(child, liveNodes)
 
         enode = nextENode(liveNodes)
-    return convert_solution(enode) if extract_path_from_goalNode else enode
+    return enode.path
