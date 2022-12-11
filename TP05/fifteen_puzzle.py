@@ -300,13 +300,14 @@ def convert_solution(goal_node: Node) -> list[str]:
     return [mv[move] for move in goal_node.moves]
 
 
-def solve_taquin(board: list[list[int]]) -> list[str]:
+def solve_taquin(board: list[list[int]], convert_sol: bool = True) -> list[str] | Node:
     """Function that solves the 15-puzzle using branch and bound.
     NB: technically the algorithm could work for more than 16 tiles (i.e. for a board of size n x n where n >= 4)
     
     Parameters
     ----------
     @ `board` - Matrix representing the initial state of the game
+    @ `convert_sol` - If True, return the list of moves as string (i.e. 'up', 'down'...) to get from the initial state to the goal state. If False, return the goal node.
     """
     DIM = len(board) # board should be a square matrix
     liveNodes: list[Node] = []
@@ -320,4 +321,4 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
 
         enode = nextENode(liveNodes)
 
-    return convert_solution(enode)
+    return convert_solution(enode) if convert_sol else enode

@@ -55,4 +55,15 @@ def gen_disorder(board: list[list[int]], node:Node, n):
         move = random.choice(list(children_move_fromList(move, tx, DIM)))
         tx = apply_moves(board, tx, [move], misplaced)
 
-    
+    return tx, misplaced
+
+if __name__ == '__main__':    
+    board = [[1, 2, 3, 4], 
+            [5, 6, 16, 8], 
+            [9, 10, 7, 11],
+            [13, 14, 15, 12]]
+
+    solution = solve_taquin(board)
+
+    print(so)
+
