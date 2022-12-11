@@ -117,7 +117,7 @@ def test_solve_taquin_for_any_dim(DIM:int):
     return _goalNode
 
 
-def test_cost_efficiency(nMax: int, amount:int):
+def test_cost_efficiency(nMax: int, amount:int) -> tuple[dict[int, float], dict[int, float]]:
     """ For each ``n`` from ``1`` to ``nMax`` (inclusive), do 50 times the following:
             generates a sorted board, then call ``gen_disorder(board, n)`` on it to create a random board 
              (shuffle the board with n 'moves' ). Then solve it and count the number explored nodes ``k``
@@ -126,6 +126,11 @@ def test_cost_efficiency(nMax: int, amount:int):
     ----------
     @ `nMax` - max number of moves to perform to shuffle the board. i.e. max "level of disorder"
     @ `amount` - number of time to perform the test for each ``n``
+
+    Returns
+    ----------
+        `(avgs_k, avgs_time)` - pair of dict mapping each ``n`` to the average number of explored nodes to find the solution and the associated runtime.
+    
     """
     board = sorted_board(4)
     avgs_k:dict[int: float] = {}
@@ -150,13 +155,16 @@ from numpy import linspace
 
 def plotTime(avgs_time:dict[int, float]):
     """Plot the average time to solve the puzzle for each level of disorder."""
-    x_plot, y_plot = list(avgs_time.keys()), [t*100 for t in avgs_time.values()] # convert to ms
-    xlabel, ylabel = "disorder level, (max distance from solution i.e. list of moves that lead to the game board sorted puzzle from 1 to 16)", r"average runtime to get to the solution (ms)"
+    x_plot, y_plot = list(avgs_time.keys()), [t*10000 for t in avgs_time.values()] # convert to 10*ns
+    xlabel, ylabel = "disorder level, (max distance from solution i.e. list of moves that lead to the game board sorted puzzle from 1 to 16)", r"average runtime to get to the solution (10*ns)"
     title = r"Average time to solve the puzzle for each disorder level with cost function: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$"
-    flabel = r"Average Runtime (ms) for $\hat{c}(x)=h(x)+g(x)$"
+    flabel = r"Average Runtime (10*ns) for $\hat{c}(x)=h(x)+g(x)$"
+    # Now plotting x^2 next to it to show how close the complexity really is from O(c(x0)^2) (i.e. O(x^2) if x is always the optimal solution)
+    plot_f2, f2Label = [(1/5* (x*x) )for x in x_plot], r"$f_2(x) = \frac{1}{5}x^2$"  # we have a factor 1/5 for which the runtime seems really close to f2(x) = 1/5*x^2, (and O(p*x^2) = O(x^2) for all constant p)
     
-    xticks, yticks = x_plot, linspace(0, max(y_plot), 20)
-    util.plot_solo(x_plot, y_plot, title, xlabel, ylabel, flabel, xticks, yticks)
+    xticks, yticks = x_plot, linspace(0, max(y_plot), 23)
+    #util.plot_solo(x_plot, y_plot, title, xlabel, ylabel, flabel, xticks, yticks)
+    util.plotVS(x_plot, y_plot, plot_f2, title, xlabel, ylabel, flabel, f2Label, xticks, yticks)
 
 
 def plotK(avgs_k:dict[int, float]):
@@ -187,9 +195,7 @@ if __name__ == '__main__':
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
 
-    nMax, amount = 14, 100 # max level of disorder, number of time to perform the test for each level
-    print(test_cost_efficiency(nMax, amount))
-    avgs = test_cost_efficiency(nMax, amount)
-    plotK(avgs[0])
-    plotTime(avgs[1])
-
+    nMax, amount = 11, 50 # max level of disorder, number of time to perform the test for each level
+    avgs_k, avgs_time = test_cost_efficiency(nMax, amount)
+    #plotK(avgs_k)
+    plotTime(avgs_time)
