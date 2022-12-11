@@ -74,7 +74,7 @@ def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tu
 
 def c_hat(board: list[list[int]]) -> int:
     """Cost function for a given board. (where everything has to be recomputed from scratch, 
-    for more info see ``update_misplaced_compute_cost()`` below.)
+    for more info on "attempt" at better complexity see ``update_misplaced_compute_cost()`` below.)
     The cost of a node of the game is the number of squares that are not at their place (16 excluded)."""
     misplaced = 0
     for i in range(len(board)):
@@ -156,7 +156,7 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     this function recomputes the different changes each move would have on the board, and updates the set of misplaced tiles accordingly.
 
     Then the cost of a node x is just its depth (h(x)) the length of the set of misplaced tiles (g(x)).
-    the total should be in O(m) where m is the number of moves. (swap should be O(1) since add() and contains checks are O(1) for sets)
+    the total should be in O(2m) where m is the number of moves. (swap should be O(1) since add() and contains checks are O(1) for sets)
 
     Parameters
     ----------
@@ -174,7 +174,7 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
         tx = swap(board, tx, move, _misplaced)
 
     # Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
-    # making the changes and reverting them (O(2*M) where M is the number of Move at max) is still faster than making a copy of the board at each iteration. O(n^2)
+    # making the changes and reverting them (O(2*m) where m is the number of Move at max) is still faster than making a copy of the board at each iteration. O(n^2)
     for i in range(len(moves)-1, -1, -1):
         tx = swap(board, tx, moves[i].inv(), None)
     
@@ -183,12 +183,10 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     return gx+hx, gx, _misplaced
 
 
-# associate each direction to its corresponding move
-mv: dict[str, M] = {UP: M.UP, RIGHT: M.RIGHT, DOWN: M.DOWN, LEFT: M.LEFT}
 # associate each move to its corresponding direction
-mv_inv: dict[M, str] = {M.UP: UP, M.RIGHT: RIGHT, M.DOWN: DOWN, M.LEFT: LEFT}
+mv: dict[M, str] = {M.UP: UP, M.RIGHT: RIGHT, M.DOWN: DOWN, M.LEFT: LEFT}
 
-M_ALL = set(mv.values()) # set of all possible moves
+M_ALL = set(mv.keys()) # set of all possible moves
 
 
 def children_moves(node: Node, DIM: int) -> set[M]:
@@ -275,7 +273,7 @@ def convert_solution(goal_node: Node) -> list[str]:
     -------
         List of moves to get from the initial state to the goal state.
     """
-    return [mv_inv[move] for move in goal_node.moves]
+    return [mv[move] for move in goal_node.moves]
 
 
 def solve_taquin(board: list[list[int]]) -> list[str]:
@@ -299,12 +297,3 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
         enode = nextENode(liveNodes)
 
     return convert_solution(enode)
-
-if __name__ == '__main__':
-    board = [[1, 2, 3, 4], 
-         [5, 6, 16, 8], 
-         [9, 10, 7, 11],
-         [13, 14, 15, 12]]
-
-    sol = solve_taquin(board)
-    print(sol)
