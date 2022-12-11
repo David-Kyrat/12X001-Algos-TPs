@@ -157,17 +157,16 @@ def nextENode(liveNodes: list[Node]) -> Node:
 def solve_shortest_path(domain:list[list[int]], a:tuple[int, int], b:tuple[int, int]) -> list[tuple[int, int]]:
     """Finds the shortest path from point a to point b according to the 2-dimensional domain.
     The path is returned as a list of steps from a to b, where each step is a tuple with 2 integers."""
-    # TODO
     n, m = len(domain), len(domain[0])
     DIM = n, m
     liveNodes: list[Node] = []
     
-    enode:Node = None # TODO
+    enode: Node = Node.init_root(a, b)
     while not P(enode):
         available_moves: set[M] = children_moves(enode, DIM)
 
         for move in available_moves:
-            child = None # TODO
+            child = Node(move, enode)
             addToLiveNodes(child, liveNodes)
 
         enode = nextENode(liveNodes)
