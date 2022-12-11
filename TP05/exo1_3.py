@@ -71,8 +71,11 @@ def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set
     """Prints the board with the white square (16) and the misplaced tiles highlighted."""
     for i in range(DIM):
         for j in range(DIM):
-            if (i, j) in misplaced and (i, j) != tx:
-                print(f"\033[1;31m{board[i][j]:2d}\033[0m ", end="")
+            if (i, j) in misplaced:
+                if (i, j) == tx:
+                    print(f"\033[1;33m{board[i][j]:2d}\033[0m ", end="")
+                else:
+                    print(f"\033[1;31m{board[i][j]:2d}\033[0m ", end="")
             else:
                 print(f"{board[i][j]:2d} ", end="")
         print()
@@ -103,7 +106,7 @@ def test_solve_taquin_for_any_dim(DIM:int):
     _DIM = DIM
     _dim2: int = _DIM*_DIM
     _board = sorted_board(_DIM)
-    gen_disorder2(_board, 20)
+    gen_disorder2(_board, _dim2//2)
         
     _goalNode: Node = solve_taquin(_board, extract_path_from_goalNode=False, white_square=_dim2)
     print("Initial board:")
