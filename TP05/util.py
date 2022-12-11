@@ -5,43 +5,41 @@ from time import time, time_ns
 
 def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Label: str, f2Label: str, xticks=None, yticks=None):
     """Plots two functions against each other.
-    - plot_x: the x-axis values
-    - plot_f1: the y-values of the first function
-    - plot_f2: the y-values of the second function
-    - title: the title of the plot
-    - xlabel: the label of the x-axis
-    - ylabel: the label of the y-axis
-    - f1Label: the label of the first function
-    - f2Label: the label of the second function
-    - `xticks` (optional) - list of ticks to display on x-axis, (default: None)
-    - `yticks` (optional) - list of ticks to display on y-axis, (default: None)
-    """
+
+    Parameters
+    ----------
+    @ `plot_x` - x-axis values
+    @ `plot_f1` - y-axis values of the first function
+    @ `plot_f2` - y-axis values of the second function
+    @ `title`  - Title of the plot
+    @ `xlabel` - Label of the x-axis
+    @ `ylabel` - Label of the y-axis
+    @ `f1Label`: the label of the first function
+    @ `f2Label`: the label of the second function
+    @ `xticks` (optional) - list of ticks to display on x-axis, (default: None)
+    @ `yticks` (optional) - list of ticks to display on y-axis, (default: None) """
 
     fig = plt.figure()
     plt.title(title)
     plt.grid()
-    
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.xticks(plot_x)
-    if xticks is not None:
-        plt.xticks(xticks)
-    if yticks is not None:
-        plt.yticks(yticks)
-    else: 
-        m1, m2, gap = min(plot_f2), max(plot_f1), 0.2
+    if xticks is not None: plt.xticks(plot_x)
+    
+    if yticks is not None: plt.yticks(yticks)
+    else:
+        m1, m2, gap = min(plot_f2), max(plot_f1), 0.1
         plt.ylim(m1, m2 - gap * m2)
     
-    plt.plot(plot_x, plot_f1, '-b', label=f1Label, linewidth=1)
-    plt.plot(plot_x, plot_f2, 'or', label=f2Label, linewidth=1)
-
-    fig.set_figheight(12)
-    fig.set_figwidth(9)
+    plt.plot(plot_x, plot_f1, 'or', label=f1Label, markersize=4)
+    plt.plot(plot_x, plot_f2, '-b', label=f2Label, linewidth=0.8)
     
     #plt.legend(prop={'size': 5})
     #plt.legend(fontsize=7)
+    fig.set_figheight(12)
+    fig.set_figwidth(10)
     plt.legend()
-    plt.tight_layout(pad=4.5)
+    plt.tight_layout(pad=3)
     plt.show()
 
 

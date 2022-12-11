@@ -1,12 +1,6 @@
 from enum import Enum
 
 ########################### Exercise 1 ###########################
-#!
-#! Implementation for the cost function:
-#! ĉ(x) = g(x) + h(x)
-#! (only thing changed is last line of ``update_misplaced_compute_cost``)
-#!
-
 # Definitions
 UP, RIGHT, DOWN, LEFT = "up", "right", "down", "left"
 #DIM:int = 4  # Dimension of the board
@@ -225,7 +219,7 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     
     gx = len(_misplaced) # g(x) = number of misplaced tiles
     hx = node.depth
-    return hx+gx, gx, _misplaced
+    return gx+hx, gx, _misplaced
 
 
 # associate each move to its corresponding direction

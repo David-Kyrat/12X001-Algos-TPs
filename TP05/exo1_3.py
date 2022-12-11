@@ -1,11 +1,10 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
 from copy import deepcopy
-import fifteen_puzzle as fp # ĉ(x) = h(x) + g(x)
-import fifteen_puzzle_cost_onlyh as fp2  # ĉ(x) = h(x)
-import util
-import random
+from time import time # measure time in seconds
+from fifteen_puzzle import *
+import util, random
 
-def children_move_fromList(move:fp.M, tx:tuple[int, int], DIM:int, cost_g_and_h: bool = True) -> set[fp.M]:
+def children_move_fromList(move:M, tx:tuple[int, int], DIM:int) -> set[M]:
     """ Return a set of all possible moves that would not produce an out of bounds error and that are not the given move.
 
     Parameters
@@ -13,15 +12,10 @@ def children_move_fromList(move:fp.M, tx:tuple[int, int], DIM:int, cost_g_and_h:
     @ `move` - Move to avoid (last move made)
     @ `tx`   - Position of the white square (16)
     @ `DIM`  - Dimension of the board
-    @ `cost_g_and_h` - if True, use the cost function ``g(x) + h(x)``. Otherwise, use ``h(x)``
 
     Returns
     -------
         set of all possible moves from a given node."""
-
-    if cost_g_and_h: from fifteen_puzzle import M, M_ALL
-    else: from fifteen_puzzle_cost_onlyh import M, M_ALL
-    
     moves = M_ALL.copy()
     if move is not None: moves.remove(move.inv()) # remove inverse of last move to avoid cycles in the game "tree"    
 
@@ -37,7 +31,8 @@ def children_move_fromList(move:fp.M, tx:tuple[int, int], DIM:int, cost_g_and_h:
 
     return moves
 
-def gen_disorder(board: list[list[int]], n:int, node=None, tx: tuple[int, int]=(3,3), cost_g_and_h: bool = True):
+
+def gen_disorder(board: list[list[int]], n:int, node:Node=None, tx: tuple[int, int]=(3,3)):
     """Creates disorder in the board by moving (at random) the blank space n times. (Usually ``node`` is a goal node but need not necessarily be.)
     NB: the moves are selected at random but they are still filtered to try to avoid cycles, and out of bounds exceptions.
     (I.e. the move is selected at random among the result of a modified version ``children_moves()``)
@@ -50,7 +45,6 @@ def gen_disorder(board: list[list[int]], n:int, node=None, tx: tuple[int, int]=(
     @ `n`     - Number of random moves to perform to "shuffle" the board
     @ (optional) `node`  - Usually a goal node. (if it is not, then the current state will be inferred from ``node.misplaced`` and ``node.moves``). (If it is not given, the current state will be will be the initial state and a root node will be created (with empty ``node.misplaced`` and ``node.moves``))
     @ (optional) `tx`    - Position of the white square (16). (If it is not given, it will be inferred from ``node``, ! has to be given, if node is not ! )
-    @ `cost_g_and_h` - if True, use the cost function ``g(x) + h(x)``. Otherwise, use ``h(x)``
 
     NB: board is modified in place
 
@@ -59,8 +53,6 @@ def gen_disorder(board: list[list[int]], n:int, node=None, tx: tuple[int, int]=(
         ``(tx_final, misplaced_final)``  - Pair containing the final position of the white square and the final set of misplaced tiles (after the n random moves).
     """
     DIM: int = len(board)
-    if cost_g_and_h:  from fifteen_puzzle import Node, apply_moves, M
-    else: from fifteen_puzzle_cost_onlyh import Node, apply_moves, M
     # empty if node is a goal node
     misplaced, tx = (node.misplaced.copy(), node.tx0) if node is not None else (set(), tx)
     if node is not None: 
@@ -72,6 +64,7 @@ def gen_disorder(board: list[list[int]], n:int, node=None, tx: tuple[int, int]=(
         tx = apply_moves(board, tx, [move], misplaced)
 
     return tx, misplaced
+
 
 #! Since printing the board did not seem like a fundamental task of this TP, The following function to print the board in color was taken from internet.
 def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set[tuple[int, int]]):
@@ -102,19 +95,14 @@ def sorted_board(n:int):
     return [[n*i+j+1 for j in range(n)] for i in range(n)]
 
 
-def test_solve_taquin_for_any_dim(DIM:int, cost_g_and_h: bool = True):
+def test_solve_taquin_for_any_dim(DIM:int):
     """Generates a random board of size DIM x DIM, where the white square value is always the one in the bottom right corner.
     Then solves the puzzle and prints the solution.
 
     Parameters
     ----------
     @ `DIM` - Dimension of the board to generate and solve.
-    @ `cost_g_and_h` - if True, use the cost function ``g(x) + h(x)``. Otherwise, use ``h(x)``
     """
-
-    if cost_g_and_h:  from fifteen_puzzle import Node, solve_taquin, apply_moves, init_misplaced
-    else: from fifteen_puzzle_cost_onlyh import Node, solve_taquin, apply_moves, init_misplaced
-    
     _DIM = DIM
     _dim2: int = _DIM*_DIM
     _board = sorted_board(_DIM)
@@ -128,7 +116,8 @@ def test_solve_taquin_for_any_dim(DIM:int, cost_g_and_h: bool = True):
     printBoard(_board, _DIM, _goalNode.tx0, _goalNode.misplaced)
     return _goalNode
 
-def test_cost_efficiency(nMax: int, amount:int, cost_g_and_h: bool = True):
+
+def test_cost_efficiency(nMax: int, amount:int) -> tuple[dict[int, float], dict[int, float]]:
     """ For each ``n`` from ``1`` to ``nMax`` (inclusive), do 50 times the following:
             generates a sorted board, then call ``gen_disorder(board, n)`` on it to create a random board 
              (shuffle the board with n 'moves' ). Then solve it and count the number explored nodes ``k``
@@ -137,27 +126,60 @@ def test_cost_efficiency(nMax: int, amount:int, cost_g_and_h: bool = True):
     ----------
     @ `nMax` - max number of moves to perform to shuffle the board. i.e. max "level of disorder"
     @ `amount` - number of time to perform the test for each ``n``
-    @ `cost_g_and_h` - if True, use the cost function ``g(x) + h(x)``. Otherwise, use ``h(x)``
-    """
-    if cost_g_and_h:  from fifteen_puzzle import Node, solve_taquin, apply_moves, init_misplaced
-    else: from fifteen_puzzle_cost_onlyh import Node, solve_taquin, apply_moves, init_misplaced
+
+    Returns
+    ----------
+        `(avgs_k, avgs_time)` - pair of dict mapping each ``n`` to the average number of explored nodes to find the solution and the associated runtime.
     
+    """
     board = sorted_board(4)
-    avgs:dict[int: float] = {}
+    avgs_k:dict[int: float] = {}
+    avgs_time: dict[int: float] = {}
     
     for n in range(1, nMax+1):
-        k = 0
+        runtime = k = 0
         for i in range(amount):
             crt_board = deepcopy(board)
             gen_disorder(crt_board, n)
+            t0 = time()
             goalNode:Node = solve_taquin(crt_board, extract_path_from_goalNode=False)
+            delta = time() - t0
+            runtime += delta
             k += goalNode.depth # number of explored nodes is the depth of the goal node
             #print(f"n: {n:2d}", f"   k: {k:3d}", f"   crt: {goalNode.depth:2d}", "   avg:", k/(i+1))
-        avgs[n] = k/amount
-    return avgs
-            
+        avgs_k[n] = k/amount
+        avgs_time[n] = runtime/amount
+    return avgs_k, avgs_time
+
+from numpy import linspace
+
+def plotTime(avgs_time:dict[int, float]):
+    """Plot the average time to solve the puzzle for each level of disorder."""
+    x_plot, y_plot = list(avgs_time.keys()), [t*10000 for t in avgs_time.values()] # convert to 10*ns
+    xlabel, ylabel = "disorder level, (max distance from solution i.e. list of moves that lead to the game board sorted puzzle from 1 to 16)", r"average runtime to get to the solution (10*ns)"
+    title = r"Average time to solve the puzzle for each disorder level with cost function: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$"
+    flabel = r"Average Runtime (10*ns) for $\hat{c}(x)=h(x)+g(x)$"
+    # Now plotting x^2 next to it to show how close the complexity really is from O(c(x0)^2) (i.e. O(x^2) if x is always the optimal solution)
+    plot_f2, f2Label = [(1/5* (x*x) )for x in x_plot], r"$f_2(x) = \frac{1}{5}x^2$"  # we have a factor 1/5 for which the runtime seems really close to f2(x) = 1/5*x^2, (and O(p*x^2) = O(x^2) for all constant p)
+    
+    xticks, yticks = x_plot, linspace(0, max(y_plot), 23)
+    #util.plot_solo(x_plot, y_plot, title, xlabel, ylabel, flabel, xticks, yticks)
+    util.plotVS(x_plot, y_plot, plot_f2, title, xlabel, ylabel, flabel, f2Label, xticks, yticks)
+
+
+def plotK(avgs_k:dict[int, float]):
+    """Plot the average number of explored nodes to solve the puzzle for each level of disorder."""
+    x_plot, x_label = list(avgs_k.keys()), "disorder level, (max distance from solution)"
+    y_plot, y_label = list(avgs_k.values()), r"average number $k$ of explored nodes (to get to the solution)"
+    flabel = r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$'
+    yticks = linspace(0, nMax, 2*nMax)
+    util.plot_solo(x_plot, y_plot, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$', 
+                   xlabel=x_label, ylabel=y_label, fLabel=flabel, xticks=x_plot, yticks=yticks)
+
+    
 if __name__ == '__main__':    
-    """ board = [[1, 2, 3, 4], 
+    """ board0 =
+            [[1, 2, 3, 4], 
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
@@ -173,26 +195,7 @@ if __name__ == '__main__':
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
 
-    nMax, amount = 7, 100 # max level of disorder, number of time to perform the test for each level
-    nMax2, amount2 = 7, 100
-    print(test_cost_efficiency(nMax, amount))
-    avgs = test_cost_efficiency(nMax, amount)
-    avgs2 = test_cost_efficiency(nMax2, amount2, cost_g_and_h=False)
-    
-    x_plot, x_label = list(avgs.keys()), "disorder level, (max distance from solution)"
-    f_plot, y_label = list(avgs.values()), r"average number $k$ of explored nodes (to get to the solution)"
-    f_plot2, flabel2 = list(avgs2.values()), r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)$ and goal node $x^*$'
-    
-    flabel = r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$'
-    #flabel = r'lul'
-    from numpy import linspace
-    yticks = linspace(0, nMax, 2*nMax)
-    util.plotVS(x_plot, f_plot, f_plot2, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$ VS $\hat{c}(x)=h(x)$', 
-                xlabel=x_label, ylabel=y_label, f1Label=flabel, f2Label=flabel2, xticks=x_plot, yticks=yticks)
-    
-
-#
-#* We now have to test the efficiency of the used cost function, 
-#* 
-#*
-#
+    nMax, amount = 11, 50 # max level of disorder, number of time to perform the test for each level
+    avgs_k, avgs_time = test_cost_efficiency(nMax, amount)
+    #plotK(avgs_k)
+    plotTime(avgs_time)
