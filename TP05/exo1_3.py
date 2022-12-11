@@ -118,22 +118,18 @@ if __name__ == '__main__':
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
-    m = 7
+    """ m = 7
     _goalNode:Node = test_solve_taquin_for_any_dim(m)
     print(convert_solution(_goalNode))
-    print("----------------------\n")
+    print("----------------------\n") """
 
     # ----------- Test the efficiency of the cost function ----------------
 
-    """ board = sorted_board(4) # generate a solution board of dim m x m
-    #gen_disorder()
-    goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False)
-    print(convert_solution(goalNode))
-
+    board = sorted_board(4) # generate a solution board of dim m x m
     n:int = 20
-    final_tx, misplaced = gen_disorder(board, goalNode, n)
-    print([board[p[0]][p[1]] for p in misplaced])
-    printBoard(board, len(board), final_tx, misplaced) """
+    final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
+    goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False)
+    
 
 #
 #* We now have to test the efficiency of the used cost function, 
