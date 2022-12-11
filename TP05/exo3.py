@@ -34,7 +34,6 @@ class Node:
         self.cost: int = Node.c_hat(self)
         self.move = move
         
-        #self.cost, self.gx = update_misplaced_compute_cost(self, parent.misplaced, domain, self.moves)
 
     @classmethod
     def init_root(cls, a: tuple[int, int], b: tuple[int, int]):
