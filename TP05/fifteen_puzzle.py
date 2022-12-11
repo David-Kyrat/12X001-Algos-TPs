@@ -98,7 +98,7 @@ class Node:
         ----------
         @ `move`   - move that led to this node from its parent
         @ `parent` - parent of this node (Can be None, If it is, then this node is the root of the game tree, and tx has to be given)
-        @ `board`  - initial board
+        @ `board`  - initial board (needed because neither this board nor its update will ever be stored/copied in any node)
 
         Other attributes
         ---------
@@ -165,7 +165,7 @@ def apply_moves(board: list[list[int]], tx0: tuple[int, int], moves: list[M], mi
 
     Returns
     ----------
-        New position of white square, (NB: modifies the board in place) """
+        New position of white square, (NB: modifies the board and ``misplaced`` in place) """
 
     tx = tx0 # index of the empty square in the initial board
     for move in moves:
@@ -210,8 +210,8 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     
     tx = apply_moves(board, node.tx0, moves, _misplaced) # node.tx0 = index of the empty square in the initial board
     
-    #? Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
-    #? making the changes and reverting them (O(2*m) where m = h(x) is the number of Moves) is still faster than making a copy of the board at each iteration. O(n^2)
+    #* Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
+    #* making the changes and reverting them (O(2*m) where m = h(x) is the number of Moves) is still faster than making a copy of the board at each iteration. O(n^2)
     
     unapply_moves(board, tx, moves)
     
@@ -323,12 +323,3 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
         enode = nextENode(liveNodes)
 
     return convert_solution(enode)
-
-if __name__ == '__main__':
-    board = [[1, 2, 3, 4], 
-         [5, 6, 16, 8], 
-         [9, 10, 7, 11],
-         [13, 14, 15, 12]]
-
-    sol = solve_taquin(board)
-    print(sol)
