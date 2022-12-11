@@ -25,85 +25,69 @@ def move(domain: list[list[int]], tx: tuple[int, int], dir: M, misplaced: set[tu
     if misplaced is None: return nc
 
     return nc
-
+#@ `domain`  - initial domain (needed because neither this domain nor its update will ever be stored/copied in any node)
 
 class Node: 
-    """Node of the game tree. Each node has a ``depth`` (``int``), a cost (``int``), a list of moves ``moves`` (``list[M]``) 
-    the index of the empty square, ``tx``, (``tuple[int, int]``) in its associated domain, a set of misplaced tiles ``misplaced`` (``set[tuple[int, int]]``)
-    and the value of g(this) (``int``)."""
+    """Node of the moves tree. Each attribute is detailled below."""
     
-    def __init__(self, move: M, parent, domain: list[list[int]]):
+    def __init__(self, move: M, parent):
         """Constructor of the Node class.
 
         Parameters
         ----------
-        @ `move`   - move that led to this node from its parent
-        @ `parent` - parent of this node (Can be None, If it is, then this node is the root of the game tree, and tx has to be given)
-        @ `domain`  - initial domain (needed because neither this domain nor its update will ever be stored/copied in any node)
-
+        @ `move`     - move that led to this node from its parent
+        @ `parent`   - parent of this node (Can be None, If it is, then this node is the root of the game tree, and tx has to be given)
+        
         Other attributes
         ---------
-        @ `ak`        - index of this node in the domain (i.e. current location)
-        @ `depth`     - depth of this node in the moves tree (i.e. number of moves: ``h(this) = parent.depth + 1``)
-        @ `gx`        - value of ``g(this) = ||b-a||_1`` (i.e. distance (norm L1) between the current location and the destination) ``
-        @ `cost`      - cost of this, defined by ``c_hat(this) = h(this) + g(this)`` (Computed from `parent.depth`, `parent.misplaced` and `move`)
+        @ `ak`      - ``tuple[int, int]``, index of this node in the domain (i.e. current location)
+        @ `b`       - ``tuple[int, int]``, index of the destination (computed from ``parent``, to construct root node see ``init_root``)
+        @ `path`    - ``list[tuple[int, int]]``, list of indexes from the root to this node (i.e. ``path = [a0, a1, ..., ak]``)
+        @ `depth`   - ``int``, depth of this node in the moves tree (i.e. number of moves: ``h(this) = parent.depth + 1``)
+        @ `cost`    - ``int``, cost (i.e. ``ĉ(this) = h(this) + g(this)``) where ``g(this) = ||b-a||_1`` (i.e. distance (norm ``L1``) between the current location and the destination)
         """
-        if parent is None: 
-            self.__init_root__(domain)
-            return
-        
+        if move is None or parent is None: return # root node
+        self.ak = move + parent.ak
+        self.b = parent.b
         self.depth = parent.depth + 1
-        self.tx0 = parent.tx0 # index of the empty square in the initial domain
-        self.moves = parent.moves + [move]
-        self.tx = move + parent.tx # addition between a move and a tuple was defined in the M class above. e.g. ``M.UP + (3, 2)`` returns ``(2, 2)``
-        self.cost, self.gx, self.misplaced = update_misplaced_compute_cost(self, parent.misplaced, domain, self.moves)
+        self.path = parent.path + [self.ak]
+        self.cost = Node.c_hat(self)
+        
+        #self.cost, self.gx = update_misplaced_compute_cost(self, parent.misplaced, domain, self.moves)
 
-    def __init_root__(self, domain: list[list[int]], white_square_value: int = 16):
-        """'Private' constructor of root, ``taquin_index`` is the index of the empty square in the initial domain """
-        self.depth = 0
-        self.tx0, self.misplaced = init_misplaced(domain, white_square_value)
-        self.cost = max(0, len(self.misplaced) - 1) # -1 because we do not count the empty square
-        self.moves = []
-        self.tx = self.tx0
-        self.gx = self.cost
+    @classmethod
+    def init_root(cls, a: tuple[int, int], b: tuple[int, int]):
+        """ Constructor of root nodes, ``a`` is the starting point, `b` is the destination. """
+        newnode = Node(None, None)
+        newnode.depth = 0
+        newnode.ak = a
+        newnode.b = b
+        newnode.cost = Node.d(a, b)
+        newnode.path = [a]
+        return newnode
 
+    @classmethod
+    def d(cls, x1, x2) -> int:
+        """Returns the distance d(this, x) = ||a_k - x||_1 (i.e. norm ``L1``) between the current location and x"""
+        if isinstance(x1, Node) and isinstance(x2, Node): return x1.__d__(x1, x2)
+        if isinstance(x1, Node): return abs(x1.ak[0] - x2[0]) + abs(x1.ak[1] - x2[1])
+        if isinstance(x2, Node): return abs(x2.ak[0] - x1[0]) + abs(x2.ak[1] - x1[1])
+        return abs(x1[0] - x2[0]) + abs(x1[1] - x2[1])
+
+    def __d__(self, node)->int:
+        """ same as ``d()`` but does not performe type check """
+        return abs(self.ak[0] - node.ak[0]) + abs(self.ak[1] - node.ak[1])
+
+   
+    @classmethod
+    def c_hat(cls, node) -> int:
+        """Returns the cost of a node (i.e. ``ĉ(node) = h(node) + g(node)``)"""
+        return node.depth + node.__d__(node.b)
+
+    
     def __repr__(self):
         """Representation of a node as a string."""
-        return f"Node(ĉ={self.cost}, h={self.depth}, tx={self.tx}, moves={self.moves})"
-
-
-
-def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], domain: list[list[int]], moves: list[M])-> tuple[int, int, set[tuple[int, int]]]: 
-    """ Instead of storing copies of the domain (which would be memory consuming since domain is a 2d matrix), 
-    this function recomputes the different changes each move would have on the domain, and updates the set of misplaced tiles accordingly.
-
-    Then the cost of a node ``x`` is just its depth (``h(x)=x.depth``) ``+`` the length of the set of misplaced tiles (``g(x)=len(x.misplaced)``).
-    the total should be in O(2*h(x)) where h(x) is the current number of moves. (swap should be O(1) since add() and contains checks are O(1) for sets)
-
-    Parameters
-    ----------
-    @ `node` - Node to compute the cost of
-    @ `domain` - domain to p
-    @ `moves` - list of moves to get from the root of the game tree to this node (i.e. each "parent" edge of node)
-
-    Returns
-    -------
-        Triple ``(ĉ(node), g(node), update_misplaced_set)`` where ``ĉ(node) = h(node) + g(node)`` and ``update_misplaced_set`` is the updated set of misplaced tiles
-    """
-    _misplaced = misplaced.copy() # set of misplaced tiles
-    
-    tx = apply_moves(domain, node.tx0, moves, _misplaced) # node.tx0 = index of the empty square in the initial domain
-    
-    #* Reverting the swaps of domain, since it is modified to computed the updated set of misplaced tiles.
-    #* making the changes and reverting them (O(2*n) where n = h(x) is the number of Moves (which is at most g(root)) since if a solution is found the it is optimal.) 
-    #* is still faster than making a copy of the domain at each iteration. O(m^2) 
-    #* (where m is the dimension of the domain, here m is a constant but we could have the exact same problem for m unknown and the same implementation would suffice)
-    
-    unapply_moves(domain, tx, moves)
-    
-    gx = len(_misplaced) # g(x) = number of misplaced tiles
-    hx = node.depth
-    return gx+hx, gx, _misplaced
+        return f"Node(ĉ={self.cost}, ak={self.ak}, g={self.cost}, h={self.depth}, b={self.b}, path={self.path})"
 
 
 def children_moves(node: Node, DIM: int) -> set[M]:
@@ -134,7 +118,9 @@ def children_moves(node: Node, DIM: int) -> set[M]:
 
 
 def P(enode: Node):
-    """ Return true if and only if enode is a goal node. """
+    """ Return true if and only if enode is a goal node.  ``enode`` has arrived 
+    at its destination ``b`` if and only if its distance to ``b`` is null (in the matical sense) 
+    i.e. if ``||enode.ak - b||_1 = 0`` i.e. ``enode.ak == b``"""
     return enode.gx == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
 
 
