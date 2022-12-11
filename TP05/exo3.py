@@ -51,16 +51,11 @@ class Node:
     @classmethod
     def d(cls, x1, x2) -> int:
         """Returns the distance d(this, x) = ||a_k - x||_1 (i.e. norm ``L1``) between the current location and x"""
-
-        if isinstance(x1, Node) and isinstance(x2, Node): return x1.__d__(x2)
+        if isinstance(x1, Node) and isinstance(x2, Node): return dist(x1.ak, x2.ak)
         if isinstance(x1, Node): return dist(x1.ak, x2)
         if isinstance(x2, Node): return dist(x1, x2.ak)
         return dist(x1, x2)
-
-    def __d__(self, node)->int:
-        """ same as ``d()`` but does not performe type check """
-        return abs(self.ak[0] - node.ak[0]) + abs(self.ak[1] - node.ak[1])
-
+    
    
     @classmethod
     def c_hat(cls, node) -> int:
