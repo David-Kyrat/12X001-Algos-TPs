@@ -5,6 +5,11 @@ from enum import Enum
 UP, RIGHT, DOWN, LEFT = "up", "right", "down", "left"
 #DIM:int = 4  # Dimension of the board
 
+#!
+#! To switch from the cost function:
+#! ĉ(x) = h(x) + g(x) to ĉ(x) = h(x)
+#! (change the last line of ``update_misplaced_compute_cost()``)
+#!
 
 class M(Enum):
     UP = (-1, 0)
