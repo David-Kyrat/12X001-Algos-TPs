@@ -1,9 +1,11 @@
+from copy import deepcopy
 from enum import Enum
+from shutil import move
 
 ########################### Exercise 1 ###########################
 # Definitions
 UP, RIGHT, DOWN, LEFT = "up", "right", "down", "left"
-DIM:int = 4  # Dimension of the board
+#DIM:int = 4  # Dimension of the board
 
 
 class M(Enum):
@@ -40,23 +42,25 @@ def isMisplaced(board: list[list[int]], coord: tuple[int, int]) -> bool:
     return board[coord[0]][coord[1]] != 4 * coord[0] + coord[1] + 1
 
 
-def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tuple[int, int]]) -> tuple[int, int]:
-    """Swap index and index coord in coord in the board.
+def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
+    """Swap index and index coord in coord in the board and update set of misplaced tiles (if not none).
 
     Parameters
     ----------
     @ `board` - Game board
     @ `tx` - index of white square (16)
     @ `move` - move applied to the white square
-    @ `misplaced` - set of misplaced tiles
+    @ (optional) `misplaced` - set of misplaced tiles
 
     Returns
     ----------
         New position of the white square
     """
-    nc = move + tx # new coord
+    nc = move + tx # new coord of white square
     board[tx[0]][tx[1]], board[nc[0]][nc[1]] = board[nc[0]][nc[1]], board[tx[0]][tx[1]] # swap
 
+    if misplaced is None: return nc
+    
     # if the new coord is misplaced, add it to the misplaced set
     if isMisplaced(board, nc): misplaced.add(nc)
     else: misplaced.discard(nc) # if not in it => does nothing
@@ -67,16 +71,17 @@ def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tu
 
     return nc
 
+
 def c_hat(board: list[list[int]]) -> int:
     """Cost function for a given board. (where everything has to be recomputed from scratch, 
     for more info see ``update_misplaced_compute_cost()`` below.)
     The cost of a node of the game is the number of squares that are not at their place (16 excluded)."""
     misplaced = 0
-    for i in range(DIM):
-        for j in range(DIM):
+    for i in range(len(board)):
+        for j in range(len(board[i])):
             if isMisplaced(board, (i, j)):
                 misplaced += 1
-    return min(0, misplaced - 1) # -1 because we do not coun the empty square
+    return max(0, misplaced - 1) # -1 because we do not coun the empty square
 
 
 class Node: 
@@ -109,13 +114,13 @@ class Node:
         self.tx0 = parent.tx0 # index of the empty square in the initial board
         self.moves = parent.moves + [move]
         self.tx = move + parent.tx # addition between a move and a tuple was defined in the M class above. e.g. ``M.UP + (3, 2)`` returns ``(2, 2)``
-        self.cost, self.gx, self.misplaced = update_misplaced_compute_cost(self, board, self.moves)
+        self.cost, self.gx, self.misplaced = update_misplaced_compute_cost(self, parent.misplaced, board, self.moves)
 
     def __init_root__(self, board: list[list[int]]):
         """'Private' constructor of root, ``taquin_index`` is the index of the empty square in the initial board """
         self.depth = 0
         self.tx0, self.misplaced = init_misplaced(board)
-        self.cost = len(self.misplaced)
+        self.cost = max(0, len(self.misplaced) - 1) # -1 because we do not count the empty square
         self.moves = []
         self.tx = self.tx0
         self.gx = self.cost
@@ -138,16 +143,16 @@ def init_misplaced(board: list[list[int]]) -> tuple[tuple[int, int], set[tuple[i
     """
     misplaced = set()
     tx0 = (-1, -1) # index of white square (16) 
-    for i in range(DIM):
-        for j in range(DIM):
+    for i in range(len(board)):
+        for j in range(len(board[i])):
             if board[i][j] == 16: tx0 = (i, j)
             if isMisplaced(board, (i, j)):
                 misplaced.add((i, j))
     return tx0, misplaced
 
 
-def update_misplaced_compute_cost(node: Node, board: list[list[int]], moves: list[M])-> tuple[int, int, set[tuple[int, int]]]: 
-    """ Instead of storing copies of the board (which would be memory and time consuming since board is a 2d matrix), 
+def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], board: list[list[int]], moves: list[M])-> tuple[int, int, set[tuple[int, int]]]: 
+    """ Instead of storing copies of the board (which would be memory consuming since board is a 2d matrix), 
     this function recomputes the different changes each move would have on the board, and updates the set of misplaced tiles accordingly.
 
     Then the cost of a node x is just its depth (h(x)) the length of the set of misplaced tiles (g(x)).
@@ -163,14 +168,19 @@ def update_misplaced_compute_cost(node: Node, board: list[list[int]], moves: lis
     -------
         Triple ``(ĉ(node), g(node), update_misplaced_set)`` where ``ĉ(node) = h(node) + g(node)`` and ``update_misplaced_set`` is the updated set of misplaced tiles
     """
-    misplaced, tx = set(), node.tx0 # set of misplaced tiles, index of the empty square in the initial board
-    
-    for move in moves: 
-        tx = swap(board, tx, move, misplaced)
+    _misplaced, tx = misplaced.copy(), node.tx0 # set of misplaced tiles, index of the empty square in the initial board
 
-    gx = len(misplaced)
+    for move in moves: 
+        tx = swap(board, tx, move, _misplaced)
+
+    # Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
+    # making the changes and reverting them (O(2*M) where M is the number of Move at max) is still faster than making a copy of the board at each iteration. O(n^2)
+    for i in range(len(moves)-1, -1, -1):
+        tx = swap(board, tx, moves[i].inv(), None)
+    
+    gx = len(_misplaced) # g(x) = number of misplaced tiles
     hx = node.depth
-    return gx+hx, gx, misplaced
+    return gx+hx, gx, _misplaced
 
 
 # associate each direction to its corresponding move
@@ -181,52 +191,62 @@ mv_inv: dict[M, str] = {M.UP: UP, M.RIGHT: RIGHT, M.DOWN: DOWN, M.LEFT: LEFT}
 M_ALL = set(mv.values()) # set of all possible moves
 
 
-def children_moves(node: Node) -> set[M]:
+def children_moves(node: Node, DIM: int) -> set[M]:
     """ Return a set of all possible moves for the children of the given node.
 
     Parameters
     ----------
     @ `node` - Node to compute the cost of
+    @ `DIM` - Dimension of the board
 
     Returns
     -------
         set of all possible moves from a given node."""
     moves = M_ALL.copy()
     if node.moves != []: moves.remove(node.moves[-1].inv()) # remove inverse of last move to avoid cycles in the game "tree"    
-    end:int = DIM-1
 
     # now remove moves that would lead to an out of bounds error
-    match node.tx[0]:
-        # if row of current whitespace is on a side (i.e. if can't go UP or DOWN)
-        case 0: moves.discard(M.UP)
-        case end: moves.discard(M.DOWN)
 
+    # if row of current whitespace is on a side (i.e. if can't go UP or DOWN)
+    if node.tx[0] == 0: moves.discard(M.UP)
+    if node.tx[0] == DIM-1: moves.discard(M.DOWN)
+    
     # idem, if column of current whitespace is on a side (i.e. if can't go LEFT or RIGHT)        
+    if node.tx[1] == 0: moves.discard(M.LEFT)
+    if node.tx[1] == DIM-1: moves.discard(M.RIGHT)
+
+    """  match node.tx[0]:
+        case 0: moves.discard(M.UP)
+        case _BOARD_ND: moves.discard(M.DOWN)
+
+    _BOARD_ND = DIM-1 # reassign end because its getting modified somewhere apparently
     match node.tx[1]:
-        case 0: moves.discard(M.LEFT)
-        case end: moves.discard(M.RIGHT)
+        case 0: 
+            moves.discard(M.LEFT)
+        case _BOARD_ND: 
+            moves.discard(M.RIGHT) """
             
     return moves
 
 
-def P(e_node: Node):
-    """ Return true if and only if e_node is a goal node. """
-    return e_node.gx == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
+def P(enode: Node):
+    """ Return true if and only if enode is a goal node. """
+    return enode.gx == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
 
 
-def addToLiveNodes(e_node: Node, liveNodes: list[Node]):
-    """ Adds (in place) given ``e_node`` to ``liveNodes`` list, while maintaining the order. (sorted by cost ĉ)
+def addToLiveNodes(enode: Node, liveNodes: list[Node]):
+    """ Adds (in place) given ``enode`` to ``liveNodes`` list, while maintaining the order. (sorted by cost ĉ)
 
     Parameters
     ----------
-    @ `e_node` - Node to add to liveNodes list
+    @ `enode` - Node to add to liveNodes list
     @ `liveNodes` - List of live nodes (i.e. nodes that have not been expanded yet)
     """
-    liveNodes.append(e_node)
+    liveNodes.append(enode)
     for i in range(len(liveNodes)-1, 0, -1): # loop backward
-        if liveNodes[i].cost < liveNodes[i-1].cost: # if the cost of the node at index i is smaller than the cost of the node at index i-1, swap them
+        if liveNodes[i].cost > liveNodes[i-1].cost: # if the cost of the node at index i is smaller than the cost of the node at index i-1, swap them
             liveNodes[i], liveNodes[i-1] = liveNodes[i-1], liveNodes[i]
-        else : break # because the oher elements are sorted
+        else: break # because the oher elements are sorted
 
 
 def nextENode(liveNodes: list[Node]) -> Node:
@@ -260,24 +280,25 @@ def convert_solution(goal_node: Node) -> list[str]:
 
 def solve_taquin(board: list[list[int]]) -> list[str]:
     """Function that solves the 15-puzzle using branch and bound.
-
+    NB: technically the algorithm could work for more than 16 tiles (i.e. for a board of size n x n where n >= 4)
+    
     Parameters
     ----------
-    @ `board` - 4x4 Matrix representing the initial state of the game
+    @ `board` - Matrix representing the initial state of the game
     """
-
+    DIM = len(board) # board should be a square matrix
     liveNodes: list[Node] = []
-    e_node = Node(None, None, board) # special constructor for root node
-    while not P(e_node):
-        available_moves: set[M] = children_moves(e_node)
+    enode = Node(None, None, board) # special constructor for root node
+    while not P(enode):
+        available_moves: set[M] = children_moves(enode, DIM)
 
         for move in available_moves: 
-            child = Node(move, e_node, board)
+            child = Node(move, enode, board)
             addToLiveNodes(child, liveNodes)
 
-        e_node = nextENode(liveNodes)
-        
-    return convert_solution(e_node)
+        enode = nextENode(liveNodes)
+
+    return convert_solution(enode)
 
 if __name__ == '__main__':
     board = [[1, 2, 3, 4], 
