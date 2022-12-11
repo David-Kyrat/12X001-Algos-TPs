@@ -6,25 +6,6 @@ from fifteen_puzzle import M, M_ALL, mv, UP, RIGHT, DOWN, LEFT
 #* We'll use the same cost function approximation ``ĉ(x) = h(x) + g(x)`` as in fifteen_puzzle .
 # 
 
-def move(domain: list[list[int]], tx: tuple[int, int], dir: M) -> tuple[int, int]:
-    """ Move 1 step from tx in the direction `dir`. (i.e. to ``tx + dir``) in the domain.
-
-    Parameter
-    ----------
-    @ `domain` - domain to scour
-    @ `dir`    - direction in which to move
-    @ (optional) `misplaced` - set of misplaced tiles
-
-    Returns
-    ----------
-        New position ``a_k+1 = a_k + dir``
-    """
-    nc = dir + tx # new coord of white square
-    domain[tx[0]][tx[1]], domain[nc[0]][nc[1]] = domain[nc[0]][nc[1]], domain[tx[0]][tx[1]] # swap
-
-    return nc
-#@ `domain`  - initial domain (needed because neither this domain nor its update will ever be stored/copied in any node)
-
 class Node: 
     """Node of the moves tree. Each attribute is detailled below."""
     
@@ -70,10 +51,11 @@ class Node:
     @classmethod
     def d(cls, x1, x2) -> int:
         """Returns the distance d(this, x) = ||a_k - x||_1 (i.e. norm ``L1``) between the current location and x"""
+
         if isinstance(x1, Node) and isinstance(x2, Node): return x1.__d__(x2)
-        if isinstance(x1, Node): return abs(x1.ak[0] - x2[0]) + abs(x1.ak[1] - x2[1])
-        if isinstance(x2, Node): return abs(x2.ak[0] - x1[0]) + abs(x2.ak[1] - x1[1])
-        return abs(x1[0] - x2[0]) + abs(x1[1] - x2[1])
+        if isinstance(x1, Node): return dist(x1.ak, x2)
+        if isinstance(x2, Node): return dist(x1, x2.ak)
+        return dist(x1, x2)
 
     def __d__(self, node)->int:
         """ same as ``d()`` but does not performe type check """
@@ -88,6 +70,20 @@ class Node:
     def __repr__(self):
         """Representation of a node as a string."""
         return f"Node(ĉ={self.cost}, ak={self.ak}, g={self.cost}, h={self.depth}, b={self.b}, path={self.path})"
+
+
+def dist(p1: tuple[int, int], p2: tuple[int, int]):
+    """Conveniance function to compute the distance (L1 norm) between two points (i.e. ``||p1-p2||_1``)
+
+    Parameters
+    ----------
+    @ `p1` - first pair of coordinates
+    @ `p2` - second pair of coordinates
+
+    Returns
+    ----------
+        distance between p1 and p2, ``||p1-p2||_1``"""
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
 
 def get(matrix: list[list[int]], index: tuple[int, int]) -> int:
