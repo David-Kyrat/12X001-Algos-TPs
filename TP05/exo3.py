@@ -170,28 +170,3 @@ def solve_shortest_path(domain:list[list[int]], a:tuple[int, int], b:tuple[int, 
 
         enode = nextENode(liveNodes)
     return enode.path
-
-def test_solve_shortest_path():
-    domain = [
-        # We want to get here
-        # |
-        # v
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 0, 0],
-        [0, 0, 1, 1, 1, 1, 1, 0],
-        [0, 0, 0, 1, 1, 1, 1, 0],
-        [0, 0, 0, 0, 1, 1, 1, 0],
-        [0, 0, 0, 0, 0, 1, 1, 0],
-        [0, 0, 0, 0, 0, 0, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0],
-        # ^
-        # |
-        # We start from here
-    ]
-    a, b = (7, 6), (0, 7)
-    solution = [a, (7, 7), (6, 7), (5, 7), (4, 7), (3, 7), (2, 7), (1, 7), b]
-    sol = solve_shortest_path(domain, a, b)
-    assert sol == solution
-
-if __name__ == '__main__':
-    test_solve_shortest_path()
