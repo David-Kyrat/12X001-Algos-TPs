@@ -29,7 +29,7 @@ def children_move_fromList(move:M, tx:tuple[int, int], DIM:int) -> set[M]:
 
     return moves
 
-def gen_disorder(board: list[list[int]], node:Node, n:int):
+def gen_disorder(board: list[list[int]], n:int, node:Node=None, tx: tuple[int, int]=(3,3)):
     """Creates disorder in the board by moving (at random) the blank space n times. (Usually ``node`` is a goal node but need not necessarily be.)
     NB: the moves are selected at random but they are still filtered to try to avoid cycles, and out of bounds exceptions.
     (I.e. the move is selected at random among the result of a modified version ``children_moves()``)
@@ -39,8 +39,9 @@ def gen_disorder(board: list[list[int]], node:Node, n:int):
     Parameters
     ----------
     @ `board` - The initial state of the board associated to ``node``
-    @ `node`  - Usually a goal node. (if it is not, then the current state will be inferred from ```node.misplaced`` and ``node.moves``)
     @ `n`     - Number of random moves to perform to "shuffle" the board
+    @ (optional) `node`  - Usually a goal node. (if it is not, then the current state will be inferred from ``node.misplaced`` and ``node.moves``). (If it is not given, the current state will be will be the initial state and a root node will be created (with empty ``node.misplaced`` and ``node.moves``))
+    @ (optional) `tx`    - Position of the white square (16). (If it is not given, it will be inferred from ``node``, ! has to be given, if node is not ! )
 
     NB: board is modified in place
 
@@ -48,23 +49,18 @@ def gen_disorder(board: list[list[int]], node:Node, n:int):
     ----------
         ``(tx_final, misplaced_final)``  - Pair containing the final position of the white square and the final set of misplaced tiles (after the n random moves).
     """
-    misplaced: set[tuple[int, int]] = node.misplaced.copy() # empty if node is a goal node
+    DIM: int = len(board)
+    # empty if node is a goal node
+    misplaced, tx = (node.misplaced.copy(), node.tx0) if node is not None else (set(), tx)
+    if node is not None: 
+        apply_moves(board, node.tx0, node.moves, misplaced)
     
-    DIM, tx = len(board), apply_moves(board, node.tx0, node.moves, misplaced)
     move: M = random.choice(list(children_move_fromList(None, tx, DIM)))
     for _ in range(n):
         move = random.choice(list(children_move_fromList(move, tx, DIM)))
         tx = apply_moves(board, tx, [move], misplaced)
 
     return tx, misplaced
-
-def gen_disorder2(board: list[list[int]], n:int):
-    """"Overload" of ``gen_disorder()`` that does not require a node as input. (It will create a root node from the given board and then call ``gen_disorder()``)
-        (see ``gen_disorder()`` for more details) """
-    root: Node = Node(None, None, board)
-    DIM: int = len(board)
-    root.__init_root__(board, DIM*DIM)
-    return gen_disorder(board, root, n)
 
 #! Since printing the board did not seem like a fundamental task of this TP, The following function to print the board in color was taken from internet.
 def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set[tuple[int, int]]):
@@ -106,7 +102,7 @@ def test_solve_taquin_for_any_dim(DIM:int):
     _DIM = DIM
     _dim2: int = _DIM*_DIM
     _board = sorted_board(_DIM)
-    gen_disorder2(_board, _dim2//2)
+    gen_disorder(_board, _dim2//2, tx=(_DIM-1, _DIM-1))
         
     _goalNode: Node = solve_taquin(_board, extract_path_from_goalNode=False, white_square=_dim2)
     print("Initial board:")
@@ -122,21 +118,22 @@ if __name__ == '__main__':
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
-    # m = 6
-    # _goalNode:Node = test_solve_taquin_for_any_dim(m)
-    # print(convert_solution(_goalNode))
-    # print("----------------------\n")
+    m = 7
+    _goalNode:Node = test_solve_taquin_for_any_dim(m)
+    print(convert_solution(_goalNode))
+    print("----------------------\n")
 
     # ----------- Test the efficiency of the cost function ----------------
 
-    board = sorted_board(4) # generate a solution board of dim m x m
+    """ board = sorted_board(4) # generate a solution board of dim m x m
+    #gen_disorder()
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False)
     print(convert_solution(goalNode))
 
     n:int = 20
     final_tx, misplaced = gen_disorder(board, goalNode, n)
     print([board[p[0]][p[1]] for p in misplaced])
-    printBoard(board, len(board), final_tx, misplaced)
+    printBoard(board, len(board), final_tx, misplaced) """
 
 #
 #* We now have to test the efficiency of the used cost function, 
