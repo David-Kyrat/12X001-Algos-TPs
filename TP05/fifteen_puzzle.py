@@ -286,3 +286,12 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
             addToLiveNodes(child, liveNodes)
     
     return convert_solution(e_node)
+
+if __name__ == '__main__':
+    board = [[1, 2, 3, 4], 
+         [5, 6, 16, 8], 
+         [9, 10, 7, 11],
+         [13, 14, 15, 12]]
+
+    sol = solve_taquin(board)
+    print(sol)
