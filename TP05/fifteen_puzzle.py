@@ -1,7 +1,4 @@
-from email.policy import default
 from enum import Enum
-from copy import deepcopy
-from this import d
 
 ########################### Exercise 1 ###########################
 # Definitions
@@ -42,13 +39,6 @@ def isMisplaced(board: list[list[int]], coord: tuple[int, int]) -> bool:
     """Returns True if the element at coord is misplaced, False otherwise. i.e. 15 should be at (3, 3)"""
     return board[coord[0]][coord[1]] != 4 * coord[0] + coord[1] + 1
 
-
-def tmp():
-    import numpy
-    B = numpy.dstack(numpy.indices((4,4)))
-    return [list(map(lambda x: 4*x[0]+x[1]+1, B[i])) for i in range(len(B))]
-
-B = tmp()
 
 def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tuple[int, int]]) -> tuple[int, int]:
     """Swap index and index coord in coord in the board.
@@ -284,7 +274,9 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
         for move in available_moves: 
             child = Node(move, e_node, board)
             addToLiveNodes(child, liveNodes)
-    
+
+        e_node = nextENode(liveNodes)
+        
     return convert_solution(e_node)
 
 if __name__ == '__main__':
