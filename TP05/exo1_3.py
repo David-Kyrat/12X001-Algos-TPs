@@ -122,10 +122,10 @@ if __name__ == '__main__':
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
-    m = 6
-    _goalNode:Node = test_solve_taquin_for_any_dim(m)
-    print(convert_solution(_goalNode))
-    print("----------------------\n")
+    # m = 6
+    # _goalNode:Node = test_solve_taquin_for_any_dim(m)
+    # print(convert_solution(_goalNode))
+    # print("----------------------\n")
 
     # ----------- Test the efficiency of the cost function ----------------
 
