@@ -1,10 +1,11 @@
+from email.policy import default
 from enum import Enum
 from copy import deepcopy
 
 ########################### Exercise 1 ###########################
 # Definitions
 UP, RIGHT, DOWN, LEFT = "up", "right", "down", "left"
-DIM = 4  # Dimension of the board
+DIM:int = 4  # Dimension of the board
 
 
 class M(Enum):
@@ -14,6 +15,7 @@ class M(Enum):
     LEFT = (0, -1)
 
     v = property(lambda self: self.value)
+
     # e.g. M.UP() returns (0, -1)
     def __call__(self): return self.v
 
@@ -31,7 +33,9 @@ class M(Enum):
             return self - other.v
         raise ValueError(f"Cannot subtract {type(other)} from {type(self)}")
 
-    def inv(self): return M((-self()[0], -self()[1]))
+    def inv(self): 
+        """Returns the inverse of the move. e.g. M.UP.inv() returns M.DOWN"""
+        return M((-self()[0], -self()[1]))
 
 def isMisplaced(board: list[list[int]], coord:tuple[int, int]) -> bool:
     """Returns True if the element at coord is misplaced, False otherwise. i.e. 15 should be at (3, 3)"""
@@ -64,11 +68,11 @@ def swap(board: list[list[int]], tx:tuple[int, int], move: M, misplaced: set[tup
 
     # if the new coord is misplaced, add it to the misplaced set
     if isMisplaced(board, nc): misplaced.add(nc)
-    elif nc in misplaced: misplaced.remove(nc)
+    else: misplaced.discard(nc) # if not in it => does nothing
     
     # if the swap corrected the position of a tile, remove it from the misplaced set
     if isMisplaced(board, tx): misplaced.add(tx) # if already in it => does nothing
-    elif tx in misplaced: misplaced.remove(tx)
+    else: misplaced.discard(tx)
 
     return nc
 
@@ -114,7 +118,6 @@ class Node:
         self.moves = parent.moves + [move]
         self.tx = move + parent.tx # addition between a move and a tuple was defined in the M class above. e.g. ``M.UP + (3, 2)`` returns ``(2, 2)``
         self.cost, self.gx, self.misplaced = update_misplaced_compute_cost(self, board, self.moves)
-        
 
     def __init_root__(self, board: list[list[int]]):
         """'Private' constructor of root, ``taquin_index`` is the index of the empty square in the initial board """
@@ -183,9 +186,44 @@ mv: dict[str, M] = {UP: M.UP, RIGHT: M.RIGHT, DOWN: M.DOWN, LEFT: M.LEFT}
 # associate each move to its corresponding direction
 mv_inv: dict[M, str] = {M.UP: UP, M.RIGHT: RIGHT, M.DOWN: DOWN, M.LEFT: LEFT}
 
+M_ALL = set(mv.values()) # set of all possible moves
 
+def children(node: Node) -> set[M]:
+    """ Return a set of all possible moves from a given node.
 
+    Parameters
+    ----------
+    @ `node` - Node to compute the cost of
 
+    Returns
+    -------
+        set of all possible moves from a given node."""
+    moves = M_ALL.copy()
+    moves.remove(node.moves[-1].inv()) # remove inverse of last move to avoid cycles in the game "tree"
+    global DIM
+    end:int = DIM-1 # for some reason, i have to declare it here, otherwise it wont work
+
+    # now remove moves that would lead to an out of bounds error
+    match node.tx[0]:
+        # if row of current whitespace is on a side (i.e. if can't go UP or DOWN)
+        case 0: 
+            moves.discard(M.UP)
+            print("UP")
+
+        case end:
+            moves.discard(M.DOWN)
+            print("DOWN")
+
+    # idem, if column of current whitespace is on a side (i.e. if can't go LEFT or RIGHT)        
+    match node.tx[1]:
+        case 0:
+            moves.discard(M.LEFT)
+            print("LEFT")
+            
+        case end:
+            moves.discard(M.RIGHT)
+            print("RIGHT")
+        
 
 def solve_taquin(board: list[list[int]]) -> list[str]:
     """Function that solves the 15-puzzle using branch and bound.
@@ -194,5 +232,6 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
     ----------
     @ `board` - board to solve
     """
-
+    s:set = set()
+    s.discard()
 
