@@ -1,5 +1,4 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
-
 from fifteen_puzzle import *
 import random
 
@@ -88,6 +87,11 @@ def pb(board:list[list[int]]):
         print()
 
 
+def sorted_board(n:int):
+    """ return an nxn matrix where each value increase by 1 (starting at 0). e.g. [[1, 2, 3,...],...]  """
+    return [[n*i+j+1 for j in range(n)] for i in range(n)]
+
+
 def test_solve_taquin_for_any_dim(DIM:int):
     """Generates a random board of size DIM x DIM, where the white square value is always the one in the bottom right corner.
     Then solves the puzzle and prints the solution.
@@ -96,15 +100,19 @@ def test_solve_taquin_for_any_dim(DIM:int):
     ----------
     @ `DIM` - Dimension of the board to generate and solve.
     """
-    dim2: int = DIM*DIM
-    board = [[DIM*i+j+1 for j in range(DIM)] for i in range(DIM)]
-    gen_disorder2(board, 20)
+    _DIM = DIM
+    _dim2: int = _DIM*_DIM
+    _board = sorted_board(_DIM)
+    gen_disorder2(_board, 20)
         
-    goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False, white_square=dim2)
-    print("Solved board:")
-    printBoard(board, DIM, goalNode.tx0, goalNode.misplaced)
+    _goalNode: Node = solve_taquin(_board, extract_path_from_goalNode=False, white_square=_dim2)
+    print("Initial board:")
+    printBoard(_board, _DIM, _goalNode.tx0, init_misplaced(_board, _dim2)[1])
+    print("\nSolved Board:")
+    apply_moves(_board, _goalNode.tx0, _goalNode.moves, _goalNode.misplaced)
+    printBoard(_board, _DIM, _goalNode.tx0, _goalNode.misplaced)
+    return _goalNode
 
-    return goalNode
 
 if __name__ == '__main__':    
     """ board = [[1, 2, 3, 4], 
@@ -112,16 +120,21 @@ if __name__ == '__main__':
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
     m = 6
-    board = [[m*i+j+1 for j in range(m)] for i in range(m)] # generate a solution board of dim m x m
+    _goalNode:Node = test_solve_taquin_for_any_dim(m)
+    print(convert_solution(_goalNode))
+    print("----------------------\n")
 
-    goalNode:Node = test_solve_taquin_for_any_dim(4)
-    #solve_taquin(board, extract_path_from_goalNode=False, white_square=m*m)
+    # ----------- Test the efficiency of the cost function ----------------
+
+    """ board = sorted_board(4) # generate a solution board of dim m x m
+
+    solve_taquin(board, extract_path_from_goalNode=False)
     print(convert_solution(goalNode))
 
-    n:int = 5
+    n:int = 20
     final_tx, misplaced = gen_disorder(board, goalNode, n)
     print([board[p[0]][p[1]] for p in misplaced])
-    printBoard(board, len(board), final_tx, misplaced)
+    printBoard(board, len(board), final_tx, misplaced) """
 
 #
 #* We now have to test the efficiency of the used cost function, 
