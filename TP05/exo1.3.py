@@ -64,19 +64,20 @@ def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set
     """Prints the board with the white square (16) and the misplaced tiles highlighted."""
     for i in range(DIM):
         for j in range(DIM):
-            if (i, j) == tx:
-                print(f"{board[i][j]:2d} ", end="")
-            elif (i, j) in misplaced:
+            if (i, j) in misplaced and (i, j) != tx:
                 print(f"\033[1;31m{board[i][j]:2d}\033[0m ", end="")
             else:
                 print(f"{board[i][j]:2d} ", end="")
         print()
 
 if __name__ == '__main__':    
-    board = [[1, 2, 3, 4], 
+    """ board = [[1, 2, 3, 4], 
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
-            [13, 14, 15, 12]]
+            [13, 14, 15, 12]] """
+    m = 4
+    board = [[m*i+j+1 for j in range(m)] for i in range(m)]
+
 
     goalNode:Node = solve_taquin(board, extract_path_from_goalNode=False)
     print(goalNode)
@@ -86,4 +87,8 @@ if __name__ == '__main__':
     print([board[p[0]][p[1]] for p in misplaced])
     printBoard(board, len(board), final_tx, misplaced)
 
-    
+#
+#* We now have to test the efficiency of the used cost function, 
+#* 
+#*
+#

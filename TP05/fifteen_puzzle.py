@@ -301,7 +301,8 @@ def convert_solution(goal_node: Node) -> list[str]:
 
 
 def solve_taquin(board: list[list[int]], extract_path_from_goalNode: bool = True) -> list[str] | Node:
-    """Function that solves the 15-puzzle using branch and bound.
+    """Function that solves the 15-puzzle using branch and bound,
+    for the cost function ``ĉ(x) = h(x) + g(x)`` where ``h(x) = depth of x`` and ``g(x) = number of misplaced tiles``.
     NB: technically the algorithm could work for more than 16 tiles (i.e. for a board of size n x n where n >= 4)
     
     Parameters
