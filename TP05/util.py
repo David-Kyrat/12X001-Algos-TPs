@@ -59,7 +59,7 @@ def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str)
     plt.show()
 
 
-def runtime(f, args, unpack: bool):
+def runtime(f, args, unpack: bool, number: int = 1):
     '''It takes a function f and an argument arg, and returns the time (in ns) it takes to run f(arg)
     
     Parameters
@@ -67,15 +67,16 @@ def runtime(f, args, unpack: bool):
     @ f - the function to be timed
     @ args - the arguments to pass to the function
     @ unpack - bool, optional if True, the function will unpack the arguments 
+    @ number - int, optional, the number of times to run the function
     before passing them to the function.
     
     Returns
     -------
         The time it takes to run the function f with the arguments args'''
     
-    delta_time = timeit(lambda : f(*args) if (unpack) else f(args), number=1) #* 1.000    
+    delta_time = timeit(lambda : f(*args) if (unpack) else f(args), number=number) #* 1.000    
     return delta_time
 
-def runtime_arr(f, argArray, unpack: bool): 
+def runtime_arr(f, argArray, unpack: bool, number:int = 1): 
     """ See "runtime()" function above for explaination """
-    return [runtime(f, arg, unpack) for arg in argArray]
+    return [runtime(f, arg, unpack, number) for arg in argArray]

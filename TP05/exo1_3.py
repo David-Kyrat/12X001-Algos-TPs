@@ -1,5 +1,8 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
+from copy import deepcopy
+from socket import gaierror
 from fifteen_puzzle import *
+import util
 import random
 
 def children_move_fromList(move:M, tx:tuple[int, int], DIM:int) -> set[M]:
@@ -112,7 +115,30 @@ def test_solve_taquin_for_any_dim(DIM:int):
     printBoard(_board, _DIM, _goalNode.tx0, _goalNode.misplaced)
     return _goalNode
 
+def test_cost_efficiency(nMax: int, amount:int):
+    """ For each ``n`` from ``1`` to ``nMax`` (inclusive), do 50 times the following:
+            generates a sorted board, then call ``gen_disorder(board, n)`` on it to create a random board 
+             (shuffle the board with n 'moves' ). Then solve it and count the number explored nodes ``k``
 
+    Parameters
+    ----------
+    @ `nMax` - max number of moves to perform to shuffle the board	
+    @ `amount` - number of time to perform the test for each ``n``
+    """
+    board = sorted_board(4)
+    avgs:dict[int: float] = {}
+    
+    for n in range(1, nMax+1):
+        k = 0
+        for _ in range(amount):
+            crt_board = deepcopy(board)
+            gen_disorder(crt_board, n)
+            goalNode:Node = solve_taquin(crt_board, extract_path_from_goalNode=False)
+            k += goalNode.depth # number of explored nodes is the depth of the goal node
+            print(f"n: {n:2d}", f"  k: {k:3d}", f"  crt: {goalNode.depth:2d}", "  avg:", k/n)
+        avgs[n] = k/amount
+    return avgs
+            
 if __name__ == '__main__':    
     """ board = [[1, 2, 3, 4], 
             [5, 6, 16, 8], 
@@ -125,10 +151,12 @@ if __name__ == '__main__':
 
     # ----------- Test the efficiency of the cost function ----------------
 
-    board = sorted_board(4) # generate a solution board of dim m x m
+    """ board = sorted_board(4) # generate a solution board of dim m x m
     n:int = 20
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
-    goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False)
+    goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
+
+    print(test_cost_efficiency(11, 50))
     
 
 #
