@@ -157,8 +157,10 @@ if __name__ == '__main__':
 
     nMax, amount = 11, 100 # max level of disorder, number of time to perform the test for each level
     print(test_cost_efficiency(nMax, amount))
-    x_plot, x_label = list(range(1, nMax+1)), "disorder level, (max dist. from solution)"
-    
+    avgs = test_cost_efficiency(nMax, amount)
+    x_plot, x_label = avgs.keys(), "disorder level, (max dist. from solution)"
+    y_plot, y_label = avgs.values(), "average number of explored nodes for given disorder lvl"
+
     util.plot_solo()
     
 
@@ -167,3 +169,19 @@ if __name__ == '__main__':
 #* 
 #*
 #
+
+
+def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str, xticks=None, yticks=None):
+    """_summary_
+
+    Parameters
+    ----------
+    @ `plot_x` - _description_
+    @ `plot_f` - _description_
+    @ `title` - _description_
+    @ `xlabel` - _description_
+    @ `ylabel` - _description_
+    @ `fLabel` - _description_
+    @ `xticks` (optional) - _description_, (default: None)
+    @ `yticks` (optional) - _description_, (default: None)
+    """

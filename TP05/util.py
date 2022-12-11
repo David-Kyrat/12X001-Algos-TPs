@@ -34,13 +34,19 @@ def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Lab
 
 def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str, xticks=None, yticks=None):
     """Plots a single function
-    - plot_x: the x-axis values
-    - plot_f: the y-values of the function
-    - title: the title of the plot
-    - xlabel: the label of the x-axis
-    - ylabel: the label of the y-axis
-    - fLabel: the label of the function
+
+    Parameters
+    ----------
+    @ `plot_x` - x-axis values
+    @ `plot_f` - y-axis values (i.e. values of the function)
+    @ `title`  - Title of the plot
+    @ `xlabel` - Label of the x-axis
+    @ `ylabel` - Label of the y-axis
+    @ `fLabel` - Label of the function
+    @ `xticks` (optional) - list of ticks to display on x-axis, (default: None)
+    @ `yticks` (optional) - list of ticks to display on y-axis, (default: None)
     """
+
     #plt.tight_layout(pad=5)
     fig = plt.figure()
     plt.title(title)
