@@ -38,7 +38,7 @@ class M(Enum):
         """Returns the inverse of the move. e.g. M.UP.inv() returns M.DOWN"""
         return M((-self()[0], -self()[1]))
 
-def isMisplaced(board: list[list[int]], coord:tuple[int, int]) -> bool:
+def isMisplaced(board: list[list[int]], coord: tuple[int, int]) -> bool:
     """Returns True if the element at coord is misplaced, False otherwise. i.e. 15 should be at (3, 3)"""
     return board[coord[0]][coord[1]] != 4 * coord[0] + coord[1] + 1
 
@@ -50,7 +50,7 @@ def tmp():
 
 B = tmp()
 
-def swap(board: list[list[int]], tx:tuple[int, int], move: M, misplaced: set[tuple[int, int]]) -> tuple[int, int]:
+def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tuple[int, int]]) -> tuple[int, int]:
     """Swap index and index coord in coord in the board.
 
     Parameters
@@ -191,8 +191,8 @@ mv_inv: dict[M, str] = {M.UP: UP, M.RIGHT: RIGHT, M.DOWN: DOWN, M.LEFT: LEFT}
 M_ALL = set(mv.values()) # set of all possible moves
 
 
-def children(node: Node) -> set[M]:
-    """ Return a set of all possible moves from a given node.
+def children_moves(node: Node) -> set[M]:
+    """ Return a set of all possible moves for the children of the given node.
 
     Parameters
     ----------
@@ -208,17 +208,13 @@ def children(node: Node) -> set[M]:
     # now remove moves that would lead to an out of bounds error
     match node.tx[0]:
         # if row of current whitespace is on a side (i.e. if can't go UP or DOWN)
-        case 0: 
-            moves.discard(M.UP)
-        case end:
-            moves.discard(M.DOWN)
+        case 0: moves.discard(M.UP)
+        case end: moves.discard(M.DOWN)
 
     # idem, if column of current whitespace is on a side (i.e. if can't go LEFT or RIGHT)        
     match node.tx[1]:
-        case 0:
-            moves.discard(M.LEFT)
-        case end:
-            moves.discard(M.RIGHT)
+        case 0: moves.discard(M.LEFT)
+        case end: moves.discard(M.RIGHT)
             
     return moves
 
@@ -228,31 +224,22 @@ def P(e_node: Node):
     return e_node.gx == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
 
 
-def addToLiveNodes(liveNodes:list[Node], e_node: Node):
+def addToLiveNodes(e_node: Node, liveNodes: list[Node]):
     """ Adds (in place) given ``e_node`` to ``liveNodes`` list, while maintaining the order. (sorted by cost ĉ)
 
     Parameters
     ----------
-    @ `liveNodes` - List of live nodes (i.e. nodes that have not been expanded yet)
     @ `e_node` - Node to add to liveNodes list
+    @ `liveNodes` - List of live nodes (i.e. nodes that have not been expanded yet)
     """
     liveNodes.append(e_node)
     for i in range(len(liveNodes)-1, 0, -1): # loop backward
         if liveNodes[i].cost < liveNodes[i-1].cost: # if the cost of the node at index i is smaller than the cost of the node at index i-1, swap them
             liveNodes[i], liveNodes[i-1] = liveNodes[i-1], liveNodes[i]
-        else : break # because the other elements are sorted
+        else : break # because the oher elements are sorted
 
-def addListToLiveNodes(liveNodes: list[Node], e_nodes: list[Node]):
-    """ It's better to add a list of nodes to liveNodes list in one go (O(n)) then sorting it (O(n*log(n))), 
-    than instead them one by one (O(n)) 
 
-    Parameters
-    ----------
-    @ `liveNodes` - _description_
-    @ `e_nodes` - _description_ 
-    """
-
-def nextENode(liveNodes:list[Node]) -> Node:
+def nextENode(liveNodes: list[Node]) -> Node:
     """ Return the next node to expand. 
     Since we maintain the list sorted by cost, the next node is just ``liveNodes.pop()``.
 
@@ -267,6 +254,20 @@ def nextENode(liveNodes:list[Node]) -> Node:
     return liveNodes.pop()
 
 
+def convert_solution(goal_node: Node) -> list[str]:
+    """ Return the list of moves (as string i.e. "up", "down"...) to get from the initial state to the goal state.
+
+    Parameters
+    ----------
+    @ `goal_node` - Node representing the goal state
+
+    Returns
+    -------
+        List of moves to get from the initial state to the goal state.
+    """
+    return [mv_inv[move] for move in goal_node.moves]
+
+
 def solve_taquin(board: list[list[int]]) -> list[str]:
     """Function that solves the 15-puzzle using branch and bound.
 
@@ -277,4 +278,11 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
 
     liveNodes: list[Node] = []
     e_node = Node(None, None, board) # special constructor for root node
+    while not P(e_node):
+        available_moves: set[M] = children_moves(e_node)
+
+        for move in available_moves: 
+            child = Node(move, e_node, board)
+            addToLiveNodes(child, liveNodes)
     
+    return convert_solution(e_node)
