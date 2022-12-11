@@ -1,6 +1,7 @@
 from email.policy import default
 from enum import Enum
 from copy import deepcopy
+from this import d
 
 ########################### Exercise 1 ###########################
 # Definitions
@@ -189,6 +190,7 @@ mv_inv: dict[M, str] = {M.UP: UP, M.RIGHT: RIGHT, M.DOWN: DOWN, M.LEFT: LEFT}
 
 M_ALL = set(mv.values()) # set of all possible moves
 
+
 def children(node: Node) -> set[M]:
     """ Return a set of all possible moves from a given node.
 
@@ -200,8 +202,7 @@ def children(node: Node) -> set[M]:
     -------
         set of all possible moves from a given node."""
     moves = M_ALL.copy()
-    if node.moves != []: moves.remove(node.moves[-1].inv()) # remove inverse of last move to avoid cycles in the game "tree"
-    
+    if node.moves != []: moves.remove(node.moves[-1].inv()) # remove inverse of last move to avoid cycles in the game "tree"    
     end:int = DIM-1
 
     # now remove moves that would lead to an out of bounds error
@@ -220,15 +221,60 @@ def children(node: Node) -> set[M]:
             moves.discard(M.RIGHT)
             
     return moves
-        
+
+
+def P(e_node: Node):
+    """ Return true if and only if e_node is a goal node. """
+    return e_node.gx == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
+
+
+def addToLiveNodes(liveNodes:list[Node], e_node: Node):
+    """ Adds (in place) given ``e_node`` to ``liveNodes`` list, while maintaining the order. (sorted by cost ĉ)
+
+    Parameters
+    ----------
+    @ `liveNodes` - List of live nodes (i.e. nodes that have not been expanded yet)
+    @ `e_node` - Node to add to liveNodes list
+    """
+    liveNodes.append(e_node)
+    for i in range(len(liveNodes)-1, 0, -1): # loop backward
+        if liveNodes[i].cost < liveNodes[i-1].cost: # if the cost of the node at index i is smaller than the cost of the node at index i-1, swap them
+            liveNodes[i], liveNodes[i-1] = liveNodes[i-1], liveNodes[i]
+        else : break # because the other elements are sorted
+
+def addListToLiveNodes(liveNodes: list[Node], e_nodes: list[Node]):
+    """ It's better to add a list of nodes to liveNodes list in one go (O(n)) then sorting it (O(n*log(n))), 
+    than instead them one by one (O(n)) 
+
+    Parameters
+    ----------
+    @ `liveNodes` - _description_
+    @ `e_nodes` - _description_ 
+    """
+
+def nextENode(liveNodes:list[Node]) -> Node:
+    """ Return the next node to expand. 
+    Since we maintain the list sorted by cost, the next node is just ``liveNodes.pop()``.
+
+    Parameters
+    ----------
+    @ `liveNodes` - List of live nodes (i.e. nodes that have not been expanded yet)
+
+    Returns
+    -------
+        ``liveNodes.pop()`` i.e. Node with that minimize the cost ĉ in given liveNodes list.
+    """
+    return liveNodes.pop()
+
 
 def solve_taquin(board: list[list[int]]) -> list[str]:
     """Function that solves the 15-puzzle using branch and bound.
 
     Parameters
     ----------
-    @ `board` - board to solve
+    @ `board` - 4x4 Matrix representing the initial state of the game
     """
-    s:set = set()
-    s.discard()
 
+    liveNodes: list[Node] = []
+    e_node = Node(None, None, board) # special constructor for root node
+    
