@@ -45,6 +45,7 @@ class Node:
         @ `path`    - ``list[tuple[int, int]]``, list of indexes from the root to this node (i.e. ``path = [a0, a1, ..., ak]``)
         @ `depth`   - ``int``, depth of this node in the moves tree (i.e. number of moves: ``h(this) = parent.depth + 1``)
         @ `cost`    - ``int``, cost (i.e. ``ĉ(this) = h(this) + g(this)``) where ``g(this) = ||b-a||_1`` (i.e. distance (norm ``L1``) between the current location and the destination)
+        @ `move`    - ``M``, last move that led to this node (i.e. ``a_k = move + a_k-1`` (``a_k-1 = parent.a_k``))
         """
         if move is None or parent is None: return # root node
         self.ak = move + parent.ak
@@ -52,6 +53,7 @@ class Node:
         self.depth = parent.depth + 1
         self.path = parent.path + [self.ak]
         self.cost = Node.c_hat(self)
+        self.move = move
         
         #self.cost, self.gx = update_misplaced_compute_cost(self, parent.misplaced, domain, self.moves)
 
@@ -90,38 +92,49 @@ class Node:
         return f"Node(ĉ={self.cost}, ak={self.ak}, g={self.cost}, h={self.depth}, b={self.b}, path={self.path})"
 
 
-def children_moves(node: Node, DIM: int) -> set[M]:
+def get(matrix: list[list[int]], index: tuple[int, int]) -> int:
+    """ Allow using tuple to access elements in a matrix. (Does not check for bounds correctness)"""
+    return matrix[index[0]][index[1]]
+
+
+def children_moves(domain: list[list[int]], node: Node, n:int, m:int) -> set[M]:
     """ Return a set of all possible moves for the children of the given node.
 
     Parameters
     ----------
     @ `node` - Node to compute the cost of
-    @ `DIM` - Dimension of the domain
+    @ `n`    - number of rows in the domain
+    @ `m`    - number of columns in the domain
 
     Returns
     -------
-        set of all possible moves from a given node."""
-    moves = M_ALL.copy()
-    if node.moves != []: moves.remove(node.moves[-1].inv()) # remove inverse of last move to avoid cycles in the game "tree"    
+        set of all possible moves from a given node. (avoiding obstacles and out of bounds errors)"""
+    moves: set[M] = M_ALL.copy()
+    if node.move is not None: moves.remove(node.move.inv()) # remove inverse of last move to avoid cycles in the game "tree"    
 
-    # now remove moves that would lead to an out of bounds error
+    # now remove moves that would lead to an out of bounds error, like we did in fifteen_puzzle.py
 
-    # if row of current white square (16) is on a side (i.e. if can't go UP or DOWN)
-    if node.tx[0] == 0: moves.discard(M.UP)
-    if node.tx[0] == DIM-1: moves.discard(M.DOWN)
+    if node.ak[0] == 0: moves.discard(M.UP)
+    if node.ak[0] == n-1: moves.discard(M.DOWN)
     
     # idem, if column of current white square (16) is on a side (i.e. if can't go LEFT or RIGHT)        
-    if node.tx[1] == 0: moves.discard(M.LEFT)
-    if node.tx[1] == DIM-1: moves.discard(M.RIGHT)
-            
-    return moves
+    if node.ak[1] == 0: moves.discard(M.LEFT)
+    if node.ak[1] == m-1: moves.discard(M.RIGHT)
+
+    rm: set[M] = set()
+
+    # Remove all obstacles from the set of possible moves
+    for m in moves:
+        if get(domain, m + node.ak) == 1: rm.add(m) 
+
+    return moves.difference(rm)
 
 
 def P(enode: Node):
     """ Return true if and only if enode is a goal node.  ``enode`` has arrived 
     at its destination ``b`` if and only if its distance to ``b`` is null (in the matical sense) 
     i.e. if ``||enode.ak - b||_1 = 0`` i.e. ``enode.ak == b``"""
-    return enode.gx == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
+    return enode.__d__(enode.b) == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
 
 
 def addToLiveNodes(enode: Node, liveNodes: list[Node]):
