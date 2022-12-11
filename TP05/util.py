@@ -32,7 +32,7 @@ def plotVS(plot_x, plot_f1, plot_f2, title: str, xlabel: str, ylabel: str, f1Lab
     plt.show()
 
 
-def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str):
+def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str, xticks=None, yticks=None):
     """Plots a single function
     - plot_x: the x-axis values
     - plot_f: the y-values of the function
@@ -47,10 +47,16 @@ def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str)
     plt.grid()
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    M, gap = max(plot_f), 0.25
-    plt.xticks(plot_x)
-    plt.ylim(0, M + gap*M)
-    #plt.yticks(np.linspace(0, M, 27))
+    if xticks is not None:
+        plt.xticks(xticks)
+    else: 
+        mx, Mx, gapx = min(plot_x), max(plot_x), 0.25
+        plt.xlim(mx - gapx * mx, Mx + gapx * Mx)
+    if yticks is not None:
+        plt.yticks(yticks)
+    else:
+        my, My, gapy = min(plot_f), max(plot_f), 0.25
+        plt.ylim(my - gapy, My + gapy * My)
     plt.plot(plot_x, plot_f, '-b', label=fLabel, linewidth=1)
     #  plt.legend(prop={'size': 5})
     #  plt.legend(fontsize=7)

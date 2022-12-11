@@ -1,6 +1,5 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
 from copy import deepcopy
-from socket import gaierror
 from fifteen_puzzle import *
 import util
 import random
@@ -122,7 +121,7 @@ def test_cost_efficiency(nMax: int, amount:int):
 
     Parameters
     ----------
-    @ `nMax` - max number of moves to perform to shuffle the board	
+    @ `nMax` - max number of moves to perform to shuffle the board. i.e. max "level of disorder"
     @ `amount` - number of time to perform the test for each ``n``
     """
     board = sorted_board(4)
@@ -130,12 +129,12 @@ def test_cost_efficiency(nMax: int, amount:int):
     
     for n in range(1, nMax+1):
         k = 0
-        for _ in range(amount):
+        for i in range(amount):
             crt_board = deepcopy(board)
             gen_disorder(crt_board, n)
             goalNode:Node = solve_taquin(crt_board, extract_path_from_goalNode=False)
             k += goalNode.depth # number of explored nodes is the depth of the goal node
-            print(f"n: {n:2d}", f"  k: {k:3d}", f"  crt: {goalNode.depth:2d}", "  avg:", k/n)
+            print(f"n: {n:2d}", f"   k: {k:3d}", f"   crt: {goalNode.depth:2d}", "   avg:", k/(i+1))
         avgs[n] = k/amount
     return avgs
             
@@ -156,7 +155,11 @@ if __name__ == '__main__':
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
 
-    print(test_cost_efficiency(11, 50))
+    nMax, amount = 11, 100 # max level of disorder, number of time to perform the test for each level
+    print(test_cost_efficiency(nMax, amount))
+    x_plot, x_label = list(range(1, nMax+1)), "disorder level, (max dist. from solution)"
+    
+    util.plot_solo()
     
 
 #
