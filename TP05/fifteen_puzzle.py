@@ -213,7 +213,9 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     tx = apply_moves(board, node.tx0, moves, _misplaced) # node.tx0 = index of the empty square in the initial board
     
     #* Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
-    #* making the changes and reverting them (O(2*m) where m = h(x) is the number of Moves) is still faster than making a copy of the board at each iteration. O(n^2)
+    #* making the changes and reverting them (O(2*n) where n = h(x) is the number of Moves (which is at most g(root)) since if a solution is found the it is optimal.) 
+    #* is still faster than making a copy of the board at each iteration. O(m^2) 
+    #* (where m is the dimension of the board, here m is a constant but we could have the exact same problem for m unknown and the same implementation would suffice)
     
     unapply_moves(board, tx, moves)
     
