@@ -1,5 +1,6 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
 from copy import deepcopy
+from time import time
 from fifteen_puzzle import *
 import util
 import random
@@ -125,21 +126,33 @@ def test_cost_efficiency(nMax: int, amount:int):
     @ `amount` - number of time to perform the test for each ``n``
     """
     board = sorted_board(4)
-    avgs:dict[int: float] = {}
+    avgs_k:dict[int: float] = {}
+    avgs_time: dict[int: float] = {}
     
     for n in range(1, nMax+1):
-        k = 0
+        runtime = k = 0
         for i in range(amount):
             crt_board = deepcopy(board)
             gen_disorder(crt_board, n)
+            t0 = time()
             goalNode:Node = solve_taquin(crt_board, extract_path_from_goalNode=False)
+            delta = time() - t0
+            runtime += delta
             k += goalNode.depth # number of explored nodes is the depth of the goal node
             #print(f"n: {n:2d}", f"   k: {k:3d}", f"   crt: {goalNode.depth:2d}", "   avg:", k/(i+1))
-        avgs[n] = k/amount
-    return avgs
-            
+        avgs_k[n] = k/amount
+        avgs_time[n] = runtime/amount
+    return avgs_k, avgs_time
+
+def plotTime(avgs_time:dict[int, float]):
+    """Plot the average time to solve the puzzle for each level of disorder."""
+    x_plot, y_plot = list(avgs_time.keys()), list(avgs_time.values())
+    xlabel, ylabel = "disorder level, (max distance from solution)", r"average runtime to get to the solution"
+    title = r"Average time to solve the puzzle for each level of disorder with cost: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$"
+    
 if __name__ == '__main__':    
-    """ board = [[1, 2, 3, 4], 
+    """ board0 =
+            [[1, 2, 3, 4], 
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
@@ -164,7 +177,8 @@ if __name__ == '__main__':
     #flabel = r'lul'
     from numpy import linspace
     yticks = linspace(0, nMax, 2*nMax)
-    util.plot_solo(x_plot, y_plot, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$', xlabel=x_label, ylabel=y_label, fLabel=flabel, xticks=x_plot, yticks=yticks)
+    util.plot_solo(x_plot, y_plot, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$', 
+                   xlabel=x_label, ylabel=y_label, fLabel=flabel, xticks=x_plot, yticks=yticks)
     
 
 #
