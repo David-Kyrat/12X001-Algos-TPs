@@ -106,13 +106,11 @@ def children_moves(domain: list[list[int]], node: Node, n:int, m:int) -> set[M]:
     if node.ak[0] == 0: moves.discard(M.UP)
     if node.ak[0] == n-1: moves.discard(M.DOWN)
     
-    # idem, if column of current white square (16) is on a side (i.e. if can't go LEFT or RIGHT)        
     if node.ak[1] == 0: moves.discard(M.LEFT)
     if node.ak[1] == m-1: moves.discard(M.RIGHT)
-
-    rm: set[M] = set()
-
+    
     # Remove all obstacles from the set of possible moves
+    rm: set[M] = set()
     for m in moves:
         if get(domain, m + node.ak) == 1: rm.add(m) 
 
