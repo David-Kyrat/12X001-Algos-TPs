@@ -37,6 +37,8 @@ class M(Enum):
         """Returns the inverse of the move. e.g. M.UP.inv() returns M.DOWN"""
         return M((-self()[0], -self()[1]))
 
+    def __repr__(self): return self.name
+
 def isMisplaced(board: list[list[int]], coord: tuple[int, int]) -> bool:
     """Returns True if the element at coord is misplaced, False otherwise. i.e. 15 should be at (3, 3)"""
     return board[coord[0]][coord[1]] != 4 * coord[0] + coord[1] + 1
@@ -151,12 +153,48 @@ def init_misplaced(board: list[list[int]]) -> tuple[tuple[int, int], set[tuple[i
     return tx0, misplaced
 
 
+def apply_moves(board: list[list[int]], tx0: tuple[int, int], moves: list[M], misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
+    """Apply the given list of moves to the given board.
+
+    Parameters
+    ----------
+    @ `board` - Game board
+    @ `tx0`  - initial Taquin indeX (index of the white square (16) in initial board)
+    @ `moves` - List of moves to apply
+    @ `misplaced` - Set of misplaced tiles (if not given, no misplaced set will be saved/computed)
+
+    Returns
+    ----------
+        New position of white square, (NB: modifies the board in place) """
+
+    tx = tx0 # index of the empty square in the initial board
+    for move in moves:
+        tx = swap(board, tx, move, misplaced)
+    return tx
+
+def unapply_moves(board: list[list[int]], tx: tuple[int, int], moves: list[M]):
+    """Return the board into its initial state. i.e. Unapply the given list of moves to the given board.
+
+    Parameters
+    ----------
+    @ `board` - Game board
+    @ `tx`  - Taquin indeX (index of the white square after applying all ``moves`` to ``board``)
+    @ `moves` - List of moves to reverse/unapply
+
+    Returns
+    ----------
+        Nothing, modifies the board in place """
+    
+    for i in range(len(moves)-1, -1, -1):
+        tx = swap(board, tx, moves[i].inv(), None)
+    
+
 def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], board: list[list[int]], moves: list[M])-> tuple[int, int, set[tuple[int, int]]]: 
     """ Instead of storing copies of the board (which would be memory consuming since board is a 2d matrix), 
     this function recomputes the different changes each move would have on the board, and updates the set of misplaced tiles accordingly.
 
-    Then the cost of a node x is just its depth (h(x)) the length of the set of misplaced tiles (g(x)).
-    the total should be in O(2m) where m is the number of moves. (swap should be O(1) since add() and contains checks are O(1) for sets)
+    Then the cost of a node ``x`` is just its depth (``h(x)=x.depth``) ``+`` the length of the set of misplaced tiles (``g(x)=len(x.misplaced)``).
+    the total should be in O(2*h(x)) where h(x) is the current number of moves. (swap should be O(1) since add() and contains checks are O(1) for sets)
 
     Parameters
     ----------
@@ -168,15 +206,14 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     -------
         Triple ``(ĉ(node), g(node), update_misplaced_set)`` where ``ĉ(node) = h(node) + g(node)`` and ``update_misplaced_set`` is the updated set of misplaced tiles
     """
-    _misplaced, tx = misplaced.copy(), node.tx0 # set of misplaced tiles, index of the empty square in the initial board
-
-    for move in moves: 
-        tx = swap(board, tx, move, _misplaced)
-
-    # Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
-    # making the changes and reverting them (O(2*m) where m is the number of Move at max) is still faster than making a copy of the board at each iteration. O(n^2)
-    for i in range(len(moves)-1, -1, -1):
-        tx = swap(board, tx, moves[i].inv(), None)
+    _misplaced = misplaced.copy() # set of misplaced tiles
+    
+    tx = apply_moves(board, node.tx0, moves, _misplaced) # node.tx0 = index of the empty square in the initial board
+    
+    #? Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
+    #? making the changes and reverting them (O(2*m) where m = h(x) is the number of Moves) is still faster than making a copy of the board at each iteration. O(n^2)
+    
+    unapply_moves(board, tx, moves)
     
     gx = len(_misplaced) # g(x) = number of misplaced tiles
     hx = node.depth
@@ -205,24 +242,13 @@ def children_moves(node: Node, DIM: int) -> set[M]:
 
     # now remove moves that would lead to an out of bounds error
 
-    # if row of current whitespace is on a side (i.e. if can't go UP or DOWN)
+    # if row of current white square (16) is on a side (i.e. if can't go UP or DOWN)
     if node.tx[0] == 0: moves.discard(M.UP)
     if node.tx[0] == DIM-1: moves.discard(M.DOWN)
     
-    # idem, if column of current whitespace is on a side (i.e. if can't go LEFT or RIGHT)        
+    # idem, if column of current white square (16) is on a side (i.e. if can't go LEFT or RIGHT)        
     if node.tx[1] == 0: moves.discard(M.LEFT)
     if node.tx[1] == DIM-1: moves.discard(M.RIGHT)
-
-    """  match node.tx[0]:
-        case 0: moves.discard(M.UP)
-        case _BOARD_ND: moves.discard(M.DOWN)
-
-    _BOARD_ND = DIM-1 # reassign end because its getting modified somewhere apparently
-    match node.tx[1]:
-        case 0: 
-            moves.discard(M.LEFT)
-        case _BOARD_ND: 
-            moves.discard(M.RIGHT) """
             
     return moves
 
@@ -297,3 +323,12 @@ def solve_taquin(board: list[list[int]]) -> list[str]:
         enode = nextENode(liveNodes)
 
     return convert_solution(enode)
+
+if __name__ == '__main__':
+    board = [[1, 2, 3, 4], 
+         [5, 6, 16, 8], 
+         [9, 10, 7, 11],
+         [13, 14, 15, 12]]
+
+    sol = solve_taquin(board)
+    print(sol)
