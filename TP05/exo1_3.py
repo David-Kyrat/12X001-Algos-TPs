@@ -59,6 +59,14 @@ def gen_disorder(board: list[list[int]], node:Node, n:int):
 
     return tx, misplaced
 
+def gen_disorder2(board: list[list[int]], n:int):
+    """"Overload" of ``gen_disorder()`` that does not require a node as input. (It will create a root node from the given board and then call ``gen_disorder()``)
+        (see ``gen_disorder()`` for more details) """
+    root: Node = Node(None, None, board)
+    DIM: int = len(board)
+    root.__init_root__(board, DIM*DIM)
+    return gen_disorder(board, root, n)
+
 #! Since printing the board did not seem like a fundamental task of this TP, The following function to print the board in color was taken from internet.
 def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set[tuple[int, int]]):
     """Prints the board with the white square (16) and the misplaced tiles highlighted."""
@@ -70,7 +78,8 @@ def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set
                 print(f"{board[i][j]:2d} ", end="")
         print()
 
-def printBoard2(board:list[list[int]]):
+
+def pb(board:list[list[int]]):
     """Prints the board with the white square (16) and the misplaced tiles highlighted."""
     DIM = len(board)
     for i in range(DIM):
@@ -78,17 +87,36 @@ def printBoard2(board:list[list[int]]):
             print(f"{board[i][j]:2d} ", end="")
         print()
 
+
+def test_solve_taquin_for_any_dim(DIM:int):
+    """Generates a random board of size DIM x DIM, where the white square value is always the one in the bottom right corner.
+    Then solves the puzzle and prints the solution.
+
+    Parameters
+    ----------
+    @ `DIM` - Dimension of the board to generate and solve.
+    """
+    dim2: int = DIM*DIM
+    board = [[DIM*i+j+1 for j in range(DIM)] for i in range(DIM)]
+    gen_disorder2(board, 20)
+        
+    goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False, white_square=dim2)
+    print("Solved board:")
+    printBoard(board, DIM, goalNode.tx0, goalNode.misplaced)
+
+    return goalNode
+
 if __name__ == '__main__':    
     """ board = [[1, 2, 3, 4], 
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
-    m = 5
-    board = [[m*i+j+1 for j in range(m)] for i in range(m)]
+    m = 6
+    board = [[m*i+j+1 for j in range(m)] for i in range(m)] # generate a solution board of dim m x m
 
-
-    goalNode:Node = solve_taquin(board, extract_path_from_goalNode=False, white_square=25)
-    print(goalNode)
+    goalNode:Node = test_solve_taquin_for_any_dim(4)
+    #solve_taquin(board, extract_path_from_goalNode=False, white_square=m*m)
+    print(convert_solution(goalNode))
 
     n:int = 5
     final_tx, misplaced = gen_disorder(board, goalNode, n)

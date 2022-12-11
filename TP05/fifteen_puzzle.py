@@ -304,8 +304,6 @@ def convert_solution(goal_node: Node) -> list[str]:
     return [mv[move] for move in goal_node.moves]
 
 
-#from exo1_3 import printBoard2 as pb
-
 def solve_taquin(board: list[list[int]], extract_path_from_goalNode: bool = True, white_square:int = 16) -> list[str] | Node:
     """Function that solves the 15-puzzle using branch and bound,
     for the cost function ``ĉ(x) = h(x) + g(x)`` where ``h(x) = depth of x`` and ``g(x) = number of misplaced tiles``.
