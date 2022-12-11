@@ -1,5 +1,5 @@
 ########################### Exercise 3 ###########################
-from fifteen_puzzle import M, M_ALL, mv, UP, RIGHT, DOWN, LEFT
+from fifteen_puzzle import M, M_ALL
 
 #
 #* Lets call ``a_k`` the index of our current location after the k-th move, we want to move from the starting point ``a0`` to the arrival/destination ``b = a_{c(x_0)}``  (``x_0`` is the root of the tree of all possible moves/outcome).
