@@ -2,24 +2,25 @@
 from fifteen_puzzle import M, M_ALL, mv, UP, RIGHT, DOWN, LEFT
 
 #
-#* Lets call ``a`` the index of our current location, we want to move ``a`` from the starting point ``a0`` to the arrival/destination ``b``.
+#* Lets call ``a_k`` the index of our current location after the k-th move, we want to move from the starting point ``a0`` to the arrival/destination ``b = a_{c(x_0)}``  (``x_0`` is the root of the tree of all possible moves/outcome).
+#* We'll use the same cost function approximation ``ĉ(x) = h(x) + g(x)`` as in fifteen_puzzle .
 # 
 
-def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
-    """Swap index and index coord in coord in the board and update set of misplaced tiles (if not none).
+def move(domain: list[list[int]], tx: tuple[int, int], dir: M, misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
+    """ Move 1 step from tx in the direction `dir`. (i.e. to ``tx + dir``) in the domain.
 
-    Parameters
+    Parameter
     ----------
-    @ `board` - Game board
-    @ `move` - move to be made
+    @ `domain` - domain to scour
+    @ `dir`    - direction in which to move
     @ (optional) `misplaced` - set of misplaced tiles
 
     Returns
     ----------
-        New position of ``a``
+        New position ``a_k+1 = a_k + dir``
     """
-    nc = move + tx # new coord of white square
-    board[tx[0]][tx[1]], board[nc[0]][nc[1]] = board[nc[0]][nc[1]], board[tx[0]][tx[1]] # swap
+    nc = dir + tx # new coord of white square
+    domain[tx[0]][tx[1]], domain[nc[0]][nc[1]] = domain[nc[0]][nc[1]], domain[tx[0]][tx[1]] # swap
 
     if misplaced is None: return nc
 
@@ -28,40 +29,39 @@ def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tu
 
 class Node: 
     """Node of the game tree. Each node has a ``depth`` (``int``), a cost (``int``), a list of moves ``moves`` (``list[M]``) 
-    the index of the empty square, ``tx``, (``tuple[int, int]``) in its associated board, a set of misplaced tiles ``misplaced`` (``set[tuple[int, int]]``)
+    the index of the empty square, ``tx``, (``tuple[int, int]``) in its associated domain, a set of misplaced tiles ``misplaced`` (``set[tuple[int, int]]``)
     and the value of g(this) (``int``)."""
     
-    def __init__(self, move: M, parent, board: list[list[int]]):
+    def __init__(self, move: M, parent, domain: list[list[int]]):
         """Constructor of the Node class.
 
         Parameters
         ----------
         @ `move`   - move that led to this node from its parent
         @ `parent` - parent of this node (Can be None, If it is, then this node is the root of the game tree, and tx has to be given)
-        @ `board`  - initial board (needed because neither this board nor its update will ever be stored/copied in any node)
+        @ `domain`  - initial domain (needed because neither this domain nor its update will ever be stored/copied in any node)
 
         Other attributes
         ---------
-        @ `tx`        - index of the empty square in the associated board.
-        @ `depth`     - depth of this node in the game tree (i.e. ``h(this) = parent.depth + 1``)
-        @ `misplaced` - set of misplaced tiles. (If not given, => will be inferred from `parent` and `move`)
-        @ `gx`        - value of ``g(this) = len(misplaced)``
+        @ `ak`        - index of this node in the domain (i.e. current location)
+        @ `depth`     - depth of this node in the moves tree (i.e. number of moves: ``h(this) = parent.depth + 1``)
+        @ `gx`        - value of ``g(this) = ||b-a||_1`` (i.e. distance (norm L1) between the current location and the destination) ``
         @ `cost`      - cost of this, defined by ``c_hat(this) = h(this) + g(this)`` (Computed from `parent.depth`, `parent.misplaced` and `move`)
         """
         if parent is None: 
-            self.__init_root__(board)
+            self.__init_root__(domain)
             return
         
         self.depth = parent.depth + 1
-        self.tx0 = parent.tx0 # index of the empty square in the initial board
+        self.tx0 = parent.tx0 # index of the empty square in the initial domain
         self.moves = parent.moves + [move]
         self.tx = move + parent.tx # addition between a move and a tuple was defined in the M class above. e.g. ``M.UP + (3, 2)`` returns ``(2, 2)``
-        self.cost, self.gx, self.misplaced = update_misplaced_compute_cost(self, parent.misplaced, board, self.moves)
+        self.cost, self.gx, self.misplaced = update_misplaced_compute_cost(self, parent.misplaced, domain, self.moves)
 
-    def __init_root__(self, board: list[list[int]], white_square_value: int = 16):
-        """'Private' constructor of root, ``taquin_index`` is the index of the empty square in the initial board """
+    def __init_root__(self, domain: list[list[int]], white_square_value: int = 16):
+        """'Private' constructor of root, ``taquin_index`` is the index of the empty square in the initial domain """
         self.depth = 0
-        self.tx0, self.misplaced = init_misplaced(board, white_square_value)
+        self.tx0, self.misplaced = init_misplaced(domain, white_square_value)
         self.cost = max(0, len(self.misplaced) - 1) # -1 because we do not count the empty square
         self.moves = []
         self.tx = self.tx0
@@ -73,9 +73,9 @@ class Node:
 
 
 
-def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], board: list[list[int]], moves: list[M])-> tuple[int, int, set[tuple[int, int]]]: 
-    """ Instead of storing copies of the board (which would be memory consuming since board is a 2d matrix), 
-    this function recomputes the different changes each move would have on the board, and updates the set of misplaced tiles accordingly.
+def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], domain: list[list[int]], moves: list[M])-> tuple[int, int, set[tuple[int, int]]]: 
+    """ Instead of storing copies of the domain (which would be memory consuming since domain is a 2d matrix), 
+    this function recomputes the different changes each move would have on the domain, and updates the set of misplaced tiles accordingly.
 
     Then the cost of a node ``x`` is just its depth (``h(x)=x.depth``) ``+`` the length of the set of misplaced tiles (``g(x)=len(x.misplaced)``).
     the total should be in O(2*h(x)) where h(x) is the current number of moves. (swap should be O(1) since add() and contains checks are O(1) for sets)
@@ -83,7 +83,7 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     Parameters
     ----------
     @ `node` - Node to compute the cost of
-    @ `board` - Game board
+    @ `domain` - domain to p
     @ `moves` - list of moves to get from the root of the game tree to this node (i.e. each "parent" edge of node)
 
     Returns
@@ -92,14 +92,14 @@ def update_misplaced_compute_cost(node: Node, misplaced: set[tuple[int, int]], b
     """
     _misplaced = misplaced.copy() # set of misplaced tiles
     
-    tx = apply_moves(board, node.tx0, moves, _misplaced) # node.tx0 = index of the empty square in the initial board
+    tx = apply_moves(domain, node.tx0, moves, _misplaced) # node.tx0 = index of the empty square in the initial domain
     
-    #* Reverting the swaps of Board, since it is modified to computed the updated set of misplaced tiles.
+    #* Reverting the swaps of domain, since it is modified to computed the updated set of misplaced tiles.
     #* making the changes and reverting them (O(2*n) where n = h(x) is the number of Moves (which is at most g(root)) since if a solution is found the it is optimal.) 
-    #* is still faster than making a copy of the board at each iteration. O(m^2) 
-    #* (where m is the dimension of the board, here m is a constant but we could have the exact same problem for m unknown and the same implementation would suffice)
+    #* is still faster than making a copy of the domain at each iteration. O(m^2) 
+    #* (where m is the dimension of the domain, here m is a constant but we could have the exact same problem for m unknown and the same implementation would suffice)
     
-    unapply_moves(board, tx, moves)
+    unapply_moves(domain, tx, moves)
     
     gx = len(_misplaced) # g(x) = number of misplaced tiles
     hx = node.depth
@@ -112,7 +112,7 @@ def children_moves(node: Node, DIM: int) -> set[M]:
     Parameters
     ----------
     @ `node` - Node to compute the cost of
-    @ `DIM` - Dimension of the board
+    @ `DIM` - Dimension of the domain
 
     Returns
     -------

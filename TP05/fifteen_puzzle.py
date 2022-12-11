@@ -112,7 +112,7 @@ class Node:
         @ `depth`     - depth of this node in the game tree (i.e. ``h(this) = parent.depth + 1``)
         @ `misplaced` - set of misplaced tiles. (If not given, => will be inferred from `parent` and `move`)
         @ `gx`        - value of ``g(this) = len(misplaced)``
-        @ `cost`      - cost of this, defined by ``c_hat(this) = h(this) + g(this)`` (Computed from `parent.depth`, `parent.misplaced` and `move`)
+        @ `cost`      - cost of this, defined by ``ĉ(this) = h(this) + g(this)`` (Computed from `parent.depth`, `parent.misplaced` and `move`)
         """
         if parent is None: 
             self.__init_root__(board)
