@@ -1,6 +1,7 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
 from copy import deepcopy
-from fifteen_puzzle import *
+import fifteen_puzzle as fp # ĉ(x) = h(x) + g(x)
+import fifteen_puzzle_othercost as fp2  # ĉ(x) = h(x)
 import util
 import random
 
@@ -155,16 +156,16 @@ if __name__ == '__main__':
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
 
-    nMax, amount = 14, 100 # max level of disorder, number of time to perform the test for each level
+    nMax, amount = 6, 50 # max level of disorder, number of time to perform the test for each level
     print(test_cost_efficiency(nMax, amount))
     avgs = test_cost_efficiency(nMax, amount)
     x_plot, x_label = list(avgs.keys()), "disorder level, (max distance from solution)"
     y_plot, y_label = list(avgs.values()), r"average number $k$ of explored nodes (to get to the solution)"
-    flabel = r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$'
+    flabel = r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)$ and goal node $x^*$'
     #flabel = r'lul'
     from numpy import linspace
     yticks = linspace(0, nMax, 2*nMax)
-    util.plot_solo(x_plot, y_plot, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$', xlabel=x_label, ylabel=y_label, fLabel=flabel, xticks=x_plot, yticks=yticks)
+    util.plot_solo(x_plot, y_plot, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)$', xlabel=x_label, ylabel=y_label, fLabel=flabel, xticks=x_plot, yticks=yticks)
     
 
 #
