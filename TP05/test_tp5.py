@@ -32,7 +32,7 @@ def test_solve_tasks():
 
 
 ########################### Exercise 3 ###########################
-from tp5 import solve_shortest_path
+from exo3 import solve_shortest_path
 
 
 def test_solve_shortest_path():

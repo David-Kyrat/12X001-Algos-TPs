@@ -6,7 +6,7 @@ from fifteen_puzzle import M, M_ALL, mv, UP, RIGHT, DOWN, LEFT
 #* We'll use the same cost function approximation ``ĉ(x) = h(x) + g(x)`` as in fifteen_puzzle .
 # 
 
-def move(domain: list[list[int]], tx: tuple[int, int], dir: M, misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
+def move(domain: list[list[int]], tx: tuple[int, int], dir: M) -> tuple[int, int]:
     """ Move 1 step from tx in the direction `dir`. (i.e. to ``tx + dir``) in the domain.
 
     Parameter
@@ -22,15 +22,13 @@ def move(domain: list[list[int]], tx: tuple[int, int], dir: M, misplaced: set[tu
     nc = dir + tx # new coord of white square
     domain[tx[0]][tx[1]], domain[nc[0]][nc[1]] = domain[nc[0]][nc[1]], domain[tx[0]][tx[1]] # swap
 
-    if misplaced is None: return nc
-
     return nc
 #@ `domain`  - initial domain (needed because neither this domain nor its update will ever be stored/copied in any node)
 
 class Node: 
     """Node of the moves tree. Each attribute is detailled below."""
     
-    def __init__(self, move: M, parent):
+    def __init__(self, move: M | None, parent):
         """Constructor of the Node class.
 
         Parameters
@@ -47,12 +45,12 @@ class Node:
         @ `cost`    - ``int``, cost (i.e. ``ĉ(this) = h(this) + g(this)``) where ``g(this) = ||b-a||_1`` (i.e. distance (norm ``L1``) between the current location and the destination)
         @ `move`    - ``M``, last move that led to this node (i.e. ``a_k = move + a_k-1`` (``a_k-1 = parent.a_k``))
         """
-        if move is None or parent is None: return # root node
-        self.ak = move + parent.ak
-        self.b = parent.b
-        self.depth = parent.depth + 1
-        self.path = parent.path + [self.ak]
-        self.cost = Node.c_hat(self)
+        if parent is None: return # root node
+        self.ak: tuple[int, int] = move + parent.ak
+        self.b: tuple[int, int] = parent.b
+        self.depth : int = parent.depth + 1
+        self.path: list[tuple[int, int]] = parent.path + [self.ak]
+        self.cost: int = Node.c_hat(self)
         self.move = move
         
         #self.cost, self.gx = update_misplaced_compute_cost(self, parent.misplaced, domain, self.moves)
@@ -66,12 +64,13 @@ class Node:
         newnode.b = b
         newnode.cost = Node.d(a, b)
         newnode.path = [a]
+        newnode.move = None
         return newnode
 
     @classmethod
     def d(cls, x1, x2) -> int:
         """Returns the distance d(this, x) = ||a_k - x||_1 (i.e. norm ``L1``) between the current location and x"""
-        if isinstance(x1, Node) and isinstance(x2, Node): return x1.__d__(x1, x2)
+        if isinstance(x1, Node) and isinstance(x2, Node): return x1.__d__(x2)
         if isinstance(x1, Node): return abs(x1.ak[0] - x2[0]) + abs(x1.ak[1] - x2[1])
         if isinstance(x2, Node): return abs(x2.ak[0] - x1[0]) + abs(x2.ak[1] - x1[1])
         return abs(x1[0] - x2[0]) + abs(x1[1] - x2[1])
@@ -84,9 +83,8 @@ class Node:
     @classmethod
     def c_hat(cls, node) -> int:
         """Returns the cost of a node (i.e. ``ĉ(node) = h(node) + g(node)``)"""
-        return node.depth + node.__d__(node.b)
+        return node.depth + Node.d(node, node.b)
 
-    
     def __repr__(self):
         """Representation of a node as a string."""
         return f"Node(ĉ={self.cost}, ak={self.ak}, g={self.cost}, h={self.depth}, b={self.b}, path={self.path})"
@@ -134,7 +132,7 @@ def P(enode: Node):
     """ Return true if and only if enode is a goal node.  ``enode`` has arrived 
     at its destination ``b`` if and only if its distance to ``b`` is null (in the matical sense) 
     i.e. if ``||enode.ak - b||_1 = 0`` i.e. ``enode.ak == b``"""
-    return enode.__d__(enode.b) == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
+    return Node.d(enode, enode.b) == 0 # A solution is found when there is no misplaced tiles i.e. the set of misplaced tiles is empty
 
 
 def addToLiveNodes(enode: Node, liveNodes: list[Node]):
@@ -171,12 +169,11 @@ def solve_shortest_path(domain:list[list[int]], a:tuple[int, int], b:tuple[int, 
     """Finds the shortest path from point a to point b according to the 2-dimensional domain.
     The path is returned as a list of steps from a to b, where each step is a tuple with 2 integers."""
     n, m = len(domain), len(domain[0])
-    DIM = n, m
     liveNodes: list[Node] = []
     
     enode: Node = Node.init_root(a, b)
     while not P(enode):
-        available_moves: set[M] = children_moves(enode, DIM)
+        available_moves: set[M] = children_moves(domain, enode, n, m)
 
         for move in available_moves:
             child = Node(move, enode)
@@ -184,3 +181,28 @@ def solve_shortest_path(domain:list[list[int]], a:tuple[int, int], b:tuple[int, 
 
         enode = nextENode(liveNodes)
     return enode.path
+
+def test_solve_shortest_path():
+    domain = [
+        # We want to get here
+        # |
+        # v
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        # ^
+        # |
+        # We start from here
+    ]
+    a, b = (7, 6), (0, 7)
+    solution = [a, (7, 7), (6, 7), (5, 7), (4, 7), (3, 7), (2, 7), (1, 7), b]
+    sol = solve_shortest_path(domain, a, b)
+    assert sol == solution
+
+if __name__ == '__main__':
+    test_solve_shortest_path()
