@@ -78,7 +78,7 @@ def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set
                     print(f"\033[1;31m{board[i][j]:2d}\033[0m ", end="")
             else:
                 print(f"{board[i][j]:2d} ", end="")
-        print()
+        print("\033[0m")
 
 
 def pb(board:list[list[int]]):
@@ -129,15 +129,14 @@ if __name__ == '__main__':
 
     # ----------- Test the efficiency of the cost function ----------------
 
-    """ board = sorted_board(4) # generate a solution board of dim m x m
-
-    solve_taquin(board, extract_path_from_goalNode=False)
+    board = sorted_board(4) # generate a solution board of dim m x m
+    goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False)
     print(convert_solution(goalNode))
 
     n:int = 20
     final_tx, misplaced = gen_disorder(board, goalNode, n)
     print([board[p[0]][p[1]] for p in misplaced])
-    printBoard(board, len(board), final_tx, misplaced) """
+    printBoard(board, len(board), final_tx, misplaced)
 
 #
 #* We now have to test the efficiency of the used cost function, 
