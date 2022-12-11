@@ -156,8 +156,8 @@ def apply_moves(board: list[list[int]], tx0: tuple[int, int], moves: list[M], mi
 
     Parameters
     ----------
-    @ `board` - Game board
-    @ `tx0`  - initial Taquin indeX (index of the white square (16) in initial board)
+    @ `board` - Game board (usually the initial board)
+    @ `tx0`   - Taquin indeX in given board (index of the white square (16) in ``board``) (usually the initial index of the white square)
     @ `moves` - List of moves to apply
     @ `misplaced` - Set of misplaced tiles (if not given, no misplaced set will be saved/computed)
 
