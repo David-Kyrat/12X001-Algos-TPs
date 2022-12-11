@@ -134,7 +134,7 @@ def test_cost_efficiency(nMax: int, amount:int):
             gen_disorder(crt_board, n)
             goalNode:Node = solve_taquin(crt_board, extract_path_from_goalNode=False)
             k += goalNode.depth # number of explored nodes is the depth of the goal node
-            print(f"n: {n:2d}", f"   k: {k:3d}", f"   crt: {goalNode.depth:2d}", "   avg:", k/(i+1))
+            #print(f"n: {n:2d}", f"   k: {k:3d}", f"   crt: {goalNode.depth:2d}", "   avg:", k/(i+1))
         avgs[n] = k/amount
     return avgs
             
@@ -155,13 +155,16 @@ if __name__ == '__main__':
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
 
-    nMax, amount = 11, 100 # max level of disorder, number of time to perform the test for each level
+    nMax, amount = 14, 100 # max level of disorder, number of time to perform the test for each level
     print(test_cost_efficiency(nMax, amount))
     avgs = test_cost_efficiency(nMax, amount)
-    x_plot, x_label = avgs.keys(), "disorder level, (max dist. from solution)"
-    y_plot, y_label = avgs.values(), "average number of explored nodes for given disorder lvl"
-
-    util.plot_solo()
+    x_plot, x_label = list(avgs.keys()), "disorder level, (max distance from solution)"
+    y_plot, y_label = list(avgs.values()), r"average number $k$ of explored nodes (to get to the solution)"
+    flabel = r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$'
+    #flabel = r'lul'
+    from numpy import linspace
+    yticks = linspace(0, nMax, 2*nMax)
+    util.plot_solo(x_plot, y_plot, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$', xlabel=x_label, ylabel=y_label, fLabel=flabel, xticks=x_plot, yticks=yticks)
     
 
 #
@@ -169,19 +172,3 @@ if __name__ == '__main__':
 #* 
 #*
 #
-
-
-def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str, xticks=None, yticks=None):
-    """_summary_
-
-    Parameters
-    ----------
-    @ `plot_x` - _description_
-    @ `plot_f` - _description_
-    @ `title` - _description_
-    @ `xlabel` - _description_
-    @ `ylabel` - _description_
-    @ `fLabel` - _description_
-    @ `xticks` (optional) - _description_, (default: None)
-    @ `yticks` (optional) - _description_, (default: None)
-    """

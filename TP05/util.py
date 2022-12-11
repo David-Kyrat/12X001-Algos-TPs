@@ -64,9 +64,11 @@ def plot_solo(plot_x, plot_f, title: str, xlabel: str, ylabel: str, fLabel: str,
         my, My, gapy = min(plot_f), max(plot_f), 0.25
         plt.ylim(my - gapy, My + gapy * My)
     plt.plot(plot_x, plot_f, '-b', label=fLabel, linewidth=1)
-    #  plt.legend(prop={'size': 5})
-    #  plt.legend(fontsize=7)
-    fig.set_figheight(7)
+    #plt.legend(prop={'size': 5})
+    #plt.legend(fontsize=7)
+    fig.set_figheight(12)
+    fig.set_figwidth(9)
+    plt.tight_layout(pad=2.5)
     plt.legend()
     plt.show()
 
