@@ -1,11 +1,11 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
 from copy import deepcopy
-import fifteen_puzzle as fp # ĉ(x) = h(x) + g(x)
 import fifteen_puzzle_cost_onlyh as fp2  # ĉ(x) = h(x)
 import util
 import random
+from fifteen_puzzle_cost_onlyh import *
 
-def children_move_fromList(move:fp.M, tx:tuple[int, int], DIM:int, cost_g_and_h: bool = True) -> set[fp.M]:
+def children_move_fromList(move:M, tx:tuple[int, int], DIM:int, cost_g_and_h: bool = True) -> set[M]:
     """ Return a set of all possible moves that would not produce an out of bounds error and that are not the given move.
 
     Parameters
@@ -19,8 +19,7 @@ def children_move_fromList(move:fp.M, tx:tuple[int, int], DIM:int, cost_g_and_h:
     -------
         set of all possible moves from a given node."""
 
-    if cost_g_and_h: from fifteen_puzzle import M, M_ALL
-    else: from fifteen_puzzle_cost_onlyh import M, M_ALL
+    
     
     moves = M_ALL.copy()
     if move is not None: moves.remove(move.inv()) # remove inverse of last move to avoid cycles in the game "tree"    
@@ -59,8 +58,6 @@ def gen_disorder(board: list[list[int]], n:int, node=None, tx: tuple[int, int]=(
         ``(tx_final, misplaced_final)``  - Pair containing the final position of the white square and the final set of misplaced tiles (after the n random moves).
     """
     DIM: int = len(board)
-    if cost_g_and_h:  from fifteen_puzzle import Node, apply_moves, M
-    else: from fifteen_puzzle_cost_onlyh import Node, apply_moves, M
     # empty if node is a goal node
     misplaced, tx = (node.misplaced.copy(), node.tx0) if node is not None else (set(), tx)
     if node is not None: 
@@ -112,8 +109,6 @@ def test_solve_taquin_for_any_dim(DIM:int, cost_g_and_h: bool = True):
     @ `cost_g_and_h` - if True, use the cost function ``g(x) + h(x)``. Otherwise, use ``h(x)``
     """
 
-    if cost_g_and_h:  from fifteen_puzzle import Node, solve_taquin, apply_moves, init_misplaced
-    else: from fifteen_puzzle_cost_onlyh import Node, solve_taquin, apply_moves, init_misplaced
     
     _DIM = DIM
     _dim2: int = _DIM*_DIM
@@ -139,8 +134,6 @@ def test_cost_efficiency(nMax: int, amount:int, cost_g_and_h: bool = True):
     @ `amount` - number of time to perform the test for each ``n``
     @ `cost_g_and_h` - if True, use the cost function ``g(x) + h(x)``. Otherwise, use ``h(x)``
     """
-    if cost_g_and_h:  from fifteen_puzzle import Node, solve_taquin, apply_moves, init_misplaced
-    else: from fifteen_puzzle_cost_onlyh import Node, solve_taquin, apply_moves, init_misplaced
     
     board = sorted_board(4)
     avgs:dict[int: float] = {}
@@ -173,8 +166,8 @@ if __name__ == '__main__':
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
 
-    nMax, amount = 9, 100 # max level of disorder, number of time to perform the test for each level
-    nMax2, amount2 = 9, 100
+    nMax, amount = 7, 100 # max level of disorder, number of time to perform the test for each level
+    nMax2, amount2 = 7, 100
     print(test_cost_efficiency(nMax, amount))
     avgs = test_cost_efficiency(nMax, amount)
     avgs2 = test_cost_efficiency(nMax2, amount2, cost_g_and_h=False)
