@@ -100,6 +100,7 @@ class Node:
         ----------
         @ `move`   - move that led to this node from its parent
         @ `parent` - parent of this node (Can be None, If it is, then this node is the root of the game tree, and tx has to be given)
+        @ `board`  - initial board
 
         Other attributes
         ---------
@@ -199,30 +200,26 @@ def children(node: Node) -> set[M]:
     -------
         set of all possible moves from a given node."""
     moves = M_ALL.copy()
-    moves.remove(node.moves[-1].inv()) # remove inverse of last move to avoid cycles in the game "tree"
-    global DIM
-    end:int = DIM-1 # for some reason, i have to declare it here, otherwise it wont work
+    if node.moves != []: moves.remove(node.moves[-1].inv()) # remove inverse of last move to avoid cycles in the game "tree"
+    
+    end:int = DIM-1
 
     # now remove moves that would lead to an out of bounds error
     match node.tx[0]:
         # if row of current whitespace is on a side (i.e. if can't go UP or DOWN)
         case 0: 
             moves.discard(M.UP)
-            print("UP")
-
         case end:
             moves.discard(M.DOWN)
-            print("DOWN")
 
     # idem, if column of current whitespace is on a side (i.e. if can't go LEFT or RIGHT)        
     match node.tx[1]:
         case 0:
             moves.discard(M.LEFT)
-            print("LEFT")
-            
         case end:
             moves.discard(M.RIGHT)
-            print("RIGHT")
+            
+    return moves
         
 
 def solve_taquin(board: list[list[int]]) -> list[str]:
