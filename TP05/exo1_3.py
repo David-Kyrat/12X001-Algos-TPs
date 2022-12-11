@@ -70,16 +70,24 @@ def printBoard(board:list[list[int]], DIM:int, tx:tuple[int, int], misplaced:set
                 print(f"{board[i][j]:2d} ", end="")
         print()
 
+def printBoard2(board:list[list[int]]):
+    """Prints the board with the white square (16) and the misplaced tiles highlighted."""
+    DIM = len(board)
+    for i in range(DIM):
+        for j in range(DIM):
+            print(f"{board[i][j]:2d} ", end="")
+        print()
+
 if __name__ == '__main__':    
     """ board = [[1, 2, 3, 4], 
             [5, 6, 16, 8], 
             [9, 10, 7, 11],
             [13, 14, 15, 12]] """
-    m = 4
+    m = 5
     board = [[m*i+j+1 for j in range(m)] for i in range(m)]
 
 
-    goalNode:Node = solve_taquin(board, extract_path_from_goalNode=False)
+    goalNode:Node = solve_taquin(board, extract_path_from_goalNode=False, white_square=25)
     print(goalNode)
 
     n:int = 5

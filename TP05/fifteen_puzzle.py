@@ -39,7 +39,8 @@ class M(Enum):
 
 def isMisplaced(board: list[list[int]], coord: tuple[int, int]) -> bool:
     """Returns True if the element at coord is misplaced, False otherwise. i.e. 15 should be at (3, 3)"""
-    return board[coord[0]][coord[1]] != 4 * coord[0] + coord[1] + 1
+    DIM = len(board)
+    return board[coord[0]][coord[1]] != DIM * coord[0] + coord[1] + 1
 
 
 def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tuple[int, int]] = None) -> tuple[int, int]:
@@ -73,7 +74,10 @@ def swap(board: list[list[int]], tx: tuple[int, int], move: M, misplaced: set[tu
 
 
 def c_hat(board: list[list[int]]) -> int:
-    """Cost function for a given board. (where everything has to be recomputed from scratch, 
+    """Cost function for a given board is the cost function the optimum, i.e. ĉ(board) = ĉ(optimum) = ĉ(root) (by relation 3.3 in the lecture notes). 
+    and for root, ĉ(root) = h(root) + g(root) = 0 + g(root) = g(root) = number of misplaced tiles (16 excluded). Hence why we only compute g(root) here.
+
+    (in this version, everything has to be recomputed from scratch, 
     for more info on "attempt" at better complexity see ``update_misplaced_compute_cost()`` below.)
     The cost of a node of the game is the number of squares that are not at their place (16 excluded)."""
     misplaced = 0
@@ -116,10 +120,10 @@ class Node:
         self.tx = move + parent.tx # addition between a move and a tuple was defined in the M class above. e.g. ``M.UP + (3, 2)`` returns ``(2, 2)``
         self.cost, self.gx, self.misplaced = update_misplaced_compute_cost(self, parent.misplaced, board, self.moves)
 
-    def __init_root__(self, board: list[list[int]]):
+    def __init_root__(self, board: list[list[int]], white_square_value: int = 16):
         """'Private' constructor of root, ``taquin_index`` is the index of the empty square in the initial board """
         self.depth = 0
-        self.tx0, self.misplaced = init_misplaced(board)
+        self.tx0, self.misplaced = init_misplaced(board, white_square_value)
         self.cost = max(0, len(self.misplaced) - 1) # -1 because we do not count the empty square
         self.moves = []
         self.tx = self.tx0
@@ -130,7 +134,7 @@ class Node:
         return f"Node(ĉ={self.cost}, h={self.depth}, tx={self.tx}, moves={self.moves})"
 
 
-def init_misplaced(board: list[list[int]]) -> tuple[tuple[int, int], set[tuple[int, int]]]:
+def init_misplaced(board: list[list[int]], white_square_value) -> tuple[tuple[int, int], set[tuple[int, int]]]:
     """Initialize the set of misplaced tiles and return index of white square (16).
 
     Parameters
@@ -145,7 +149,7 @@ def init_misplaced(board: list[list[int]]) -> tuple[tuple[int, int], set[tuple[i
     tx0 = (-1, -1) # index of white square (16) 
     for i in range(len(board)):
         for j in range(len(board[i])):
-            if board[i][j] == 16: tx0 = (i, j)
+            if board[i][j] == white_square_value: tx0 = (i, j)
             if isMisplaced(board, (i, j)):
                 misplaced.add((i, j))
     return tx0, misplaced
@@ -300,7 +304,9 @@ def convert_solution(goal_node: Node) -> list[str]:
     return [mv[move] for move in goal_node.moves]
 
 
-def solve_taquin(board: list[list[int]], extract_path_from_goalNode: bool = True) -> list[str] | Node:
+#from exo1_3 import printBoard2 as pb
+
+def solve_taquin(board: list[list[int]], extract_path_from_goalNode: bool = True, white_square:int = 16) -> list[str] | Node:
     """Function that solves the 15-puzzle using branch and bound,
     for the cost function ``ĉ(x) = h(x) + g(x)`` where ``h(x) = depth of x`` and ``g(x) = number of misplaced tiles``.
     NB: technically the algorithm could work for more than 16 tiles (i.e. for a board of size n x n where n >= 4)
@@ -309,12 +315,15 @@ def solve_taquin(board: list[list[int]], extract_path_from_goalNode: bool = True
     ----------
     @ `board` - Matrix representing the initial state of the game
     @ `convert_sol` - If True, return the list of moves as string (i.e. 'up', 'down'...) to get from the initial state to the goal state. If False, return the goal node.
+    @ `white_square` - (only useful if board is a nxn matrix with n>4) Value of the white square in the initial state of the game. Default is 16.
 
     NB: does not modify given board
     """
     DIM = len(board) # board should be a square matrix
     liveNodes: list[Node] = []
+
     enode = Node(None, None, board) # special constructor for root node
+    if white_square != 16 and DIM > 4:  enode.__init_root__(board, white_square) # if white_square is not 16 then update the value used in ``init_misplaced()``
     while not P(enode):
         available_moves: set[M] = children_moves(enode, DIM)
 
@@ -323,5 +332,4 @@ def solve_taquin(board: list[list[int]], extract_path_from_goalNode: bool = True
             addToLiveNodes(child, liveNodes)
 
         enode = nextENode(liveNodes)
-
     return convert_solution(enode) if extract_path_from_goalNode else enode
