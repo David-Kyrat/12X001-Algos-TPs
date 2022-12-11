@@ -174,14 +174,17 @@ if __name__ == '__main__':
     
     x_plot, x_label = list(avgs.keys()), "disorder level, (max distance from solution)"
     f_plot, y_label = list(avgs.values()), r"average number $k$ of explored nodes (to get to the solution)"
-    f_plot2, flabel2 = list(avgs2.values()), r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)$ and goal node $x^*$'
+    #f_plot2, flabel2 = list(avgs2.values()), r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)$ and goal node $x^*$'
     
-    flabel = r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)+g(x)$ and goal node $x^*$'
+    f_label = r'average $k = \hat{c}(x^*)$ for cost: $\hat{c}(x)=h(x)$ and goal node $x^*$'
     #flabel = r'lul'
     from numpy import linspace
     yticks = linspace(0, nMax, 2*nMax)
-    util.plotVS(x_plot, f_plot, f_plot2, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$ VS $\hat{c}(x)=h(x)$', 
-                xlabel=x_label, ylabel=y_label, f1Label=flabel, f2Label=flabel2, xticks=x_plot, yticks=yticks)
+    #util.plotVS(x_plot, f_plot, f_plot2, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)+g(x)$ VS $\hat{c}(x)=h(x)$', 
+    #                xlabel=x_label, ylabel=y_label, f1Label=flabel, f2Label=flabel2, xticks=x_plot, yticks=yticks)
+
+    util.plot_solo(x_plot, f_plot, title=r'Average number (100 runs) of explored nodes for given disorder level, with $\hat{c}(x)=h(x)$',
+                   xlabel=x_label, ylabel=y_label, fLabel=f_label, xticks=x_plot, yticks=yticks)
     
 
 #

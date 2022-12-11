@@ -173,8 +173,8 @@ if __name__ == '__main__':
     final_tx, misplaced = gen_disorder(board, n, tx=(3, 3))
     goalNode: Node = solve_taquin(board, extract_path_from_goalNode=False) """
 
-    nMax, amount = 9, 100 # max level of disorder, number of time to perform the test for each level
-    nMax2, amount2 = 9, 100
+    nMax, amount = 7, 100 # max level of disorder, number of time to perform the test for each level
+    nMax2, amount2 = 7, 100
     print(test_cost_efficiency(nMax, amount))
     avgs = test_cost_efficiency(nMax, amount)
     avgs2 = test_cost_efficiency(nMax2, amount2, cost_g_and_h=False)
