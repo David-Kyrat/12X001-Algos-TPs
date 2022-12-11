@@ -1,8 +1,7 @@
 """ EXERCISE 1.3 - Efficiency Test of fifteen_puzzle solution (see fifteen_puzzle.py)"""
 
+#from fifteen_puzzle import apply_moves, Node
 from fifteen_puzzle import *
-
-
 
 def gen_disorder(board, node:Node, n):
     """Creates disorder in the board by moving (at random) the blank space n times. (Usually ``node`` is a goal node but need not necessarily be.)
@@ -19,7 +18,8 @@ def gen_disorder(board, node:Node, n):
 
     NB: board is modified in place
     """
-    misplaced: set[tuple[int, int]] = node.misplaced # empty if node is a goal node
+    misplaced: set[tuple[int, int]] = node.misplaced.copy() # empty if node is a goal node
     
-    apply_moves(board, node.tx0, node.moves, )
+    apply_moves(board, node.tx0, node.moves, misplaced)
 
+    

@@ -1,6 +1,4 @@
-from copy import deepcopy
 from enum import Enum
-from shutil import move
 
 ########################### Exercise 1 ###########################
 # Definitions
