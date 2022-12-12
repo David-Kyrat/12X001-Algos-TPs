@@ -125,7 +125,7 @@
 
 \begin{enumerate}[label=(\alph*)]
 	\item \textit{Quel est le rôle de $h(x)$ dans la fonction de coût $\hat{c}(x) = g(x) + h(x)$ ?}
-	\item A quel type de recherche correspond la fonction de coût
+	\item \textit{A quel type de recherche correspond la fonction de coût}
 	\begin{enumerate}[label=\arabic*)]
 		\item \textit{$\hat{c}(x) = g(x) + h(x)$ ?}
 		\item \textit{$\hat{c}(x) = h(x)$ ?}
@@ -174,8 +174,37 @@ Ce qui veut dire que pour garder le coût constant, il faut que entre $g(x_{i})$
 Or comme on fait seulement un mouvement par étape, (i.e. $\max(g(x_i) - g(x_{i+1})) = 1 $)\\
 cela implique qu'à chaque étape on se rapproche de $\xsol$ autant que possible, i.e. qu'on prenne le meilleur chemin / E-Node à chaque étape.\\
 
-Ce qui nous donne la relation \quo{on est sur le bon chemin} ($\hat{c}(x_{i+k})$ constants) si et seulement si on le nombre de case mal placé diminue (i.e. $g(x_{i+k}) < g(x_i)$)\\
+Ce qui nous donne la relation \quo{on est sur le bon chemin} ($\hat{c}(x_{i+k})$ constants) si et seulement si on le nombre de case mal placé diminue (i.e. $g(x_{i+k}) < g(x_i)$).\\
 
+\item \textit{A quel type de recherche correspond la fonction de coût}
+\begin{enumerate}[label=\arabic*)]
+	\item \textit{$\hat{c}(x) = g(x) + h(x)$ ?}\\
+	C'est une recherche "least cost" (comme défini en (3.4) dans le cours), on est dans le cas d'un jeu
+	où l'espace à explorer est un graph dirigé qui décrit les différents mouvements possibles à partir d'une configuration $x_0$.
+
+	On cherche donc une configuration gagnante $\xsol$ telle que la longueur du chemin \textit{path($x_0$, $\xsol$)} 
+	i.e. la somme des coûts des noeuds du chemin $(x_0 \ldots x_i \ldots \xsol)$ soit minimale.\\
+	
+	Pour ce faire on définit donc $h(x)$ comme étant la profondeur de la configuration $x$ dans l'arbre de recherche, (\textit{height})
+	(i.e. le nombre de coups déjà fait / coût accumulé jusqu'à $x$) et $g(x)$ comme une lower bound du nombre de coups restant à faire pour atteindre $\xsol$.
+	
+	Comme ça, on a une estimation du nombre de coups minimum qui compose \textit{path($x_0$, $\xsol$)}. (un coup == un edge de l'arbre)\\
+	
+	\item \textit{$\hat{c}(x) = h(x)$ ?}\\
+	D'après la relation (3.4) du cours, encore une fois, on aurait à faire à une recherche \textit{à coût uniforme}.
+	CITATION
+	\begin{quote}
+		\textit{A uniform cost search is a search in which the cost of each step is the same.}
+		(replace with not bullshit one)
+	\end{quote}
+	On remarque que dans ce cas la recherche \quo{least cost} nous donne en fait un BFS (breadth first search).\\
+	car seul la profondeur détermine le coût donc on va explorer les noeuds sur la même largeur de $x$ en priorité.\\
+	
+\end{enumerate}
+
+
+%
+%
 \end{enumerate}
 
 %
