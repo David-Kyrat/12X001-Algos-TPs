@@ -4,7 +4,7 @@
 \usepackage[T1]{fontenc}
 \usepackage[autolanguage]{numprint}
 \usepackage{hyperref}
-%\usepackage[fleqn]{amsmath}
+\usepackage[fleqn]{amsmath}
 \usepackage{enumitem,amssymb}
 \usepackage{graphicx}
 \usepackage{xcolor}
@@ -78,6 +78,7 @@
 %
 \newcommand{\xor}{\oplus}
 \newcommand{\nb}{05}
+\newcommand{\xsol}{x^{\star}}
 %
 \DeclareMathSymbol{*}{\mathbin}{symbols}{"01}
 
@@ -112,15 +113,71 @@
 %
 %
 \begin{center}
-{\huge TP \nb}
+	{\huge TP \nb}
 \end{center}
 \vspace{0.3cm}
 %
 \section{Taquin / Fifteen Puzzle}
 
 \subsection{Fonction de coût}
+\vspace{0.4cm}
 
-%
+
+\begin{enumerate}[label=(\alph*)]
+	\item \textit{Quel est le rôle de $h(x)$ dans la fonction de coût $\hat{c}(x) = g(x) + h(x)$ ?}
+	\item A quel type de recherche correspond la fonction de coût
+	\begin{enumerate}[label=\arabic*)]
+		\item \textit{$\hat{c}(x) = g(x) + h(x)$ ?}
+		\item \textit{$\hat{c}(x) = h(x)$ ?}
+	\end{enumerate}
+	\item  \textit{En se basant sur les critères discutés en cours concernant les propriétés de $\hat{c}$
+	vis-à-vis d'une fonction de coût idéale $c(x)$, montrez que si l'on fait une recherche Branch-and-Bound 
+	avec la fonction de coût définie au point précédent et que l'on trouve une solution, cette solution est optimale.}\\
+\end{enumerate}
+
+\begin{enumerate}[label=(\alph*)]
+
+	\item Avant de parler du rôle de la fonction $h(x)$, il faut d'abord expliquer pourquoi il est avantageux (dans ce contexte) de garder notre $\hat{c}(x_j)$ le plus constant possible pour tout $j$.\\
+	
+	Soit $T$, l'arbre des possibilités de racine $x_0$ (parfois appelé \textit{root}) du jeu (où une solution de notre problème est simplement une suite de edge de $T$)
+	et soit $x_j$ un noeud de $T$, i.e. $x_j$ est un état de notre problème.
+	
+	On veut garder $\hat{c}(x) \leq \hat{c}(y)$ pour tout enfants $y$ de $x$, car pour une recherche directe 
+	qui minimise le coût $\hat{c}(x)$, le relation (3.3) du cours donne que $c(x) \leq c(y)$. \\
+	
+	Or $\forall \text{ enfant } y \text{ de } x:\ c(x) \leq c(y)$ 
+	implique que $\hat{c}(\xsol) = c(\xsol) \ge c(x_0) = c(\textit{optimum})$. ($\xsol$ est un noeud solution) \\
+	Donc vu que le coût des noeuds dans la descendance d'un $x_0$ et jusqu'à \(\xsol\) ne peut pas diminuer, et que $\xsol$ 
+	est garantie d'être une solution optimale, le mieux qu'on puisse faire (pour minimiser le coût du chemin total $x_0 \ldots x_i\ldots \xsol$) est de ne pas augmenter
+	le coût des $x_{i\ >0}$ i.e. le garder constant.
+
+	En résumé, on veut garder les $\hat{c}(x_{i+k})$ le plus proche de $c(x_0)$ et donc des autres $\hat{c}(x_i)$ possible.\\
+	Ce qui ce traduit par \quo{garder le coût} constant car la relation (3.3) nous garanti que $c(x_0)$ est le plus petit coût possible. (i.e. le coût de la solution qui minimise le plus le coût total)\\
+	(Ce qui est particulièrement dur quand $\hat{c}$ est une mauvaise approximation i.e. les $\hat{c}(x)$ sont loin des $c(x)$)
+
+ $c(x_0) \approx \hat{c}(x_0) \approx \hat{c}(x_i) \approx \hat{c}(x_{i+k}) \approx \hat{c}(\xsol)$ serait une recherche parfaite
+ (pour un $\hat{c}(x_0)$ proche de $c(x_0)$,\ \(k, i \in \N\) )\\
+
+On peut donc maintenant constater que le rôle de $h$ est d'imposer que le coût des $x_{i+k}$ ne peut rester constant que si les $g(x_{i+k})$ diminuent.
+C'est à dire que si $g$ est une \quo{mauvaise} borne/fonction ($g$ est une borne inférieur du nombre de coup qui reste à faire), cela va directement se voir sur le coût total $\hat{c}$ 
+et les $\hat{c}(x_{i+k})$ (pour les plus hautes valeurs de $k$). 
+En effet on a que: 
+\begin{align*}
+	\hat{c}(x_{i+k}) \leq \hat{c}(x_i) &\Longleftrightarrow g(x_{i+k}) + h(x_{i+k})\ \leq\ g(x_{i}) + h(x_{i}) \\
+	%&\Longleftrightarrow g(x_{i+k}) + h(x_{i+k}) \leq g(x_{i}) + h(x_{i})\\
+	&\Longleftrightarrow g(x_{i+k}) + h(x_{i}) + k\ \leq\ g(x_{i}) + h(x_i)\\
+	&\Longleftrightarrow g(x_{i+k}) + k\ \leq\ g(x_{i})\\
+	&\Longleftrightarrow k\ \leq\ g(x_{i}) - g(x_{i+k})\\
+\end{align*}
+
+Ce qui veut dire que pour garder le coût constant, il faut que entre $g(x_{i})$ et $g(x_{i+k})$ on se soit rapproché de la solution optimale $\xsol$ de $k$ coups.\\
+Or comme on fait seulement un mouvement par étape, (i.e. $\max(g(x_i) - g(x_{i+1})) = 1 $)\\
+cela implique qu'à chaque étape on se rapproche de $\xsol$ autant que possible, i.e. qu'on prenne le meilleur chemin / E-Node à chaque étape.\\
+
+Ce qui nous donne la relation \quo{on est sur le bon chemin} ($\hat{c}(x_{i+k})$ constants) si et seulement si on le nombre de case mal placé diminue (i.e. $g(x_{i+k}) < g(x_i)$)\\
+
+\end{enumerate}
+
 %
 %
 \end{document}
