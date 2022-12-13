@@ -191,21 +191,86 @@ Ce qui nous donne la relation \quo{on est sur le bon chemin} ($\hat{c}(x_{i+k})$
 	Comme ça, on a une estimation du nombre de coups minimum qui compose \textit{path($x_0$, $\xsol$)}. (un coup == un edge de l'arbre)\\
 	
 	\item \textit{$\hat{c}(x) = h(x)$ ?}\\
-	D'après la relation (3.4) du cours, encore une fois, on aurait à faire à une recherche \textit{à coût uniforme}.
-	CITATION
+	D'après la relation (3.4) du cours, encore une fois, on aurait à faire à une recherche\\ à \textit{coût uniforme}.
 	\begin{quote}
-		\textit{A uniform cost search is a search in which the cost of each step is the same.}
-		(replace with not bullshit one)
+		\quo{\textit{On peut bien sûr choisir $g(x) = 0$ pour tout x. On parle de recherche à coût uniforme. Le Branch \& Bound trouvera
+		l'optimum recherché, mais l'efficacité de l'exploration sera sans doute faible.}}
 	\end{quote}
 	On remarque que dans ce cas la recherche \quo{least cost} nous donne en fait un BFS (breadth first search).\\
-	car seul la profondeur détermine le coût donc on va explorer les noeuds sur la même largeur de $x$ en priorité.\\
+	car seul la profondeur détermine le coût donc on va explorer les noeuds sur la même largeur de $x$ en priorité.
+	Elle est donc très peu efficace, niveau complexité en temps car il n'y aucun \quo{guide} sur le chemin à prendre.\\
+
+	\item Les critères et propriétés de \(\hat{c}(x)\) ayant été longuement abordés au point 1) on se contentera de rappeler le théorème 2 du cours:
+	\begin{quote}
+		\quo{\textit{Soit une recherche Branche \& Bound à coût minimum (least cost) 
+		et soit une fonction \(\hat{c}\) qui vérifie que \(\hat{c}(x) \leq c(x) \) pour tous les noeuds $x$, 
+		et \(\hat{c}(\xsol) = c(\xsol) \) pour les noeuds réponse $\xsol$.}}
+	\end{quote}
+	Donc en se basant sur le fait que l'équation 1 de l'énoncé $\hat{c}(x) = g(x) + h(x)$ vérifie bien les critères du théorème 2,
+	il ne nous reste plus qu'à prouver que \(h(x) \leq g(x) + h(x) \) (car \(g(x) + h(x) \leq c(x) \)) et que \(h(\xsol) = h(\xsol) + g(\xsol)\) (car \(g(\xsol) + h(\xsol) = c(\xsol) \)):
+	\begin{align*}
+		h(x) &\leq g(x) + h(x)\\
+		&\Longleftrightarrow h(x) - h(x) \leq g(x)\\
+		&\Longleftrightarrow 0 \leq g(x)
+	\end{align*} 
+	Or $g(x)$ est une lower bound du nombre de coups restant à faire pour atteindre $\xsol$ elle donc évidemment toujours plus grande à 0. Sauf pour $g(\xsol)$ qui vaut 0.
 	
+	\begin{align*}
+		h(\xsol) =&\ h(\xsol) + g(\xsol)\\
+		\Longleftrightarrow&\  h(\xsol) = h(\xsol) + 0\\
+		\Longleftrightarrow&\ h(\xsol) = h(\xsol)
+	\end{align*}
+	Donc par le théorème 2, si on trouve une solution avec cette fonction de coût (\(\hat{c}(x) =  h(x)\)) elle est optimale.
 \end{enumerate}
+\end{enumerate}
+%\newpage
+
+\stepcounter{subsection}
+
+\subsection{Efficacité de l'algorithme}
+\begin{enumerate}
+\item Optimalité de la solution. \\
+\includegraphics[scale=0.5]{images/AlgoTP5-c-h.png}
+$.\qquad \qquad \qquad $\textit{Figure 1. (légende sur graph)}\\
+\includegraphics[scale=0.5]{images/AlgoTP5-both-c.png}
+$.\qquad \qquad \qquad $ \textit{Figure 2. (légende sur graph)}\\
+
+Soit $n$ le nombre de coup optimal i.e. $g(x_0)$ et $m$ la taille de la matrice du board. Ici $m$ est fixé cependant on pourrait très bien utiliser la même implémention pour le problème avec un board de taille $m \times m$. pour $m$ variable (\textit{la version $m \times m$, est testée dans le fichier exo1\_3.py}).\\
+(On a bien que l'axe $x$ sur les 2 graphs représente le $n$ passé à la fonction \code{gen\_disorder()}.)\\
+
+Comme on le voit sur la figure 2, l'efficacité en terme de \quo{quelle solution est la plus optimale?} est relativement la même pour les 2 fonctions de coûts. En effet, on voit bien que le nombre de coups à faire grandit parfaitment linéairement avec le désordre (i.e. distance à la solution qui est juste le board trié de 1 à 16). Les 2 courbes sont parfaitement superposées. 
+Pour un move de plus on a bien au max 1 noeud en plus à parcourir pour les 2. \\
+Par contre au niveau de la complexité en temps, les résultats sont nettements différents pour les 2 comme on va le voir au point précédent.
+
+\item  Complexité en temps.
+
+\includegraphics[scale=0.5]{images/AlgoTP5-runtime-c-h-g.png}
+$.\qquad \qquad \qquad $ \textit{Figure 3}\\
+
+\includegraphics[scale=0.5]{images/AlgoTP5-runtime-c-h.png}
+$.\qquad \qquad \qquad $ \textit{Figure 4}\\
+
+Comme on peut le voir la complexité en temps de la fonction de coût de la figure 3 du 2e $h(x)+g(x)$ est en $O(\hat{c}(x_0)^2)= O(\hat{c}(\xsol)^2) = O(n^2)$
+
+Car on fait en général un boucle avec $n$ itérations et sur chaque itération on effectue au maximum $n$ \quo{moves} sur le board. (voir fonction \code{update\_misplaced\_compute\_cost} de l'exo1.)
+et c'est le \quo{bout de code} le plus cher niveau complexité qu'on fait, i.e. la complexité du tout serait juste $O(n^2)+O(n^2)+ \cdots + O(n)+ \cdots + O(1) = O(n^2)$ \\
+
+La complexité en temps de l'autre fonction de coût (Figure 4) ressemble beaucoup plus à du $O(n^3)$ (comme l'a calculé numpy avec sa fonction polyfit) \\ 
+A noter que le 1er graph mesure le temps en \textbf{10$*$ns} (i.e. \( 10^{-8} s\).) et le 2e en \textbf{ms} (i.e. \( 10^{-3} s\).)\\
+L'écart entre les 2 deux est donc \textit{massivement} plus grand que ce qu'on pourrait penser au 1er coup d'oeil, on a bien un facteur de $\times$ 10'000 (i.e. \( 10^5 * 10^{-8} = 10^{-3}\ \)s).
+
+\stepcounter{section}
+
+\section{Shortest Path}
+
+Pour la fonction shortest path, on utilise simplement la même fonction de coût. (tout est documenté voir le fichier exo3.py).
 
 
-%
-%
+
 \end{enumerate}
+%
+%
+
 
 %
 %
