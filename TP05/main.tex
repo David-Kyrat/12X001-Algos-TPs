@@ -1,3 +1,4 @@
+% !TeX root = main.tex
 \documentclass[french]{article}
 \usepackage[margin=1in,a4paper]{geometry}
 \usepackage[utf8]{inputenc}
@@ -117,7 +118,7 @@
 \end{center}
 \vspace{0.3cm}
 %
-\section{Taquin / Fifteen Puzzle}
+\section{Taquin / Fifteen Puzzle (5 Points)}
 
 \subsection{Fonction de coût}
 \vspace{0.4cm}
@@ -244,33 +245,39 @@ Par contre au niveau de la complexité en temps, les résultats sont nettements 
 
 \item  Complexité en temps.
 
-\includegraphics[scale=0.5]{images/AlgoTP5-runtime-c-h-g.png}
+\includegraphics[scale=0.5]{images/AlgoTP5-runtime-c-h-g3.png}
 $.\qquad \qquad \qquad $ \textit{Figure 3}\\
 
-\includegraphics[scale=0.5]{images/AlgoTP5-runtime-c-h.png}
+\includegraphics[scale=0.5]{images/AlgoTP5-runtime-c-h2.png}
 $.\qquad \qquad \qquad $ \textit{Figure 4}\\
 
-Comme on peut le voir la complexité en temps de la fonction de coût de la figure 3 du 2e $h(x)+g(x)$ est en $O(\hat{c}(x_0)^2)= O(\hat{c}(\xsol)^2) = O(n^2)$
+Comme on peut le voir, la complexité en temps de la fonction de coût de la figure 3 ($h(x)+g(x)$) est en $O(\hat{c}(x_0)^2)= O(\hat{c}(\xsol)^2) = O(n^2)$
 
 Car on fait en général un boucle avec $n$ itérations et sur chaque itération on effectue au maximum $n$ \quo{moves} sur le board. (voir fonction \code{update\_misplaced\_compute\_cost} de l'exo1.)
 et c'est le \quo{bout de code} le plus cher niveau complexité qu'on fait, i.e. la complexité du tout serait juste $O(n^2)+O(n^2)+ \cdots + O(n)+ \cdots + O(1) = O(n^2)$ \\
 
-La complexité en temps de l'autre fonction de coût (Figure 4) ressemble beaucoup plus à du $O(n^3)$ (comme l'a calculé numpy avec sa fonction polyfit) \\ 
-A noter que le 1er graph mesure le temps en \textbf{10$*$ns} (i.e. \( 10^{-8} s\).) et le 2e en \textbf{ms} (i.e. \( 10^{-3} s\).)\\
-L'écart entre les 2 deux est donc \textit{massivement} plus grand que ce qu'on pourrait penser au 1er coup d'oeil, on a bien un facteur de $\times$ 10'000 (i.e. \( 10^5 * 10^{-8} = 10^{-3}\ \)s).
+On voit que le runtime de l'autre fonction de coût (Figure 4) fit bien mieux à une courbe d'ordre $O(n^3)$ 
+(le polynôme que l'on voit en légende à été calculé avec la méthode des moindres carrées, i.e. ce polynôme est celui qui minimise les carrées des distances entre les points et la courbe.
+Montrant qu'on a bien du $O(n^3)$).
+
+Il est important de noter que le 1er graph mesure le temps en \textbf{10$*$ns} (i.e. \( 10^{-8} s\).) et le 2e en \textbf{ms} (i.e. \( 10^{-3} s\).)\\
+L'écart entre les 2 deux est donc \textit{massivement} plus grand que ce qu'on pourrait penser au 1er coup d'oeil, on a bien un facteur de $\times 10'000$ (i.e. \( 10^5 * 10^{-8} = 10^{-3}\ \)s).
+\end{enumerate}
 
 \stepcounter{section}
 
-\section{Shortest Path}
+\section{Plus court chemin (Extra 1 Point)}
 
-Pour la fonction shortest path, on utilise simplement la même fonction de coût. (tout est documenté voir le fichier exo3.py).
+\subsection{Fonction de coût}
 
+La fonction de coût qui remplie les critères nécessaires pour garantir l'optimisation d'une solution est
+tout simplement la même que celle utilisée pour le problème du taquin.
 
-
-\end{enumerate}
-%
-%
-
+En effet le théorème 2 du cours et le \quo{guide} sur comment choisir sa fonction de coût sont
+tellements généraux qu'on pourrait les appliquer à beaucoup de problèmes.
+La seule chose qui va changer ici, fondamentalement, c'est la fonction $g(x)$ qui a été choisie pour être simplement 
+la distance définie par la norme $L_1$ (i.e. \(\Vert * \Vert_1\)) 
+entre la position de $x$ et la destination $b$.
 
 %
 %
