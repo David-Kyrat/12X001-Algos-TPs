@@ -39,6 +39,7 @@ def test_approx_vertex_cover():
 from exo2 import approx_knapsack
 
 def test_approx_knapsack():
+    
     w, v = [12, 10, 7, 3, 1], [9, 5, 4, 2, 2]
     assert approx_knapsack(w, v, 0) == ([], [])
     assert approx_knapsack(w, v, 10) == ([7, 1], [4, 2])
