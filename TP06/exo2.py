@@ -1,4 +1,5 @@
 from copy import deepcopy
+from itertools import zip_longest
 from multiprocessing.sharedctypes import Value
 
 
@@ -6,7 +7,7 @@ class El:
     """A class representing an element of the knapsack problem.
         It has a weight `w`, a value `v` and a ratio `r`."""
     
-    def __init__(self, idx:list[int], weight:int, value:int):
+    def __init__(self, idx:tuple[list[int], list[int]], weight:int, value:int):
         """Constructor for El instances.
 
         Parameters
@@ -15,16 +16,16 @@ class El:
         @ `weight` - (int), weight of the element
         @ `value` - (int), value of the element
         """
-        self.idxs:list[int] = idx
         self.w: int = weight
         self.v: int = value
         self.r: float = value / weight if weight != 0 else 0
+        self.idxs:tuple[list[int], list[int]] = idx
         
     def __repr__(self):
         return f"(w={self.w:2d}, v={self.v}, r={self.r}, {self.idxs})"
-
+    def get(self, i): return [] if i >= len(self.idxs) else self.idxs[i]
     # useful because we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of indexes
-    def __add__(self, other): return El(self.idxs + other.idxs, self.w + other.w, self.v + other.v)
+    def __add__(self, other): return El((self.get(0) + other.get(0), self.get(1) + other.get(1)), self.w + other.w, self.v + other.v)
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, El): return False
@@ -82,7 +83,7 @@ def approx_knapsack(weights, values, max_weight) -> tuple[list[int], list[int]]:
     # For the approximation algorithm we must have monotically decreasing indices for the values (i.e. v1 >= v2 >= ... >= vn)
     # We sort the values and the corresponding weights in decreasing order
     if max_weight <= 0: return [], []
-    E: list[El] = [El([i], weights[i], values[i]) for i in range(len(weights))]
+    E: list[El] = [El(([weights[i]], [values[i]]), weights[i], values[i]) for i in range(len(weights))]
     E.sort(key=lambda e: e.v)
     R = set()
     for j in range(len(E)):
@@ -91,23 +92,28 @@ def approx_knapsack(weights, values, max_weight) -> tuple[list[int], list[int]]:
         Rj:El = greedy_knapsack(deepcopy(Ij), max_weight)
         R.add(Rj)
         
-        """ def pr():
+        def pr():
             print("Ij", "\n".join([str(x) for x in Ij]), "\n")
             print("Rj", Rj, "\n")
             print("R","\n".join([str(x) for x in R]), "\n")
-        pr()
-        if 2 == 3: print("lul") """
+        #pr()
+        if 2 == 3: print("lul")
     tmp = max(R).idxs
-    out=[weights[i] for i in tmp][::-1], [values[i] for i in tmp][::-1]
-    return out
+    #out=[weights[i] for i in tmp][::-1], [values[i] for i in tmp][::-1]
+    return tmp[0][::-1], tmp[1][::-1]
     #return max(R).idxs
 
+def test_sol(weights, values, sol: tuple[list[int], list[int]]):
+    #sol_w = sum([weights[i] for i in sol[0]])
+    #sol_v = sum([values[i] for i in sol[1]])
+    tmp = list(zip(sol[0], sol[1]))
+    return tmp, (sum(sol[0]), sum(sol[1]))
  
 if __name__ == '__main__':
     w, v = [12, 10, 7, 3, 1], [9, 5, 4, 2, 2]
-    print("Res1", approx_knapsack(w, v, 0)) # == ([], [])
+    """ print("Res1", approx_knapsack(w, v, 0)) # == ([], [])
     print("Res2",approx_knapsack(w, v, 10)) # == ([7, 1], [4, 2])
-    print("Res3",approx_knapsack(w, v, 12)) # == ([12], [9])
+    print("Res3",approx_knapsack(w, v, 12)) # == ([12], [9]) """
     print("Res4",approx_knapsack(w, v, 22)) # == ([12, 1, 3], [9, 2, 2])
     print("Res5",approx_knapsack(w, v, 29)) # == ([12, 1, 3, 7], [9, 2, 2, 4])
     
