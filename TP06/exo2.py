@@ -1,5 +1,4 @@
-from copy import deepcopy
-
+########################### Exercise 2 ###########################
 class El:
     """A class representing an element of the knapsack problem.
         It has a weight `w` , a value `v`, a ratio `r` and pair of weight-list, value-list, `wv_list`."""
@@ -25,6 +24,7 @@ class El:
     
     # useful because we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of indexes
     def __add__(self, other): return El(self.w + other.w, self.v + other.v, (self.get(0) + other.get(0), self.get(1) + other.get(1)))
+
     
 def greedy_knapsack(items: list, W, b0: El = El(0,0)) -> El:
     """:return: Solution of Knapsack problem for set of item "items" and max weight W, by selecting first
@@ -45,7 +45,7 @@ def greedy_knapsack(items: list, W, b0: El = El(0,0)) -> El:
     
     return bag
 
-########################### Exercise 2 ###########################
+
 def approx_knapsack(weights, values, max_weight) -> tuple:
     """Returns an approximation for the (0-1) knapsack problem.
     The approximation is at most 2-times worse than the optimal solution"""
@@ -57,12 +57,3 @@ def approx_knapsack(weights, values, max_weight) -> tuple:
     R = [greedy_knapsack( E[j+1:], max_weight, (el if (el.w <= max_weight) else El(0, 0))) for j, el in enumerate(E)]
     
     return max(R, key=lambda x: x.v).wv_list # takes max w.r.t. values
-
-if __name__ == '__main__':
-    w, v = [12, 10, 7, 3, 1], [9, 5, 4, 2, 2]
-    assert approx_knapsack(w, v, 0) == ([], [])
-    assert approx_knapsack(w, v, 10) == ([7, 1], [4, 2])
-    assert approx_knapsack(w, v, 12) == ([12], [9])
-    assert approx_knapsack(w, v, 22) == ([12, 1, 3], [9, 2, 2])  
-    assert approx_knapsack(w, v, 29) == ([12, 1, 3, 7], [9, 2, 2, 4])
-    
