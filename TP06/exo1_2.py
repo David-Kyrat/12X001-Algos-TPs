@@ -16,24 +16,21 @@ def get_incident_edges(matrix: list[list[int]], edge:tuple[int, int]):
     edgesl = edges(matrix)
     return [e for e in edgesl if u not in e and v not in e]
 
-            
-def rm_incident_edges(matrix:list[list[int]], edges: list[tuple[int, int]], edge:tuple[int, int], rmd: set[tuple[int, int]]):
+
+def arbitrary_edge(edges: set[tuple[int, int]]):
+    """ Returns an arbitrary edge from the given set of edges."""
+    return next(iter(edges))
+
+
+def discard_multiple(s: set, *els):
+    """ Applies `s.discard(e)` to each element of `els`. """
+    for e in els: s.discard(e)
+ 
+def rm_incident_edges(edges: set[tuple[int, int]], edge:tuple[int, int]):
     """Removes all edges incident to the given edge from ``edges``."""
     u, v = edge[0], edge[1]
-    n = len(matrix)
-    for j in range(n):
-        if matrix[u][j] == 1 and (u, j) not in rmd:   
-            edges.remove((u, j))
-            rmd.add((u, j))
-        if matrix[j][u] == 1 and (j, u) not in rmd:
-            edges.remove((j, u))
-            rmd.add((j, u))
-        if matrix[j][v] == 1 and (j, v) not in rmd:   
-            edges.remove((j, v))
-            rmd.add((j, v))
-        if matrix[v][j] == 1 and (v, j) not in rmd:
-            edges.remove((v, j))
-            rmd.add((v, j))
+    for j in range(len(edges)):
+        discard_multiple(edges, (u, j), (j, u), (j, v), (v, j))
 
 
 def approx_vertex_cover(matrix: list[list[int]]) -> list[int]:
@@ -42,11 +39,17 @@ def approx_vertex_cover(matrix: list[list[int]]) -> list[int]:
     C: set[tuple[int, int]] = set()
     E: set[tuple[int, int]] = edges(matrix)
     n: int = len(matrix) # matrix is squared
-    removed: set[tuple[int, int]] = set()
+    
     for _ in range(n):
-        e = E[0]
+        e = arbitrary_edge(E)
         C.add(e)
-        rm_incident_edges(matrix, E, e, removed)
+        rm_incident_edges(E, e)
         if not E: break
 
-    return flatten_solution(C)
+    return sorted(flatten_solution(C))
+
+if __name__ == '__main__':
+    n = 10
+    matrix = [[1 if i != j else 0 for j in range(n)] for i in range(n)]
+    print(approx_vertex_cover(matrix))
+    
