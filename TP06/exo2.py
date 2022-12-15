@@ -1,13 +1,10 @@
 from copy import deepcopy
-from itertools import zip_longest
-from multiprocessing.sharedctypes import Value
-
 
 class El:
     """A class representing an element of the knapsack problem.
         It has a weight `w`, a value `v` and a ratio `r`."""
     
-    def __init__(self, idx:tuple[list[int], list[int]], weight:int, value:int):
+    def __init__(self, idx, weight:int, value:int):
         """Constructor for El instances.
 
         Parameters
@@ -19,7 +16,7 @@ class El:
         self.w: int = weight
         self.v: int = value
         self.r: float = value / weight if weight != 0 else 0
-        self.idxs:tuple[list[int], list[int]] = idx
+        self.idxs = idx
         
     def __repr__(self):
         return f"(w={self.w:2d}, v={self.v}, r={self.r}, {self.idxs})"
@@ -46,50 +43,53 @@ class El:
     # We sort the values and the corresponding weights in decreasing order
     
 
-def greedy_knapsack(items: list[El], W) -> El:
+def greedy_knapsack(items: list, W, b:El=El([],0,0)) -> El:
     """:return: Solution of Knapsack problem for set of item "items" and max weight W, by selecting first
         all the items with the highest <characteristic defined by sorting key>
         NB: if "highest" is set to false then select the lowest ... items first  """
     if items is None: return None
-    n, w, i = len(items), 0, 0
+    #n, w, i = len(items), 0, 0
     #bag: list[El] = []
-    bag = El([], 0, 0)
+    bag = b
+    i,n = 0, len(items)
     if n == 0: return bag
     if n == 1: return bag if items[0].w > W else items[0]
     items.sort(key=lambda el: el.r, reverse=True)
-    #res:El = None
     
-    def try_rec(k, w, n):
-        nonlocal bag
-        if k >= n: return k, w, n
-        crt = items[k]
-        if crt.w + w > W: return try_rec(k + 1, w, n)
-        else:  
-            #bag.append(items.pop(k))
-            # we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of indexes
-            if bag is None: bag = items.pop(k)
-            else: bag += items.pop(k) 
-            #bag += items.pop(k)
-            return k, w + crt.w, n - 1
-
-    while w < W and i < n:
-        i, w, n = try_rec(i, w, n)
+    while bag.w <= W and i < n : 
+        crt:El = items[i]
+        if bag.w + crt.w <= W:
+            bag += crt
+            #print(bag)
+        i +=1
+    
     return bag
 
 ########################### Exercise 2 ###########################
-def approx_knapsack(weights, values, max_weight) -> tuple[list[int], list[int]]:
+def approx_knapsack(weights, values, max_weight) -> tuple:
     """Returns an approximation for the (0-1) knapsack problem.
     The approximation is at most 2-times worse than the optimal solution"""
     # For the approximation algorithm we must have monotically decreasing indices for the values (i.e. v1 >= v2 >= ... >= vn)
     # We sort the values and the corresponding weights in decreasing order
     if max_weight <= 0: return [], []
     E: list[El] = [El(([weights[i]], [values[i]]), weights[i], values[i]) for i in range(len(weights))]
-    E.sort(key=lambda e: e.v)
+    #E.sort(key=lambda e: e.v)
     R = set()
     for j in range(len(E)):
-        Ij:list[El] = E[j:]
+        crt:El = El([], 0, 0)
+        if E[j].w <= max_weight:
+            crt = E[j]
+        #print(crt)
+        Ij:list[El] = E[j+1:]
         # we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of indexes
-        Rj:El = greedy_knapsack(deepcopy(Ij), max_weight)
+        
+        #print("crt", crt)
+        Rj:El = greedy_knapsack(deepcopy(Ij), max_weight, crt)
+        
+        #print("")
+        #print(Rj, "\n")
+        #if E[j].w + Rj.w < max_weight : 
+        #  Rj += E[j]
         R.add(Rj)
         
         def pr():
@@ -100,10 +100,10 @@ def approx_knapsack(weights, values, max_weight) -> tuple[list[int], list[int]]:
         if 2 == 3: print("lul")
     tmp = max(R).idxs
     #out=[weights[i] for i in tmp][::-1], [values[i] for i in tmp][::-1]
-    return tmp[0][::-1], tmp[1][::-1]
+    return max(R).idxs
     #return max(R).idxs
 
-def test_sol(weights, values, sol: tuple[list[int], list[int]]):
+def test_sol(weights, values, sol: tuple):
     #sol_w = sum([weights[i] for i in sol[0]])
     #sol_v = sum([values[i] for i in sol[1]])
     tmp = list(zip(sol[0], sol[1]))
@@ -111,9 +111,10 @@ def test_sol(weights, values, sol: tuple[list[int], list[int]]):
  
 if __name__ == '__main__':
     w, v = [12, 10, 7, 3, 1], [9, 5, 4, 2, 2]
-    """ print("Res1", approx_knapsack(w, v, 0)) # == ([], [])
+    print("Res1", approx_knapsack(w, v, 0)) # == ([], [])
     print("Res2",approx_knapsack(w, v, 10)) # == ([7, 1], [4, 2])
-    print("Res3",approx_knapsack(w, v, 12)) # == ([12], [9]) """
+    print("Res3",approx_knapsack(w, v, 12)) # == ([12], [9])
     print("Res4",approx_knapsack(w, v, 22)) # == ([12, 1, 3], [9, 2, 2])
-    print("Res5",approx_knapsack(w, v, 29)) # == ([12, 1, 3, 7], [9, 2, 2, 4])
     
+    
+    print("Res5",approx_knapsack(w, v, 29)) # == ([12, 1, 3, 7], [9, 2, 2, 4])
