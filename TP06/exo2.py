@@ -54,7 +54,7 @@ def approx_knapsack(weights, values, max_weight) -> tuple:
     if max_weight <= 0 or values is None or values is None : return [], []
     E: list[El] = [El(*wv_pair) for wv_pair in zip(weights, values)]
     
-    R = [greedy_knapsack( E[j+1:], max_weight, el if (el.w <= max_weight) else El(0, 0)) for j, el in enumerate(E)]
+    R = [greedy_knapsack( E[j+1:], max_weight, (el if (el.w <= max_weight) else El(0, 0))) for j, el in enumerate(E)]
     
     return max(R, key=lambda x: x.v).wv_list # takes max w.r.t. values
 
