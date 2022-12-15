@@ -58,14 +58,4 @@ def approx_knapsack(weights, values, max_weight) -> tuple:
         Rj:El = greedy_knapsack(Ij, max_weight, crt)        
         R.append(Rj)
     
-    return max(R, key=lambda x: x.v).idxs # takes max w.r.t. values
-
-if __name__ == '__main__':
-    w, v = [12, 10, 7, 3, 1], [9, 5, 4, 2, 2]
-    print("Res1", approx_knapsack(w, v, 0)) # == ([], [])
-    print("Res2",approx_knapsack(w, v, 10)) # == ([7, 1], [4, 2])
-    print("Res3",approx_knapsack(w, v, 12)) # == ([12], [9])
-    print("Res4",approx_knapsack(w, v, 22)) # == ([12, 1, 3], [9, 2, 2])
-    
-    
-    print("Res5",approx_knapsack(w, v, 29)) # == ([12, 1, 3, 7], [9, 2, 2, 4])
+    return max(R, key=lambda x: x.v).wv_list # takes max w.r.t. values
