@@ -4,23 +4,23 @@ class El:
     """A class representing an element of the knapsack problem.
         It has a weight `w`, a value `v` and a ratio `r`."""
     
-    def __init__(self, idx, weight:int, value:int):
+    def __init__(self, wv_list, weight:int, value:int):
         """Constructor for El instances.
 
         Parameters
         ----------
-        @ `index` - (int), index of the element in the original list
+        @ `wv_list` - tuple of list of weight & values, containing those that sums up to weight and value
         @ `weight` - (int), weight of the element
         @ `value` - (int), value of the element
         """
         self.w: int = weight
         self.v: int = value
         self.r: float = value / weight if weight != 0 else 0
-        self.idxs = idx
+        self.wv_list = wv_list
         
     def __repr__(self):
-        return f"(w={self.w:2d}, v={self.v}, r={self.r}, {self.idxs})"
-    def get(self, i): return [] if i >= len(self.idxs) else self.idxs[i]
+        return f"(w={self.w:2d}, v={self.v}, r={self.r}, {self.wv_list})"
+    def get(self, i): return [] if i >= len(self.wv_list) else self.wv_list[i]
     # useful because we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of indexes
     def __add__(self, other): return El((self.get(0) + other.get(0), self.get(1) + other.get(1)), self.w + other.w, self.v + other.v)
     
