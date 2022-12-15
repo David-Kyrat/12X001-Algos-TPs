@@ -1,5 +1,5 @@
 ########################### Exercise 1 ###########################
-from exo1_2 import approx_vertex_cover
+from exo1 import approx_vertex_cover
 
 def test_approx_vertex_cover():
     # In case of a fully connected graph, the algorithm simply returns all nodes in order
