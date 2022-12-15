@@ -115,5 +115,7 @@ if __name__ == '__main__':
     print("Res2",approx_knapsack(w, v, 10)) # == ([7, 1], [4, 2])
     print("Res3",approx_knapsack(w, v, 12)) # == ([12], [9]) """
     print("Res4",approx_knapsack(w, v, 22)) # == ([12, 1, 3], [9, 2, 2])
+    exp4 = ([12, 1, 3], [9, 2, 2])
+    exp4 = set(zip(exp4[0], exp4[1]))
     print("Res5",approx_knapsack(w, v, 29)) # == ([12, 1, 3, 7], [9, 2, 2, 4])
     
