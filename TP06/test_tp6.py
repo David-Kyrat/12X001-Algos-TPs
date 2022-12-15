@@ -1,5 +1,5 @@
 ########################### Exercise 1 ###########################
-from tp6 import approx_vertex_cover
+from exo1 import approx_vertex_cover
 
 def test_approx_vertex_cover():
     # In case of a fully connected graph, the algorithm simply returns all nodes in order
@@ -36,7 +36,7 @@ def test_approx_vertex_cover():
 
 
 ########################### Exercise 2 ###########################
-from tp6 import approx_knapsack
+from exo2 import approx_knapsack
 
 def test_approx_knapsack():
     w, v = [12, 10, 7, 3, 1], [9, 5, 4, 2, 2]
