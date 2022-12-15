@@ -44,8 +44,4 @@ def test_approx_knapsack():
     assert approx_knapsack(w, v, 10) == ([7, 1], [4, 2])
     assert approx_knapsack(w, v, 12) == ([12], [9])
     assert approx_knapsack(w, v, 22) == ([12, 1, 3], [9, 2, 2])  
-    # ^^ i belive this one is wrong, because even ([12, 10], [9, 5]) 
-    #    has weight sum of 10+12=22<=MaxWeight=22 and Value 9+5=14 > 9+2+2=13
-    # Furthermore the solution [1, 12, 7], [2, 9, 4] (which is the one i get) gives a value of 15, while having a weight of 20.
-    
     assert approx_knapsack(w, v, 29) == ([12, 1, 3, 7], [9, 2, 2, 4])

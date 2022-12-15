@@ -2,7 +2,7 @@ from copy import deepcopy
 
 class El:
     """A class representing an element of the knapsack problem.
-        It has a weight `w`, a value `v`, a ratio `r` and pair of weight-list, value-list."""
+        It has a weight `w` , a value `v`, a ratio `r` and pair of weight-list, value-list, `wv_list`."""
     
     def __init__(self, weight:int, value:int, wv_list: tuple[list[int], list[int]] | None = None):
         """Constructor for El instances.
@@ -19,14 +19,14 @@ class El:
         self.r: float = value / weight if weight != 0 else 0
         self.wv_list = wv_list if wv_list is not None else ([weight], [value])
         
-    def __repr__(self):
-        return f"(w={self.w:2d}, v={self.v}, r={self.r}, {self.wv_list})"
+    def __repr__(self): return f"(w={self.w:2d}, v={self.v}, r={self.r}, {self.wv_list})"
+
     def get(self, i): return [] if i >= len(self.wv_list) else self.wv_list[i]
     
     # useful because we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of indexes
-    def __add__(self, other): return El((self.get(0) + other.get(0), self.get(1) + other.get(1)), self.w + other.w, self.v + other.v)
+    def __add__(self, other): return El(self.w + other.w, self.v + other.v, (self.get(0) + other.get(0), self.get(1) + other.get(1)))
     
-def greedy_knapsack(items: list, W, b0:El=El([],0,0)) -> El:
+def greedy_knapsack(items: list, W, b0: El = El(0,0)) -> El:
     """:return: Solution of Knapsack problem for set of item "items" and max weight W, by selecting first
         all the items with the highest <characteristic defined by sorting key>
         NB: if "highest" is set to false then select the lowest ... items first  """
@@ -39,6 +39,7 @@ def greedy_knapsack(items: list, W, b0:El=El([],0,0)) -> El:
     
     while bag.w <= W and i < n : 
         crt:El = items[i]
+        # we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of each summed values&weights
         if bag.w + crt.w <= W: bag += crt
         i +=1
     
@@ -50,14 +51,18 @@ def approx_knapsack(weights, values, max_weight) -> tuple:
     The approximation is at most 2-times worse than the optimal solution"""
     # For the approximation algorithm we must have monotically decreasing indices for the values (i.e. v1 >= v2 >= ... >= vn)
     # We sort the values and the corresponding weights in decreasing order
-    if max_weight <= 0: return [], []
-    E: list[El] = [El(([weights[i]], [values[i]]), weights[i], values[i]) for i in range(len(weights))]
-    R = []
-    for j, el in enumerate(E):
-        crt:el = el if (el.w <= max_weight) else El([], 0, 0)
-        Ij:list[El] = E[j+1:]
-        # we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of each summed values&weights
-        Rj:El = greedy_knapsack(Ij, max_weight, crt)        
-        R.append(Rj)
+    if max_weight <= 0 or values is None or values is None : return [], []
+    E: list[El] = [El(*wv_pair) for wv_pair in zip(weights, values)]
+    
+    R = [greedy_knapsack( E[j+1:], max_weight, el if (el.w <= max_weight) else El(0, 0)) for j, el in enumerate(E)]
     
     return max(R, key=lambda x: x.v).wv_list # takes max w.r.t. values
+
+if __name__ == '__main__':
+    w, v = [12, 10, 7, 3, 1], [9, 5, 4, 2, 2]
+    assert approx_knapsack(w, v, 0) == ([], [])
+    assert approx_knapsack(w, v, 10) == ([7, 1], [4, 2])
+    assert approx_knapsack(w, v, 12) == ([12], [9])
+    assert approx_knapsack(w, v, 22) == ([12, 1, 3], [9, 2, 2])  
+    assert approx_knapsack(w, v, 29) == ([12, 1, 3, 7], [9, 2, 2, 4])
+    
