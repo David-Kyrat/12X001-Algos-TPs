@@ -87,9 +87,14 @@ def approx_knapsack(weights, values, max_weight) -> tuple[list[int], list[int]]:
     E.sort(key=lambda e: e.v)
     R = set()
     for j in range(len(E)):
-        Ij:list[El] = E[j:]
+        Rj:El = None
+        #if 
+        Ij:list[El] = E[j+1:]
         # we're not going to store a solution as a list but instead as one element that will contain the sum of each values and weight and the list of indexes
+        
         Rj:El = greedy_knapsack(deepcopy(Ij), max_weight)
+        if E[j].w < Rj.w : 
+          Rj += E[j]
         R.add(Rj)
         
         def pr():
