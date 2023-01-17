@@ -11,6 +11,10 @@ tests
 tests/*
 
 *.zip
+*.log
+*.aux
+
+
 
 TP05/out
 TP05/images
