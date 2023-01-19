@@ -1,19 +1,13 @@
-# redifing abs because name is shorter than the 'fabs' function from math (and because it should only take ints here)
-def abs(x:int)->int: return x if (x >= 0) else -x
-
-
 def diff(arr1, arr2):
     '''Return `arr1` \ `arr2` (mathematical difference)'''
     set2 = set(arr2)  # "is in" check should be O(1)
     return [a1 for a1 in arr1 if a1 not in set2]
-
 
 def isSameDiag(i1, j1, i2, j2):
     '''`isSameDiag` returns `True` if the two points are on the same diagonal, and `False` otherwise.
     Returns: Whether the two coordinates are on the same diagonal (or anti-diagonal).'''
     disti, distj = abs(i1-i2), abs(j1-j2)
     return disti == distj
-
 
 def T(x, k, n):
     '''`T(x,k,n)` returns the set of all possible positions for the `(k+1)`-th queen, given the positions
@@ -26,7 +20,6 @@ def T(x, k, n):
     Returns: The set of all possible positions for the `k+1`-th queen. '''
         
     return diff(range(n), x[:k])
-
 
 def B(x, k, n):
     '''If the last queen is not on the same diagonal as any of the previous queens, then return True
@@ -58,7 +51,6 @@ def P(x, k, n):
         if count[el] > 1: return False
         
     return True
-
 
 def solve_bt(n) -> None | list[list[int]]:
     '''`solve_bt` returns all the solutions for the N-Queens problem for a chess board of size n.
