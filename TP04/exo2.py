@@ -57,8 +57,8 @@ def compute_change(money, coin_set:list) -> list:
         for k, coin in enumerate(Ci):
             # if largest current coin is too big, then the solution is exactly the one we mememorized before
             if (k == 0 and step_idx > 0 and coin > left): return D[step_idx-1]
-            crt_amnt = left // coin
-            left -= crt_amnt * coin
+            crt_amnt, left = left // coin, left % coin
+            #left -= crt_amnt * coin
             sol[n-step_idx-1 + k] = crt_amnt # stores crt_amnt in sol but in reversed order since we iterate first on the lowest coins
             if left <= 0: return sol
         return []

@@ -38,3 +38,15 @@ def test_compute_change():
     assert compute_change(1, coin_set) == [1]
     assert compute_change(30, coin_set) == [30]
     assert compute_change(48, coin_set) == [24, 24] # Optimal solution greedy could not find.
+
+
+########################### Exercise 3 ###########################
+from exo3 import longest_common_subsequence, longest_common_substring
+
+def test_longest_common_subsequence():
+    a, b = ["a", "c", "t", "g", "a", "a"], ["c", "g", "a", "t"]
+    assert longest_common_subsequence(a, b) == ["c", "g", "a"]
+
+def test_longest_common_substring():
+    a, b = ["a", "c", "t", "g", "a", "a"], ["c", "g", "a", "t"]
+    assert longest_common_substring(a, b) == ["g", "a"]

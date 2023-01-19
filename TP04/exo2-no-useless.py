@@ -28,15 +28,13 @@ def compute_change(money, coin_set:list) -> list:
         for k, coin in enumerate(Ci):
             # if largest current coin is too big, then the solution is exactly the one we memorized before
             if (k == 0 and step_idx > 0 and coin > left): return D[step_idx-1]
-            crt_amnt = left // coin
-            left -= crt_amnt * coin
+            crt_amnt, left = (left // coin), (left % coin)
             sol[n-step_idx-1 + k] = crt_amnt # stores crt_amnt in sol but in reversed order since we iterate first on the lowest coins
             if left <= 0: return sol
         return []
         
     for i in range(n-1, -1, -1):
         tmp = solve_sub(C[i:], n-1-i) # padding with the necessary amount of 0s
-        #if len(tmp) < n: tmp = [0]*i + tmp
         D.append(tmp)
     # Now we just have to search the min of the sum of each column
     # Hence min { sum(D[i]) } for i in {0..n} is the optimal amount of coins, and row i contains the optimal solution.
