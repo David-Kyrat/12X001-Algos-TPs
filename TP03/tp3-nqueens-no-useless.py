@@ -17,8 +17,7 @@ def T(x, k, n):
     @ `x` - (Partial solution) i.e. Current state of the board. List of column indices (i.e. [x_i]_{1<=i<=k} where x_i = column of i-th queen)
     @ `k` - the number of queens placed so far
     @ `n` - the number of queens
-    Returns: The set of all possible positions for the `k+1`-th queen. '''
-        
+    Returns: The set of all possible positions for the `k+1`-th queen. '''   
     return diff(range(n), x[:k])
 
 def B(x, k, n):
@@ -29,7 +28,6 @@ def B(x, k, n):
     @ `k` - Index of current row/step we are working on  
     @ `n` - the size of the board
     Returns: Whether the current solution is valid. i.e. If the last queen is not on the same diagonal as any of the previous queens'''
-        
     if k == 0: return True
     for i in range(k):
         if isSameDiag(k, x[k], i, x[i]): return False
@@ -49,7 +47,6 @@ def P(x, k, n):
     for el in x: # x are columns indices
         count[el] += 1
         if count[el] > 1: return False
-        
     return True
 
 def solve_bt(n) -> None | list[list[int]]:
@@ -58,7 +55,6 @@ def solve_bt(n) -> None | list[list[int]]:
     such that the i-th queen is located at index `(i, solve_bt[k][i])` (for the k-th solution) of the `n`x`n` chess board.
     No two queen are on the same column, same row or same diagonal.
     Returns: A list of all possible solution to the N-Queens problem. i.e. list of lists of the columns indices of the queens. '''
-        
     if n < 4: return []
     sols:set = set()
     def bt_rec(x, k, n):        
