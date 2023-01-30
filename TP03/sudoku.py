@@ -60,3 +60,21 @@ def BT_sudoku(dim: int) -> list[list[int]]:
                 rBT(x, k + 1, n)
                 if found: return x
     return rBT([[] for _ in range(dim)], 0, dim)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
