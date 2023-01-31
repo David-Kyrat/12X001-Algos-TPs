@@ -68,8 +68,15 @@ class Node:
 
 def dist(p1: tuple[int, int], p2: tuple[int, int]):
     """Conveniance function to compute the distance (L1 norm) between two points (i.e. ``||p1-p2||_1``)
+
+    Parameters
+    ----------
     @ `p1` - first pair of coordinates
-    @ `p2` - second pair of coordinates"""
+    @ `p2` - second pair of coordinates
+
+    Returns
+    ----------
+        distance between p1 and p2, ``||p1-p2||_1``"""
     return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
 
@@ -151,11 +158,14 @@ def solve_shortest_path(domain:list[list[int]], a:tuple[int, int], b:tuple[int, 
     The path is returned as a list of steps from a to b, where each step is a tuple with 2 integers."""
     n, m = len(domain), len(domain[0])
     liveNodes: list[Node] = []
+    
     enode: Node = Node.init_root(a, b)
     while not P(enode):
         available_moves: set[M] = children_moves(domain, enode, n, m)
+
         for move in available_moves:
             child = Node(move, enode)
             addToLiveNodes(child, liveNodes)
+
         enode = nextENode(liveNodes)
     return enode.path
