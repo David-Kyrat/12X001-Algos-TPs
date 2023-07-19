@@ -11,9 +11,11 @@ def dc(nums: List[int]) -> int:
     i = 0
     def dc_rec(p: int, q: int) -> int:
         nonlocal i
-        if p >= q: return nums[p] # print(f"nums[{p}] = {nums[p]}\n")
+        if p >= q:
+            print(f"nums[{p}] = {nums[p]}\n")
+            return nums[p]
         m = (q + p) // 2
-        # print(f"p{i} = {p}  m{i} = {m}  q{i} = {q} {nums[p: m + 1]} | {nums[m+1 : q+1]}")
+        print(f"p{i} = {p}  m{i} = {m}  q{i} = {q} {nums[p: m + 1]} | {nums[m+1 : q+1]}")
         return combine(dc_rec(p, m), dc_rec(m + 1, q))
 
     return dc_rec(0, len(nums) - 1)
@@ -42,7 +44,7 @@ def test_for_1_to_1000():
         assert correct_sum(inp) == dc(inp)
 
 
-""" def __test__(n: int):
+def __test__(n: int):
     inp = list(range(n+1))
     print("\t", inp)
     expected = correct_sum(inp)
@@ -51,4 +53,4 @@ def test_for_1_to_1000():
     assert expected == obtained
 
 if __name__ == "__main__":
-    __test__(5) """
+    __test__(5)
