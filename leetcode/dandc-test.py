@@ -16,20 +16,7 @@ def dc(nums: List[int]) -> int:
             return nums[p]
         else:
             m = (q + p) // 2
-            """ try:
-                m_val = nums[m]
-            except IndexError:
-                print(f"Index_Error!\n\tp{i} = {p}  m{i} = {m}  q{i} = {q}")
-                exit(1) """
-            # acc += m_val
             print(f"p{i} = {p}  m{i} = {m}  q{i} = {q} {nums[p: m + 1]} | {nums[m+1 : q+1]}")
-            #print(p, m, nums[p : m + 1], "|", nums[m + 1 : q + 1], m + 1, q)
-            # m + 1 because nums[m] must belong in the left part
-            # and q + 1 because nums[q] must belong in the right part
-            i += 1
-            """ a = dc_rec(p, m, acc)
-            print("--------")
-            b = dc_rec(m + 1, q, acc)  # noqa: F841 """
             return combine(dc_rec(p, m), dc_rec(m + 1, q))
 
     return dc_rec(0, len(nums) - 1)
