@@ -15,7 +15,7 @@ class Solution:
             if max_k(k) >= N: return # if we arrived at the end of said indices => stop
             path.append(None) # => else store (or not) elements starting from max(k, old_i) (old_i is the iteration index with which recBT was called)
             _T = T(x, k, N)
-            print(f"T(x, {k}, {N}) =", [nums[xi] for xi in _T])
+            #print(f"T(x, {k}, {N}) =", [nums[xi] for xi in _T])
             for i in _T:
                 print("")
                 #print(path, f"path | k, nums[{i}] ", k, nums[i])
