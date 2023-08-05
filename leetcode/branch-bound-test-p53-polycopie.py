@@ -1,12 +1,12 @@
-from typing import List, Self
+from typing import List, Self, Optional
 
 def path_str(node) -> str: return str([x.val for x in [*node.path, node]])
 
 class Node:
-    def __init__(self, val: int, cost: int, path: List[Self] = []):
+    def __init__(self, val: int, cost: int, path: Optional[List[Self]] = None):
         self.val = val
         self.cost = cost
-        self.path = path.copy() # HINT: Useful to keep track of path?
+        self.path = path.copy() if path is not None else [] # HINT: Useful to keep track of path?
         #HINT: if yes: handle case where jumping to adjacent node
         # "forgets current path" i.e. [1, 2, 5] -> 3 (chosen) -> [1, 3]
 
@@ -38,7 +38,8 @@ def branch_bound():
         # WARN: In this implementation path depends on previously visited nodes not on the parent
         # y child of x =\\> y.path = [x, ...]. y.path[0] may be y's neighbour
         #
-        # HINT: Dépend de ce qu'on cherche. Si la solution est juste le résultat final, ou le path optimal ou autre. Car si on veut minimiser le nb de coups et le poids (ici) alors changer de branch sera tres penalisant car on aura 2 nodes pour une même depth.
+        # HINT: Dépend de ce qu'on cherche. Si la solution est juste le résultat final, ou le path optimal / nombre de noeuds visités ou autre. Car si on veut minimiser le nb de coups et le poids (ici) alors changer de branch sera tres penalisant car on aura 2 nodes pour une même depth.
+        # => Pour shortest path par exemple osef du nombre de noeud visité on veut juste trouver le plus petit chemin même s'il nous a pris 15 coups à trouver.
         val_left, val_right = (
             2 * node.val,
             2 * node.val + 1,
@@ -63,7 +64,8 @@ def branch_bound():
         out = pq.pop()
         # WARN: if we care about all visited nodes to solution keep below lines and comment path
         # assignation in constructor. Otherwise comment this one.
-        out.path = [*old_enode.path, old_enode] # adjusts current visited nodes between `root` and `out`
+        
+        # out.path = [*old_enode.path, old_enode] # adjusts current visited nodes between `root` and `out`
         return out
     
 
@@ -77,8 +79,12 @@ def branch_bound():
 
     live_nodes: List[Node] = []
     enode: Node = root
+    tmp = True
     while not P(enode):
         print("enode =", enode)
+        if tmp:
+            addToLiveNodes(live_nodes, root)
+            tmp = False
         for node in get_children(enode): addToLiveNodes(live_nodes, node)
         print(live_nodes)
         enode = nextENode(live_nodes, enode)
