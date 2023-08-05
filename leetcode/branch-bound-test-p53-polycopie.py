@@ -7,11 +7,8 @@ class Node:
         self.val = val
         self.cost = cost
         self.path = path.copy() if path is not None else [] # HINT: Useful to keep track of path?
-        #HINT: if yes: handle case where jumping to adjacent node
-        # "forgets current path" i.e. [1, 2, 5] -> 3 (chosen) -> [1, 3]
 
     def __repr__(self):
-        #return f"({self.path}, val={self.val} cost={self.cost})"
         return f"({path_str(self)}, cost={self.cost})"
 
 

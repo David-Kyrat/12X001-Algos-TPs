@@ -30,7 +30,6 @@ class Solution:
         for idx, xi in numss:
             to_search = target - xi
             crt_pair = (xi, to_search)
-            print(crt_pair, idx)
             if crt_pair not in pairs: found_idx = self.bin_search(numss, to_search)
             if found_idx is not None and numss[found_idx][0] != idx:
                 return [idx, numss[found_idx][0]]
