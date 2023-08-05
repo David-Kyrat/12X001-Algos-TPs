@@ -11,7 +11,6 @@ class Cell:
         self.free = board[row][col] == 0
     
     def __repr__(self):
-
         free_str = '✅' if self.free else '❌'
         return f"({self.row}, {self.col} {free_str})"
 
