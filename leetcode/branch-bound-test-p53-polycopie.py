@@ -61,7 +61,9 @@ def branch_bound():
     def nextENode(pq: List[Node], old_enode: Node) -> Node:
         """ Return: `pq.pop()` i.e. also removes element """
         out = pq.pop()
-        #out.path = [*old_enode.path, old_enode] # adjusts current visited nodes between `root` and `out`
+        # WARN: if we care about all visited nodes to solution keep below lines and comment path
+        # assignation in constructor. Otherwise comment this one.
+        out.path = [*old_enode.path, old_enode] # adjusts current visited nodes between `root` and `out`
         return out
     
 
