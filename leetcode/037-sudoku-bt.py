@@ -2,11 +2,10 @@ from typing import List, Set
 
 
 class Solution:
-    def solveSudoku(self, board: List[List[str]]) -> None:
+    def solveSudoku(self, board: List[List[str]]) -> None:  
         """
         Do not return anything, modify board in-place instead.
         """
-        printt = False
         n = len(board) # n is dimension, N is n**2 i.e. max k
         values = {str(x) for x in range(1, n+1)}
         block_coords = []
@@ -16,14 +15,8 @@ class Solution:
  
         def coord(k: int): return (k // n, k % n)
         def to_idx(i: int, j: int): return i * n + j
-        def is_same_diag(i1: int, j1: int, i2: int, j2: int):
-            z = i1 - i2, j1 - j2
-            return z[0] == z[1]
-        def is_same_antidiag(i1: int, j1: int, i2: int, j2: int):
-            z = i1 - i2, j1 - j2
-            return z[0] == -z[1]
 
-        def T(x: List[List[str]], k: int, N: int) -> Set[str]:
+        def T(x: List[List[str]], k: int, N: int) -> Set[str]:  
             base = values.copy()
             row, col = coord(k)
             # discard same row (before)
@@ -33,39 +26,48 @@ class Solution:
             # discard same column
             for i in range(row):
                 base.discard(x[i][col])
-            return base
+            out = list(base)
+            out.sort()
+            return out
 
-        def B(x: List[List[str]], k: int, N: int):
+        def B(x: List[List[str]], k: int, N: int):  
             row_tc, col_tc = coord(k)
             val = x[row_tc][col_tc]
-            #if val == ".": return False
+            #print("B: val =", val)
             # check uniqueness in 3x3 bloc
             for i in range(row_tc - (row_tc % 3), row_tc + 1): # min 1 iter max 3 iter
-                offset = 2 if i < row_tc else col_tc % 3 # iterate through whole line if its not the last
+                mod = col_tc % 3
+                offset = 2 - mod if i < row_tc else 0 # iterate through whole line if its not the last
                 # i.e. last line stops at column `col_tc`
-                for j in range(min(col_tc - offset, 0), col_tc):
-                    #if j < 0: print("j < 0", col_tc, " ", col_tc % 3)
-                    #print(f"x[{i}][{j}] = {x[i][j]}, {val}")
-                    if x[i][j] == val: return False
-            print("")
+                for j in range(col_tc - mod, col_tc + offset + 1):
+                    # print(f"x[{i}][{j}] = {x[i][j]}, {val}")
+                    if x[i][j] == val and (i, j) != (row_tc, col_tc):
+                        #print((i, j), x[i][j], val)
+                        return False
             return True
         
         def printBlock(x, k, N):
             row_tc, col_tc = coord(k)
+            tmp = []
             for i in range(row_tc - (row_tc % 3), row_tc + 1): # min 1 iter max 3 iter
-                offset = 2 if i < row_tc else col_tc % 3 # iterate through whole line if its not the last
+                mod = col_tc % 3
+                offset = 2 - mod if i < row_tc else 0 # iterate through whole line if its not the last
                 # i.e. last line stops at column `col_tc`
                 s = ""
-                for j in range(col_tc - offset, col_tc + 1):
+                for j in range(col_tc - mod, col_tc + 1 + offset):
                     s += f"{x[i][j]} "
+                    tmp.append(x[i][j])
                 print(s)
+            print(tmp)
+            return len(set(tmp))  == len(tmp)
+        
 
-
-        def P(x: List[List[str]], k: int, N: int):
+        def P(x: List[List[str]], k: int, N: int):  
             rowt, colt = coord(k)
             for row in x:
                 for el in row:
                     if el == ".": return False
+                if len(set(row)) != len(row): return False
             to_check = []
             # get block to check
             for pairs in block_coords:
@@ -81,30 +83,39 @@ class Solution:
             return B(x, k, N) if crt_k < k else True
 
         done = False
-        def rBT(x: List[List[str]], k: int, N: int):
+        given = set()
+        for i, row in enumerate(board):
+            for j, x in enumerate(row):
+                if x != ".": given.add(to_idx(i, j))
+        print(given)
+
+        def rBT(x: List[List[str]], k: int, N: int):  
             nonlocal done
-            nonlocal printt
-            for y in T(x, k, N):
-                k1, k2 = coord(k)
-                x[k1][k2] = y
-                if B(x, k, N):
-                    if (k1, k2) in block_coords:
-                        print("block:")
-                        printt = True
-                        printBlock(x, k, N)
-                        printt = False
-                    if P(x, k, N):
-                        done = True
-                        return
-                    rBT(x, k + 1, N)
-                    if done: return
+            if k >= N: return
+            # check values to assign to x[k1][k2]
+            k1, k2 = coord(k)
+            if k >= 75:
+                if 1 != 1: print("")
+            if k in given:
+                if k < N: rBT(x, k + 1, N)
+            else:
+                for y in T(x, k, N):
+                    x[k1][k2] = y
+                    if B(x, k, N):
+                        # if (k1, k2) in block_coords:
+                        #     print("block:")
+                        #     printBlock(x, k, N)
+                        #     print("")
+                        if P(x, k, N):
+                            done = True
+                            print("sol found")
+                            for row in board:
+                                print(row)
+                            print(" ")
+                            return
+                        rBT(x, k + 1, N)
+                    if done or k >= N: return
         rBT(board, 0, (n**2) - 1)
-        print("")
-        for row in board:
-            print([int(_x) for _x in row])
-
-        
-
 
 if __name__ == "__main__":
     board = [["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]
@@ -112,4 +123,4 @@ if __name__ == "__main__":
     s.solveSudoku(board)
     for row in board:
         print(row)
-
+    
