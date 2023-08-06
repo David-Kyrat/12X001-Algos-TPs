@@ -101,7 +101,7 @@ def test_specific():
     s = Solution()
     res = s.constructMaximumBinaryTree(nums)
     # s.BFS(res)
-    res.display()
+    res.display() 
     res2 = s.insertIntoMaxTree(res, 4)
     res2.display()
 
