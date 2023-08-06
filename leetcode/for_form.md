@@ -13,3 +13,4 @@
 # B&B:
 
 - Shortest path (no bs version)
+- cost fun of branch-bound-test-polycop
