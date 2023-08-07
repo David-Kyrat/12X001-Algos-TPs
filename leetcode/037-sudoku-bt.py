@@ -2,7 +2,7 @@ from typing import List, Set
 
 
 class Solution:
-    def solveSudoku(self, board: List[List[str]]) -> None:  
+    def solveSudoku(self, board: List[List[str]]) -> None:
         """
         Do not return anything, modify board in-place instead.
         """
@@ -12,11 +12,12 @@ class Solution:
         for i in range(2, 9, 3):
             for j in range(2, 9, 3):
                 block_coords.append((i, j))
- 
+
         def coord(k: int): return (k // n, k % n)
+
         def to_idx(i: int, j: int): return i * n + j
 
-        def T(x: List[List[str]], k: int, N: int) -> Set[str]:  
+        def T(x: List[List[str]], k: int, N: int) -> Set[str]:
             base = values.copy()
             row, col = coord(k)
             # discard same row (before)
@@ -26,11 +27,10 @@ class Solution:
             # discard same column
             for i in range(row):
                 base.discard(x[i][col])
-            out = list(base)
-            out.sort()
+            out = sorted(base)
             return out
 
-        def B(x: List[List[str]], k: int, N: int):  
+        def B(x: List[List[str]], k: int, N: int):
             row_tc, col_tc = coord(k)
             val = x[row_tc][col_tc]
             #print("B: val =", val)
@@ -45,7 +45,7 @@ class Solution:
                         #print((i, j), x[i][j], val)
                         return False
             return True
-        
+
         def printBlock(x, k, N):
             row_tc, col_tc = coord(k)
             tmp = []
@@ -60,9 +60,9 @@ class Solution:
                 print(s)
             print(tmp)
             return len(set(tmp))  == len(tmp)
-        
 
-        def P(x: List[List[str]], k: int, N: int):  
+
+        def P(x: List[List[str]], k: int, N: int):
             rowt, colt = coord(k)
             for row in x:
                 for el in row:
@@ -89,7 +89,7 @@ class Solution:
                 if x != ".": given.add(to_idx(i, j))
         print(given)
 
-        def rBT(x: List[List[str]], k: int, N: int):  
+        def rBT(x: List[List[str]], k: int, N: int):
             nonlocal done
             if k >= N: return
             # check values to assign to x[k1][k2]
@@ -115,6 +115,7 @@ class Solution:
                             return
                         rBT(x, k + 1, N)
                     if done or k >= N: return
+
         rBT(board, 0, (n**2) - 1)
 
 if __name__ == "__main__":

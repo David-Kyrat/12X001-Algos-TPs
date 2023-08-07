@@ -74,8 +74,7 @@ if __name__ == "__main__":
     # COST_MATRIX = [[11, 14, 11, 17, 24], [12, 15, 17, 14, 35], [18, 13, 19, 20, 27], [40, 22, 23, 28, 18], [12, 43, 25, 34, 55]]
     COST_MATRIX = [ [11 , 14 , 11 , 17] , [12 , 15 , 17 , 14] , [18 , 13 , 19 , 20] , [40 , 22 , 23 , 28] ]
     result, cost_tot = branch_bound(COST_MATRIX)
-    min_mat = 0
-    for row in COST_MATRIX: min_mat += min(row)
+    min_mat = sum(min(row) for row in COST_MATRIX)
     print("theorical c(root):", min_mat)
 
     print("total cost:", cost_tot)

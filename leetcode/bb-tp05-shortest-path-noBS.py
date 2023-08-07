@@ -30,6 +30,7 @@ def left(row: int, col: int): return row, col - 1
 UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3
 MOVES: Dict = {UP: up, RIGHT: right, DOWN: down, LEFT: left}
 
+
 # Return: opposite of `move` i.e. LEFT => RIGHT...
 def opposite(move: int): return move + 2 % len(MOVES)
 
@@ -75,6 +76,7 @@ def addToLiveNodes(pq: List[Node], node: Node):
 def nextENode(pq: List[Node]) -> Node: return pq.pop()
 
 def P(node: Node, goal: Cell): return node.pos == goal
+
 
 def shortest_path(board: List[List[int]], _start: Tuple[int, int], _goal: Tuple[int, int]) -> Node:
     start, goal = Cell(_start, board), Cell(_goal, board)
