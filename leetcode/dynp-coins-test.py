@@ -44,10 +44,25 @@ def solve(S: int, cs: List[int]):
     return A
 
 
+def get_sol(filled_mat, goal: int, coin_set: List[int]) -> List[int]:
+    """takes filled matrix of solution for the coins problem
+    where `S` in [0, goal] and return the array of coined used"""
+    amounts = filled_mat[goal - 1]
+    out = []
+    for idx, amount in enumerate(amounts):
+        # appends `amount` times `coin_set[idx]` to `out`
+        out.extend(coin_set[idx] for _ in range(amount))
+    return out
+
+
 if __name__ == "__main__":
     # S, cs = 20, [1, 3, 4]
-    S, cs = 63, [1, 5, 10, 21, 25]
+    S, cs = 62, [25, 21, 10, 5, 1]
+    # S, cs = 48,[30, 24, 12, 6, 3, 1]
+    
     A = solve(S, cs)
     print("")
     print("Solution:")
     mprint(A, cs)
+    print(get_sol(A, S, cs))
+
