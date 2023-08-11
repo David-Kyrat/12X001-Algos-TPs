@@ -98,6 +98,7 @@ def P(node: Node) -> bool: return count_misplaced(node.bd) <= 0
 
 def fifteen_puzzle(board: List[List[int | None]]) -> Node:
     blank_pos = 0, 0
+    count, idx = 50, 0
     for i, row in enumerate(board):
         for j, val in enumerate(row):
             if val is None : blank_pos = i, j
@@ -106,9 +107,13 @@ def fifteen_puzzle(board: List[List[int | None]]) -> Node:
     root = Node([], board, blank_pos)
     enode: Node = root
     while not P(enode):
+        if idx >= count: break
         for node in listOfChildren(enode): addToLiveNodes(live_nodes, node)
+        print([node.cost for node in live_nodes])
         enode = live_nodes.pop()
-        print(enode); mprint(enode.bd); print(" ")  # noqa: E702
+        print(enode); mprint(enode.bd);
+        print(" ")  # noqa: E702
+        idx += 1
     return enode
 
 
@@ -132,12 +137,13 @@ def mprint(matrix: List[List]):
     print(p.get_string(header=False, border=False))
     print("-----------------")
 
-
+import numpy as np
 if __name__ == "__main__":
     board = [[1, 2, 3, 4], [5, 6, None, 8], [9, 10, 7, 11], [13, 14, 15, 12]]
 
     print("-------- input ------")
     mprint(board)
+    print(cost(board, []))
 
     print(" ")
     sol = fifteen_puzzle(board)
