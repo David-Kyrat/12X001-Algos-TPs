@@ -42,8 +42,9 @@ def dp_all_pair_sp(V: list[int], L: list[list[int | float]]) -> list[list]:
 def dijkstra(V: list[int], M: list[list[int | float]], start: int, goal: int):
     """start, goal: indices of start and goal vertex in V"""
     N = len(V)
-    C, visited = [inf] * N, {start}
+    C, visited = [inf] * N, set()
     C[start] = 0
+    path: list[int] = []
     pq: list[tuple[int, int]] = [(start, 0)] # node, cost
 
     def add_priority(node: int, cost: int):
@@ -54,13 +55,15 @@ def dijkstra(V: list[int], M: list[list[int | float]], start: int, goal: int):
                 pq[i], pq[i - 1] = next, crt
             else: break
 
-    def get_adjacent(node: int) -> list[int] :
+    def get_adjacent(node: int) -> list[int]:
         return [i for i in range(N) if i != node and isfinite(M[node][i])]
 
-    enode= None
+    enode = None
     while len(pq) > 0:
         enode = pq.pop()[0]
+        if enode in visited: continue
         visited.add(enode)
+        if enode == goal: return C, path
         print("crt_cost", C[enode], " enode", V[enode])
         for node in get_adjacent(enode):
             if node in visited: continue
@@ -68,7 +71,7 @@ def dijkstra(V: list[int], M: list[list[int | float]], start: int, goal: int):
             if cost < C[node]:
                 C[node] = cost
                 add_priority(node, cost) # type: ignore
-    return C
+    return C, path
 
 
 def main1():
@@ -92,7 +95,8 @@ def main1():
     V = list(range(1, N + 1))
 
     # dp_all_pair_sp(V, M)
-    res = dijkstra(V, M, 0, 5)
+    res, path = dijkstra(V, M, 0, 5)
+    print(path)
     for idx, val in enumerate(V): print(f"{val}: {res[idx]}")
 
 if __name__ == "__main__":
