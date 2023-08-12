@@ -1,21 +1,18 @@
-from copy import deepcopy
-from math import inf, isfinite
 from pprint import PrettyPrinter
-
 from prettytable import PrettyTable
-
 pprint = PrettyPrinter(indent=4).pprint
 
 
 def mprint(matrix: list[list]):
     p = PrettyTable()
     for row in matrix: p.add_row(row)
-    # for i, row in enumerate(matrix):
-        # p.add_row([f"{i + 1}:", *row])
     print("_________________")
     print(p.get_string(header=False, border=False))
     print("-----------------")
+    print(" ")
 
+from copy import deepcopy
+from math import inf, isfinite
 
 def dp_all_pair_sp(V: list[int], L: list[list[int | float]]):
     # sourcery skip: use-itertools-product
@@ -28,8 +25,8 @@ def dp_all_pair_sp(V: list[int], L: list[list[int | float]]):
     for i, row in enumerate(D):
         for j, val in enumerate(row):
             if isfinite(val) and j != i:  # edge (i, j) exists
-                P[i][j].append(j + 1)  # type: ignore
-    mprint(P)
+                P[i][j].append(j + 1)
+    # I. S.
     for k in range(N):
         for i in range(N):
             for j in range(N):
@@ -37,10 +34,7 @@ def dp_all_pair_sp(V: list[int], L: list[list[int | float]]):
                 if candidate < crt:
                     P[i][j] = P[i][k] + P[k][j][1:] # dont add k twice
                     D[i][j] = candidate
-
         mprint(P)
-                # D[i][j] = min(D[i][j], D[i][k] + D[k][j])
-        print(" ")
     return D
 
 
