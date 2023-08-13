@@ -62,46 +62,50 @@ def coins2_BT_version(S: int, coins: list[int]):
 
 # WARN: with cache
 
-def coins2_BT_version_cache(S: int, coins: list[int]):
+""" def coins2_BT_version_cache(S: int, coins: list[int]):
     # sourcery skip: comprehension-to-generator
-    """S: goal,  cs: set of coins, BT version => cached later"""
+    ""S: goal,  cs: set of coins, BT version => cached later""
     if S == 0 or not cs: return [[]]
-    def incr_ret(lst, idx):
+    cache: list[list[int]] = [[] for _ in range(S + 1)]
+    def incr_ret(lst, idx, val):
         lst[idx] += 1#; print(lst)
+        if sum(cache[val]) <= sum(lst): cache[val] = lst
         return lst
     def set_cache(idx: int, value: list[int], cache: list[list[int]]) -> list[int]:
-        """set `cache[idx]` to `value` and return `value`"""
+        ""set `cache[idx]` to `value` and return `value`""
         cache[idx] = value
         return value
-    cache: list[list[int]] = [[] for _ in range(S + 1)]
+    def is_sol(goal: int, used: list[int], coins: list[int]):
+        return sum(c_i * amnt_i for c_i, amnt_i in zip(coins, used)) == goal
+        
     def solve_rec(N: int, used: list[int]) -> list[int]:
         nonlocal coins
         #print("\n", f"N = {N},  used: {used}")
         if N <= 0: return used
-        if cache[N]:
-            return cache[N] # Dyn Prog, avoid out of bounds
+        if cache[N] and is_sol(N, cache[N], coins):
+           return cache[N] # if cache[N] sums up to N => return dont recompute
         
         # sol for N-c_1 + for (N-c_1)-c_1, for (N-c_1)-c_2 ...
-        """ out1 = []
+        "" out1 = []
         for i, c_i in enumerate(coins):
             print("\n", f"c_{i} = {c_i},  N = {N},  N-c_{i} = {N-c_i}")
             if N-c_i < 0: break # sorted increasing
             tmp2 = solve_rec(N - c_i, incr_ret(used.copy(), i))
             out1.append(tmp2)
-        return min(out1) """
-        min_N: list[int] = min(
+        return min(out1) ""
+        cache[N] = min(
             [
-                solve_rec(N - c_i, incr_ret(used.copy(), i))
+                solve_rec(N - c_i, incr_ret(used.copy(), i, N-c_i))
                 for i, c_i in enumerate(coins)
                 if N - c_i >= 0
             ],
         key=lambda lst: sum(lst))
-        cache[N] = min_N
-        return min_N #set_cache(N, min_N, cache)
+        #cache[N] = min_N
+        return cache[N]#set_cache(N, min_N, cache)
     # a = solve_rec(S, [0] * len(coins))
     #print(f"called {cnt} times")
     mprint(cache)
-    return solve_rec(S, [0] * len(coins))
+    return solve_rec(S, [0] * len(coins)) """
 
 def get_sol(filled_mat, goal: int, coin_set: List[int]) -> List[int]:
     """takes filled matrix of solution for the coins problem
@@ -120,7 +124,7 @@ if __name__ == "__main__":
     # S, cs = 62, [25, 21, 10, 5, 1]
     # S, cs = 48,[30, 24, 12, 6, 3, 1]
     
-    res = coins2_BT_version(S, cs)
+    res = coins2_BT_version_cache(S, cs)
     # A = solve(S, cs)
     print("")
     print("Goal:", S, "coins:", cs)
