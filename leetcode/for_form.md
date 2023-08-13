@@ -19,6 +19,8 @@
 # Dyn Prog:
 
 - coins
+- coins2 (BT -> DP)
+- floyd
 
 
 # Other: 
