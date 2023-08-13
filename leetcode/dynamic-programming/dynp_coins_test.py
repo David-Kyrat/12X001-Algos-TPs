@@ -9,7 +9,7 @@ def mprint(matrix: List[List], cns: str | List[int] = ""):
     for i, row in enumerate(matrix):
         p.add_row([f"{i + 1}:", *(row or [""] * len(cns))])
     print("_________________")
-    print("    ", cns)
+    #print("    ", cns)
     print(p.get_string(header=False, border=False))
     print("-----------------")
 
@@ -37,8 +37,7 @@ def solve(S: int, cs: List[int]) -> list[list[int]]:
         A[s - 1] = sol
         return sol[:]
 
-    for s in range(1, S + 1):
-        solve_before(s)
+    for s in range(1, S + 1): solve_before(s)
     return A
 
 
