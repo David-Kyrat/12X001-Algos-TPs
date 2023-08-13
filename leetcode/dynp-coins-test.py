@@ -1,12 +1,6 @@
-import enum
 from math import ceil
-from pprint import PrettyPrinter
-from typing import List, Set, Tuple
-
 from prettytable import PrettyTable
-
-pprint = PrettyPrinter(indent=4).pprint
-
+from typing import List
 
 def mprint(matrix: List[List], cns: str | List[int] = ""):
     p = PrettyTable()
@@ -51,30 +45,32 @@ def coins2_BT_version(S: int, coins: list[int]):
     def incr_ret(lst, idx):
         lst[idx] += 1#; print(lst)
         return lst
-    cnt = 0
+    cache = [[] for _ in range(S)]
     def solve_rec(N: int, used: list[int]) -> list[int]:
-        nonlocal coins, cnt
-        #print("\n", f"N = {N},  used: {used}")
+        nonlocal coins
+        print("\n", f"N = {N},  used: {used}")
         if N <= 0: return used
-        cnt += 1
-        out1 = []
+        if cache[N]: return cache[N] # Dyn Prog
+        
         # sol for N-c_1 + for (N-c_1)-c_1, for (N-c_1)-c_2 ...
-        """ for i, c_i in enumerate(coins):
+        """ out1 = []
+        for i, c_i in enumerate(coins):
             print("\n", f"c_{i} = {c_i},  N = {N},  N-c_{i} = {N-c_i}")
             if N-c_i < 0: break # sorted increasing
             tmp2 = solve_rec(N - c_i, incr_ret(used.copy(), i))
             out1.append(tmp2)
         return min(out1) """
-        return min(
+        return cache[N] := min(
             [
                 solve_rec(N - c_i, incr_ret(used.copy(), i))
                 for i, c_i in enumerate(coins)
                 if N - c_i >= 0
             ]
         )
-    a = solve_rec(S, [0] * len(coins))
-    print(f"called {cnt} times")
-    return a, cnt
+    # a = solve_rec(S, [0] * len(coins))
+    #print(f"called {cnt} times")
+    return solve_rec(S, [0] * len(coins))
+    # return a, cnt
 
 
 def get_sol(filled_mat, goal: int, coin_set: List[int]) -> List[int]:
@@ -87,44 +83,10 @@ def get_sol(filled_mat, goal: int, coin_set: List[int]) -> List[int]:
         out.extend(coin_set[idx] for _ in range(amount))
     return out
 
-import matplotlib.pyplot as plt
-import numpy as np
-def plot_solo(plot_x, plot_f, title: str = None, xlabel: str = None, ylabel: str = None, fLabel: str = None):
-    """Plots a single function
-    - plot_x: the x-axis values
-    - plot_f: the y-values of the function
-    - title: the title of the plot
-    - xlabel: the label of the x-axis
-    - ylabel: the label of the y-axis
-    - fLabel: the label of the function
-    """
-    #plt.tight_layout(pad=5)
-    fig = plt.figure()
-    if title: plt.title(title)
-    plt.grid()
-    if xlabel: plt.xlabel(xlabel)
-    if ylabel: plt.ylabel(ylabel)
-    M, gap = max(plot_f), 0.25
-    
-    plt.xticks(plot_x)
-    #plt.ylim(0, M + gap*M)
-    plt.yticks(np.linspace(0, M, 27))
-    if fLabel:
-        plt.plot(plot_x, plot_f, '-b', label=fLabel, linewidth=1)
-    else:
-        plt.plot(plot_x, plot_f, '-b')
-    #  plt.legend(prop={'size': 5})
-    #  plt.legend(fontsize=7)
-    fig.set_figheight(7)
-    plt.legend()
-    print("\nshowing plot\n")
-    plt.show()
-    #fig.show()
-    #fig.tight_layout()
 
 if __name__ == "__main__":
     S, cs = 20, [1, 3, 4]
-    for 
+    K, N = len(cs), 40
     # S, cs = 62, [25, 21, 10, 5, 1]
     # S, cs = 48,[30, 24, 12, 6, 3, 1]
     
