@@ -39,18 +39,47 @@ def solve(S: int, cs: List[int]) -> list[list[int]]:
 # BT impl then caching BT impl
 
 def coins2_BT_version(S: int, coins: list[int]):
+    """S: goal,  cs: set of coins, BT version => cached later"""
+    if S == 0 or not cs: return [[]]
+    def incr_ret(lst, idx):
+        lst[idx] += 1
+        return lst
+    def solve_rec(N: int, used: list[int]) -> list[int]:
+        nonlocal coins
+        #print("\n", f"N = {N},  used: {used}")
+        if N <= 0: return used
+        # sol for N-c_1 + for (N-c_1)-c_1, for (N-c_1)-c_2 ...
+        return min(
+                (
+                    solve_rec(N - c_i, incr_ret(used.copy(), i))
+                    for i, c_i in enumerate(coins)
+                    if N - c_i >= 0
+                ),
+            key=lambda lst: sum(lst))
+
+    return solve_rec(S, [0] * len(coins))
+
+
+# WARN: with cache
+
+def coins2_BT_version_cache(S: int, coins: list[int]):
     # sourcery skip: comprehension-to-generator
     """S: goal,  cs: set of coins, BT version => cached later"""
     if S == 0 or not cs: return [[]]
     def incr_ret(lst, idx):
         lst[idx] += 1#; print(lst)
         return lst
-    cache = [[] for _ in range(S)]
+    def set_cache(idx: int, value: list[int], cache: list[list[int]]) -> list[int]:
+        """set `cache[idx]` to `value` and return `value`"""
+        cache[idx] = value
+        return value
+    cache: list[list[int]] = [[] for _ in range(S + 1)]
     def solve_rec(N: int, used: list[int]) -> list[int]:
         nonlocal coins
-        print("\n", f"N = {N},  used: {used}")
+        #print("\n", f"N = {N},  used: {used}")
         if N <= 0: return used
-        if cache[N]: return cache[N] # Dyn Prog
+        if cache[N]:
+            return cache[N] # Dyn Prog, avoid out of bounds
         
         # sol for N-c_1 + for (N-c_1)-c_1, for (N-c_1)-c_2 ...
         """ out1 = []
@@ -60,18 +89,19 @@ def coins2_BT_version(S: int, coins: list[int]):
             tmp2 = solve_rec(N - c_i, incr_ret(used.copy(), i))
             out1.append(tmp2)
         return min(out1) """
-        return cache[N] := min(
+        min_N: list[int] = min(
             [
                 solve_rec(N - c_i, incr_ret(used.copy(), i))
                 for i, c_i in enumerate(coins)
                 if N - c_i >= 0
-            ]
-        )
+            ],
+        key=lambda lst: sum(lst))
+        cache[N] = min_N
+        return min_N #set_cache(N, min_N, cache)
     # a = solve_rec(S, [0] * len(coins))
     #print(f"called {cnt} times")
+    mprint(cache)
     return solve_rec(S, [0] * len(coins))
-    # return a, cnt
-
 
 def get_sol(filled_mat, goal: int, coin_set: List[int]) -> List[int]:
     """takes filled matrix of solution for the coins problem
