@@ -8,8 +8,10 @@ class ListNode:
         self.next = next
 class Solution:
     def mergeKLists(self, lists: List[Optional[ListNode]]) -> Optional[ListNode]:
-        
-        def combine(l1: ListNode, l2: ListNode) -> Optional[ListNode]:
+        if not lists or lists == [[]]: return None
+        if len(lists) == 1: return lists[0]
+
+        def combine(l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
             if l1 is None and l2 is None: return None
             if l2 is None: return l1
             if l1 is None: return l2
@@ -38,11 +40,9 @@ class Solution:
             crt.next = p2 if p1 is None else p1
             return out
 
-        def rec(p: int, q: int) -> ListNode:
+        def rec(p: int, q: int) -> Optional[ListNode]:
             if p >= q: return lists[p]
             m = (p + q) // 2
             return combine(rec(p, m), rec(m + 1, q))
 
-        if not lists or lists == []  or lists == [[]]: return None
-        if len(lists) == 1: return lists[0]
         return rec(0, len(lists)-1)

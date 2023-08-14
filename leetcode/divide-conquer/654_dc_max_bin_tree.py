@@ -1,4 +1,4 @@
-from typing import Tuple, List, Optional
+from typing import List, Optional, Tuple
 
 
 # Definition for a binary tree node.
@@ -10,7 +10,7 @@ class TreeNode:
 
 
 class Solution:
-    def _max(self, nums: List[int]) -> Tuple[int]:
+    def _max(self, nums: List[int]) -> Tuple[int, int]:
         crt_idx, crt = 0, nums[0]
         for i, x in enumerate(nums):
             if x > crt: crt_idx, crt = i, x

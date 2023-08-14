@@ -1,3 +1,10 @@
+# WARN: DONT FORGET TO ADD ENONCE
+# WHEN PBLMS ARE NOT CLEAR (e.g. 654 max bin tree)
+
+# Greedy:
+
+- Kruskal
+
 # DC:
 
 - Majority Element
@@ -19,11 +26,13 @@
 # Dyn Prog:
 
 - coins
-- coins2 (BT -> DP)
 - floyd
+- tribonnaci?
+- 746 - min_cost_climbing
 
 
 # Other: 
 
 - DFS
 - BFS
+- Dijkstra
