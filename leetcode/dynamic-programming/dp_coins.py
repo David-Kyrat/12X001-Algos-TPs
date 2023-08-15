@@ -7,17 +7,16 @@ from prettytable import PrettyTable
 def mprint(matrix: List[List], cns: str | List[int] = ""):
     p = PrettyTable()
     for i, row in enumerate(matrix):
-        p.add_row([f"{i + 1}:", *(row or [""] * len(cns))])
+        p.add_row([f"{i}:", *(row or [""] * len(cns))])
     print("_________________")
-    #print("    ", cns)
+    print("   ", cns)
     print(p.get_string(header=False, border=False))
     print("-----------------")
 
 
 def solve(S: int, cs: List[int]) -> list[list[int]]:
     """S: goal,  cs: set of coins"""
-    if S == 0 or not cs:
-        return [[]]
+    if S == 0 or not cs: return [[]]
     A = [[0] * len(cs) for _ in range(S)]
 
     def solve_before(s: int):
