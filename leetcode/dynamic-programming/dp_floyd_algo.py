@@ -13,10 +13,7 @@ def mprint(matrix: list[list]):
 
 from copy import deepcopy
 from math import inf, isfinite
-
-
 def dp_all_pair_sp(V: list[int], L: list[list[int | float]]) -> list[list]:
-    # sourcery skip: use-itertools-product
     """Dyn-Prog sol to all pair shortest path problem,
     V: list of vertices, L: adjencency matrix (with weights)
     (non-existant edges must be present with weight inf)"""

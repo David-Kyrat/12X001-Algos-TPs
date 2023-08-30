@@ -10,7 +10,6 @@ class Solution:
         def IH(k: int) -> int:
             """Induction Hypothesis (rec. relation)"""
             return S[k - 1] + S[k - 2]
-
         for i in range(3, n + 1):
             # don't recompute overlapping subproblems
             if S[i] == 0: S[i] = IH(i)

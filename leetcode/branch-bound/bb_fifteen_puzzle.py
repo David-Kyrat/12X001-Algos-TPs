@@ -7,7 +7,6 @@ class M:
     UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3
     ALL = [UP, RIGHT, DOWN, LEFT]
 
-
 def swap(board: List[List[int | None]], pos1: Tuple[int, int], pos2: Tuple[int, int]):
     r1, c1 = pos1
     r2, c2 = pos2
@@ -41,7 +40,6 @@ def cost(board: List[List[int | None]], state: List[int]) -> int:
     start_pos: position of blank space for root node."""
     h = len(state)
     return h + count_misplaced(board)
-
 
 class Node:
     def __init__(self, state: List[int], board: List[List[int | None]], old_bpos: Tuple[int, int]):
@@ -78,7 +76,6 @@ def next_move_not_out(node: Node) -> Set[int]:
     if col >= N-1: moves.discard(M.RIGHT)
     return moves
 
-
 def listOfChildren(node: Node) -> List[Node]:
     next_moves: Set[int] = next_move_not_out(node)
     last_move: Optional[int] = node.last_move()
@@ -94,7 +91,6 @@ def addToLiveNodes(pq: List[Node], node: Node):
         else: break
 
 def P(node: Node) -> bool: return count_misplaced(node.bd) <= 0
-
 
 def fifteen_puzzle(board: List[List[int | None]]) -> Node:
     blank_pos = 0, 0

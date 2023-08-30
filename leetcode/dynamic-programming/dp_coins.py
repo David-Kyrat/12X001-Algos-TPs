@@ -18,7 +18,6 @@ def coinChange_lecture(cs: List[int], S: int) -> list[list[int]]:
         hi = s - 1  # i, hi => 2 pointers on 0 -> s/2 (i), s -> s/2 (hi)
         # e.g. 2: 1 + 1, 3: 1 + 2, 2 + 1
         for i in range(ceil(s / 2)):
-            # print(f"{i+1} + {hi} = {i + 1 + hi}")
             tmp.append([amnt_i + amnt_hi for amnt_i, amnt_hi in zip(A[i], A[hi - 1])])
             hi -= 1
         sol = min(tmp, key=lambda lst: sum(lst))  # min amount of coin used, is min of the sum of each element

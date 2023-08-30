@@ -17,7 +17,7 @@ class Solution:
 
         def sumk(x, k):
             summ, i = 0, 0
-            for xi in x:  # noqa: RET503
+            for xi in x:
                 summ += nums[xi]
                 i += 1
                 if i > k: return summ
@@ -27,23 +27,15 @@ class Solution:
             summ = sumk(x, k)
             return summ <= target if target >= 0 else summ >= target
 
-        # summ = sum(nums[i] for i in x[: k + 1] if i is not None)
-        # return summ <= target if target >= 0 else summ >= target
-
-        # FIXME: Each problem must exactly have one solution! that solution must be of size 2!
         def P(x, k, N):
             if k != 1: return False
             summ = sumk(x, k)
             return summ == target
-            # candidate = x[:k + 1]
-            # return (len(candidate) == 2) and sum(nums[i] for i in candidate if i is not None) == target
         out = None
 
-        # global ABC
-        # ABC = nums.copy()
         def rBT(x: list[int], k: int, N: int) -> list[int] | None:
             nonlocal out
-            for y in T(x, k, N):  # noqa: RET503
+            for y in T(x, k, N):
                 # print(y)
                 x[k] = y
                 if B(x, k, N) and nums[x[k]] not in pairs[nums[x[0]]]:
@@ -57,11 +49,11 @@ class Solution:
                     return out
 
         N = len(nums)
-        return rBT([None] * N, 0, N)  # type: ignore
+        return rBT([None] * N, 0, N)
 
 
 if __name__ == "__main__":
-    in2, t2 = [1,1,1,1,1,3, 2, 4], 6
+    in2, t2 = [1,1,1,1,1,3, 2, 4], 7
     in3, t3 = [-1, -2, -3, -4, -5], -8
     in4, t4 = [1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 7, 1, 1, 1, 1, 1], 11
     s = Solution()

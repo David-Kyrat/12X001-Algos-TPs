@@ -6,7 +6,6 @@ class Solution:
         N = len(nums)
         dp: list[list[int]] = [[]] * len(nums)
 
-        # dp[0], dp[1] = nums[0], nums[1]
         dp[0], dp[1] = [0], [1] # store index of steps used to avoid reusing them
         # because we cant rob 2 time same house
         print(nums, "\n")
@@ -14,12 +13,7 @@ class Solution:
             max_mon = max((dp[k - j] for j in range(2, k + 1)), key=lambda lst: sum(nums[i] for i in lst))
             dp[k] = max_mon + [k]
 
-        for i, x in enumerate(dp):
-            print(f"{i}: {x}  (nums[{i}] = {nums[i]})")
-        print("-------------------\n")
         return (out := max(dp[-1], dp[-2], key=lambda lst: sum(nums[i] for i in lst)), sum(nums[i] for i in out))
-
-    # HINT: METHOD 1:
 
     def rob(self, nums: list[int]):
         if not nums: return 0
@@ -51,3 +45,6 @@ if __name__ == "__main__":
     # assert res1 == 4
     # assert res2 == 12
     # assert res3 == 4
+        # for i, x in enumerate(dp):
+        #     print(f"{i}: {x}  (nums[{i}] = {nums[i]})")
+        # print("-------------------\n")

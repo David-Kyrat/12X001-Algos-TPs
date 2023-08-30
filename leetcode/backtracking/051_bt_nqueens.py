@@ -17,12 +17,12 @@ class Solution:
     def solveNQueens(self, n: int) -> List[List[str]]:
         if n < 3: return [[]]
         out = []
-        def is_same_diag(coord1: Tuple[int], coord2: Tuple[int]) -> bool:
+        def is_same_diag(coord1: Tuple[int, int], coord2: Tuple[int, int]) -> bool:
             # c1 same diag c2 <==> (z:= c1-c2 => z_1 = z_2)
             z = (coord1[0] - coord2[0], coord1[1] - coord2[1])
             return z[0] == z[1]
 
-        def is_same_anti_diag(coord1: Tuple[int], coord2: Tuple[int]) -> bool:
+        def is_same_anti_diag(coord1: Tuple[int, int], coord2: Tuple[int, int]) -> bool:
             # c1 same anti_diag c2 <==> (z:= c1-c2 => z_1 = -z_2)
             z = (coord1[0] - coord2[0], coord1[1] - coord2[1])
             return z[0] == -z[1]
@@ -49,7 +49,6 @@ class Solution:
         def P(x: List[int], k, N):
             if x[0] is None: return False
             # At each step check for diag collision between x[i] and each other x[i-j] for all j < i
-            # print("in P:", x, f"k={k}")
             queen = 0
             for i, xi in enumerate(x):
                 if i > k: break  # iterate through x[0] -> x[k] (included)

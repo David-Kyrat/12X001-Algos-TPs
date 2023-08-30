@@ -1,12 +1,3 @@
-# 1584. Min Cost to Connect All Points
-from typing import List
-
-
-class Solution:
-
-    def minCostConnectPoints(self, points: List[List[int]]) -> int:
-        return 0
-
 def pp(e: tuple[int, int]):
     e1, e2 = e
     c1, c2 = chr(e1 + 97), chr(e2 + 97) # a = 97
@@ -21,10 +12,8 @@ def ps(s: set[tuple[int, int]]):
 
 
 def in_tree(v: int, tree: set[tuple[int, int]]) -> bool:
-    # sourcery skip: use-any
     for edge in tree:
-        if v in edge:
-            return True
+        if v in edge: return True
     return False
 
 def find_tree(v: int, trees: list[set[tuple[int, int]]]) -> int: #set[tuple[int, int]]:
@@ -37,9 +26,7 @@ def find_tree(v: int, trees: list[set[tuple[int, int]]]) -> int: #set[tuple[int,
 def merge_tree(t1_idx: int, t2_idx: int, trees: list[set[tuple[int, int]]]):
         t1, t2 = trees[t1_idx], trees[t2_idx]
         trees.remove(t1)
-        print(f"Merging {ps(t1)} and {ps(t2)}")
         trees[t2_idx] = t1.union(t2)
-        #print(trees)
 
 
 def kruskal(A: list[list[int]]) -> set[tuple[int, int]]:  # sourcery skip: identity-comprehension
@@ -61,13 +48,11 @@ def kruskal(A: list[list[int]]) -> set[tuple[int, int]]:  # sourcery skip: ident
     F: set[tuple[int, int]] = set()  # forest which will hold/be the MST
     while S and len(F) < N:
         e, cost = S.pop()
-        print(f"e = {pp(e)} ({cost})")
         v1, v2 = e
         t1_idx, t2_idx = find_tree(v1, trees), find_tree(v2, trees)
         if trees[t1_idx] != trees[t2_idx]:
             F.add(e)
             merge_tree(t1_idx, t2_idx, trees)
-            print("")
     return F
 
 

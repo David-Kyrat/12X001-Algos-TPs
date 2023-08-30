@@ -27,7 +27,8 @@ def branch_bound():
         return WEIGHTS[node_val - 2]
 
     def cost(child_val: int, parent: Node):
-        return parent.cost + (W(child_val) - MIN_W)
+        # computed as cost up to there (parent) + distance (child's weight) from Minimum weight
+        return parent.cost + (W(child_val) - MIN_W) 
 
     def get_children(node: Node) -> List[Node]:
         """Returns: all children of `node`"""

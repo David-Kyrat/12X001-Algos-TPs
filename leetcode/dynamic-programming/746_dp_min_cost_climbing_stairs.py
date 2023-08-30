@@ -2,7 +2,7 @@ from typing import List
 
 class Solution:
 
-    # HINT: Brute Force
+    # HINT Brute Force
     def mCCS_bf(self, cost: List[int]) -> int:
         N, j_m = len(cost), 2  # max stair index, max jump
         cost.append(0)
@@ -13,14 +13,10 @@ class Solution:
             if k in calls: calls[k] += 1
             else: calls[k] = 1
             return cost[k] + min((F(k - j) for j in range(1, j_m + 1)))  # I. H.
-
-        out = min(F(N - 1), F(N - 2))  # we can start at 0 or 1
         # expo. growth rate of calls (fibonacci to be precise, i.e.e 7:3, 6: 5, 4: 13...)
-        for i in sorted(calls.keys()): print(f"{i}: Called {calls[i]} times")
-        return out
-        # return min(F(N - 1), F(N - 2))  # we can start at 0 or 1
+        return min(F(N - 1), F(N - 2))  # we can start at 0 or 1
 
-    # HINT: Memoization (cache for recursive calls, Top-Down)
+    # HINT Memoization (cache for recursive calls, Top-Down)
     def mCCS_memo(self, cost: List[int]) -> int:
         N, j_m = len(cost), 2  # max stair index, max jump
         cache = [-1] * N
@@ -36,8 +32,7 @@ class Solution:
         
         return min(F(N - 1), F(N - 2))  # we can start at 0 or 1
     
-    # HINT: Dynamic Programming (Bottom-Up)
-
+    # HINT Dynamic Programming (Bottom-Up)
     def minCostClimbingStairs(self, cost: List[int]): # type: ignore
         cost.append(0)
         N = len(cost)
@@ -48,14 +43,11 @@ class Solution:
             # knowing the optimal costs from 0 to stairs 1 to k-1
             for j in range(1, j_m + 1):
                 dp[k] = min(dp[k], cost[k] + dp[k - j])
- 
-            # NB. for loop is *absolutely* necessary:
-            # dp[k] = cost[k] + min([dp[k - j] for j in range(1, j_m + 1)])
-
-        return dp[-1]
+            """ NB. for loop is not *absolutely* necessary:
+                dp[k] = cost[k] + min([dp[k - j] for j in range(1, j_m + 1)])"""
+        return min(dp[-1], dp[-2])
 
     def minCostClimbingStairs(self, cost: List[int]) -> int: # noqa: F811
-        # sourcery skip: comprehension-to-generator
         N, j_max = len(cost), 2
         # Initialize a DP array to store the minimum cost to reach each step.
         dp = [0] * N
@@ -63,11 +55,10 @@ class Solution:
         dp[0], dp[1] = cost[0], cost[1]
 
         # Iterate through the rest of the steps and calculate the minimum cost.
-        for i in range(2, N):
+       for i in range(2, N):
             # Minimum cost to reach the current step is the cost of the current step
             # plus the minimum of the cost to reach the previous step or the step before it.
             dp[i] = cost[i] + min([dp[i - j] for j in range(1, j_max + 1)])
-            #dp[i] = cost[i] + min(dp[i - 1], dp[i - 2])
 
         # The minimum cost to reach the top floor can be either from the last step or
         # the second to last step (since you can start from either step 0 or step 1).
