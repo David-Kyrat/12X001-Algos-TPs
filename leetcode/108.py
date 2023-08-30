@@ -1,4 +1,3 @@
-import math
 # Definition for a binary tree node.
 
 
@@ -13,9 +12,10 @@ class TreeNode:
 
 
 class Solution:
-    def partition(self, p: int, q: int) -> int: return (q + p) // 2
+    def partition(self, p: int, q: int) -> int:
+        return (q + p) // 2
 
-    def sortedArrayToBST(self, nums: list[int]) -> TreeNode|None:
+    def sortedArrayToBST(self, nums: list[int]) -> TreeNode | None:
         if not nums or len(nums) == 0: return None
         N = len(nums)
         if N == 1: return TreeNode(nums[0])
@@ -26,7 +26,8 @@ class Solution:
             if q - p >= 1:
                 middle = self.partition(p, q)
                 return TreeNode(nums[middle], sabst_rec(p, middle), sabst_rec(middle + 1, q))
-            else: return None
+            else:
+                return None
 
         return sabst_rec(0, N)
 
@@ -36,4 +37,3 @@ if __name__ == "__main__":
     s = Solution()
     out1 = s.sortedArrayToBST(in1)
     print("[", out1, out1.left, out1.right, out1.left.left, out1.left.right, out1.right.left, out1.right.right, "]")
-
