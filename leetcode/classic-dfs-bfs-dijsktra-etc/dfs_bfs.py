@@ -11,7 +11,6 @@ class Node:
         """Return: nodes adjacent to `self`. (i.e. children for a tree)"""
         val_left, val_right, val_top = self.val * 2, self.val * 2 + 1, max(self.val // 2, 1)  # last make graph undirected i.e <->
         return [] if val_right > Node.MAX_VAL else [Node(val_top), Node(val_left), Node(val_right)]
-    def __repr__(self) -> str: return repr(self.val)
 
 
 def BFS(root: Node, goal: int) -> Optional[Node]:
@@ -20,7 +19,6 @@ def BFS(root: Node, goal: int) -> Optional[Node]:
     while len(queue) > 0:
         crt = queue.pop(0)  # queue => First in, First Out
         visited.add(crt.val)
-        print(crt)
         if crt.val == goal: return crt
         for node in crt.get_adjacents():
             # avoid cycle
@@ -34,7 +32,6 @@ def DFS2(root: Node, goal: int) -> Optional[Node]:
     while len(stack) > 0:
         crt = stack.pop(-1)
         visited.add(crt.val)
-        print(crt)
         if crt.val == goal: return crt
         for node in crt.get_adjacents():
             if node.val not in visited: stack.append(node)
@@ -50,7 +47,6 @@ def graph_traversal(root: Node, goal: int, is_bfs: bool):
     while len(live_nodes) > 0:
         crt = next_node()
         visited.add(crt.val)
-        print(crt)
         if crt.val == goal: return crt
         for node in crt.get_adjacents():
             if node.val not in visited: live_nodes.append(node)
@@ -69,19 +65,10 @@ def DFS(root: Node, goal: int) -> Optional[Node]:
                 return
             if node.val not in visited: rec(node)
             if out is not None: return
-
     rec(root)
     return out
-
-
-
-
 if __name__ == "__main__":
     root = Node(1)
-    # found = BFS(root, 16)
-    # print("-------------------")
-    # found = DFS(root, 15)
-    # found = DFS2(root, 16)
     found = graph_traversal(root=root, goal=16, is_bfs=True)
     print("Not Found" if found is None else f"Found: {found.val}")
     print("-------------------")

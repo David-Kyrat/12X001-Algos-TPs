@@ -4,11 +4,7 @@ from typing import List, Optional, Tuple
 # Definition for a binary tree node.
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
-        self.val = val
-        self.left = left
-        self.right = right
-
-
+        self.val = val; self.left = left; self.right = right
 class Solution:
     def _max(self, nums: List[int]) -> Tuple[int, int]:
         crt_idx, crt = 0, nums[0]

@@ -1,16 +1,12 @@
 from math import inf
-from typing import List, Tuple
 
 COST_MATRIX = []
-
 class Node:
     def __init__(self, cost: int, state: List[Tuple[int, int]]):
         """affectation: task_index, agent_index , state: list of tuple[task_index, agent_index]"""
         self.cost = cost
         self.state = state.copy()
-
     def affectation(self) -> Tuple[int, int]: return self.state[-1]
-    def __repr__(self): return f"({self.state[-1]}, c={self.cost}), cost={COST_MATRIX[self.affectation()[0]][self.affectation()[1]]}"
 
 def cost(affectations: List[Tuple[int, int]], cost_mat: List[List[int]]) -> int:
     h = sum(cost_mat[task_idx][cost_idx] for (task_idx, cost_idx) in affectations)  # cost accumulated up to here
@@ -24,7 +20,7 @@ def cost(affectations: List[Tuple[int, int]], cost_mat: List[List[int]]) -> int:
                 min_idx, min_cost = a_idx, a_cost
                 used_idx.add(a_idx)
         g += min_cost
-    return g + h # type: ignore
+    return g + h
 
 
 def listOfChildren(parent: Node, cost_mat: List[List[int]]):
@@ -41,7 +37,6 @@ def listOfChildren(parent: Node, cost_mat: List[List[int]]):
         for agent_idx in free_agents
     ]
 
-
 def addToLiveNodes(node: Node, pq: List[Node]):
     """Add while maintining priority queue order"""
     pq.append(node)
@@ -53,7 +48,6 @@ def addToLiveNodes(node: Node, pq: List[Node]):
 
 def P(node: Node, cost_mat: List[List[int]]) -> bool:
     return len(node.state) == len(cost_mat)  # affectations completed?
-
 
 def branch_bound(cost_mat: List[List[int]]) -> Tuple[List[Tuple[int, int]], int]:
     """Return: affectations, i.e. list of coordinates"""

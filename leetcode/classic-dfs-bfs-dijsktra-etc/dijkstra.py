@@ -25,8 +25,7 @@ def dijkstra(V: list[int], M: list[list[int | float]], start: int, goal: int):
         pq.append((node, cost))
         for i in range(len(pq) - 1, 0, -1):
             crt, next = pq[i], pq[i - 1]
-            if crt[1] > next[1]:
-                pq[i], pq[i - 1] = next, crt
+            if crt[1] > next[1]: pq[i], pq[i - 1] = next, crt
             else: break
 
     def get_adjacent(node: int) -> list[int]:
@@ -38,7 +37,6 @@ def dijkstra(V: list[int], M: list[list[int | float]], start: int, goal: int):
         if enode in visited: continue
         visited.add(enode)
         if enode == goal: return C, path
-        print("crt_cost", C[enode], " enode", V[enode])
         for node in get_adjacent(enode):
             if node in visited: continue
             cost = M[enode][node] + C[enode]
