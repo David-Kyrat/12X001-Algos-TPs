@@ -16,14 +16,11 @@ class Node:
 def BFS(root: Node, goal: int) -> Optional[Node]:
     visited: Set[int] = set()
     queue: List[Node] = [root]  # emulate queue behavior with list
-    while len(queue) > 0:
+    while queue:
         crt = queue.pop(0)  # queue => First in, First Out
         visited.add(crt.val)
         if crt.val == goal: return crt
-        for node in crt.get_adjacents():
-            # avoid cycle
-            if node.val not in visited: queue.append(node)
-            # adds to end => prioritize node on same depth
+        queue.extend(node for node in crt.get_adjacents() if node.val not in visited)
     return None
 
 def DFS2(root: Node, goal: int) -> Optional[Node]:
