@@ -1,4 +1,5 @@
 from math import inf
+from typing import Tuple, List
 
 COST_MATRIX = []
 class Node:
